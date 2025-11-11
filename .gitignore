@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+env/
+venv/
+
+# Env files
+.env
+*.pyc
+
+# Docker
+*.log
