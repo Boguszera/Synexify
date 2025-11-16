@@ -3,7 +3,7 @@ from .user_base import UserBase
 
 class AdminUser(UserBase):
     def manage_users(self):
-        pass  # CRUD users
+        pass  # app service
 
     def manage_projects(self):
-        pass  # CRUD projects
+        pass  # app service
