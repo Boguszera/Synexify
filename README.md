@@ -58,6 +58,14 @@ Synexify/
 │  │  ├─ manager_user.py
 │  │  ├─ team_member_user.py
 │  │  ├─ user_base.py
+├─ application/                 # Use-case logic
+│  ├─ __init__.py
+│  ├─ admin_panel_service.py                     
+│  ├─ authorization_service.py                     
+│  ├─ backlog_service.py                     
+│  ├─ reporting_service.py                     
+│  ├─ sprint_service.py                     
+│  └─ task_service.py  
 ├─ Dockerfile
 ├─ docker-compose.yml
 ├─ manage.py
