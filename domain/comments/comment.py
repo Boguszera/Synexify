@@ -5,9 +5,10 @@ from domain.users.user_base import UserBase
 
 
 class Comment:
-    def __init__(self, content: str, author: UserBase):
+    def __init__(self, comment_id: int, content: str, author: UserBase):
         if not content or not content.strip():
             raise ValueError("Comment content cannot be empty")
+        self._id = comment_id
         self._content: str = content
         self._author = author
         self._created_at: datetime = datetime.now(timezone.utc)

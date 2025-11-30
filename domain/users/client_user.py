@@ -2,6 +2,10 @@
 from .user_base import UserBase
 
 class ClientUser(UserBase):
+    pass
+
+    # app layer
+    """
     def view_project(self, project):
 
         if not hasattr(project, "get_name") or not callable(project.get_name):
@@ -13,3 +17,4 @@ class ClientUser(UserBase):
             "project": project.get_name(),
             "progress": project.get_progress()
         }
+    """

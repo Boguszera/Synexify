@@ -2,6 +2,9 @@
 from .user_base import UserBase
 
 class TeamMemberUser(UserBase):
+    pass
+
+    """
     def update_task_status(self, task, status):
         from domain.tasks.task_base import TaskBase
 
@@ -24,3 +27,5 @@ class TeamMemberUser(UserBase):
 
         attachment = Attachment(filename=file, uploaded_by=self)
         task.attach_file(attachment)
+    
+    """

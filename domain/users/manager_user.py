@@ -4,6 +4,10 @@ from domain.tasks.task_base import TaskBase
 from domain.users.user_base import UserBase as UserType
 
 class ManagerUser(UserBase):
+    pass
+
+    # app layer
+    """
     def assign_task(self, task, user):
         if not isinstance(task, TaskBase):
             raise TypeError("task must be a TaskBase instance")
@@ -22,3 +26,4 @@ class ManagerUser(UserBase):
         sprint = SprintBase("New Sprint")
         project.add_sprint(sprint)
         return sprint
+    """

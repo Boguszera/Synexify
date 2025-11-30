@@ -29,16 +29,19 @@ class UserBase:
     def get_login(self):
         return self._login
 
-    """
-    def get_tasks(self):
-        return self._tasks 
-    """
-
     def set_role(self, role: str):
         if role not in self.VALID_ROLES:
             raise ValueError(f"Invalid role '{role}', must be one of: {', '.join(self.VALID_ROLES)}")
         self._role = role
 
+
+    # app layer
+    """
+    def get_tasks(self):
+        return self._tasks 
+    """
+
+    """
     def add_comment(self, task, content: str):
         # creates a domain comment object. persistence layer is responsible for saving it.
         from domain.comments.comment import Comment
@@ -52,3 +55,4 @@ class UserBase:
 
         comment = Comment(content=content, author=self)
         task.add_comment(comment)
+    """

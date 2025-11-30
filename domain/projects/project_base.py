@@ -59,12 +59,14 @@ class ProjectBase(Reportable):
             raise ValueError("User not a member")
         self._members.remove(user)
 
+    """
     def add_task(self, task: TaskBase):
         if not isinstance(task, TaskBase):
             raise TypeError("Task must be a TaskBase instance")
         if task in self._tasks:
             return
         self._tasks.append(task)
+    """
 
     def add_sprint(self, sprint: SprintBase):
         if not isinstance(sprint, SprintBase):
@@ -73,5 +75,21 @@ class ProjectBase(Reportable):
             return
         self._sprints.append(sprint)
 
+    def get_all_tasks(self):
+        tasks = []
+        for sprint in self._sprints:
+            tasks.extend(sprint.get_tasks())
+        return tasks
+
     def generate_report(self) -> str:
-        return f"Project {self._name}: {len(self._tasks)} tasks, {len(self._members)} members"
+        total_tasks = sum(len(sprint.get_tasks()) for sprint in self._sprints)
+        completed_tasks = sum(
+            1 for sprint in self._sprints for task in sprint.get_tasks() if task.get_status() == "done"
+        )
+        progress = (completed_tasks / total_tasks * 100) if total_tasks else 0.0
+
+        return (
+            f"Project {self._name}: {total_tasks} tasks, "
+            f"{len(self._members)} members, "
+            f"{progress:.1f}% complete"
+        )

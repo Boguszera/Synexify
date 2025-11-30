@@ -33,16 +33,16 @@ class TaskBase(Assignable, Commentable):
         return self._status
 
     def get_assignees(self):
-        return self._assignees
+        return list(self._assignees)
 
     def get_comments(self):
         return list(self._comments)
 
     def get_attachments(self):
-        return self._attachments
+        return list(self._attachments)
 
     def get_tags(self):
-        return self._tags
+        return list(self._tags)
 
     def assign_user(self, user):
         from domain.users.user_base import UserBase

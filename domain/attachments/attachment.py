@@ -4,9 +4,10 @@ from domain.users.user_base import UserBase
 
 
 class Attachment:
-    def __init__(self, filename: str, uploaded_by):
+    def __init__(self, attachment_id: int, filename: str, uploaded_by):
         if not filename or not filename.strip():
             raise ValueError("Filename cannot be empty")
+        self._id = attachment_id
         self._filename: str = filename
         self._uploaded_by = uploaded_by
         self._uploaded_at = datetime.now(timezone.utc)
