@@ -16,12 +16,48 @@ Minimal Django 5 + PostgreSQL project running in Docker.
 
 ```
 Synexify/
-├─ appcore/                 # Django configuration
+├─ appcore/                 # Django core configuration
 │  ├─ __init__.py
 │  ├─ settings.py           
 │  ├─ urls.py               
 │  ├─ wsgi.py               
-│  └─ asgi.py               
+│  └─ asgi.py          
+├─ domain/                  # Busines domain logic (DDD)
+│  ├─ attachments/
+│  │  ├─ __init__.py
+│  │  ├─ attachment.py
+│  ├─ comments/
+│  │  ├─ __init__.py
+│  │  ├─ comment.py
+│  ├─ interfaces/
+│  │  ├─ __init__.py
+│  │  ├─ assignable.py
+│  │  ├─ commentable.py
+│  │  ├─ reportable.py
+│  ├─ projects/
+│  │  ├─ __init__.py
+│  │  ├─ client_project.py
+│  │  ├─ internal_project.py
+│  │  ├─ project_base.py
+│  ├─ sprints/
+│  │  ├─ __init__.py
+│  │  ├─ sprint_base.py
+│  ├─ tags/
+│  │  ├─ __init__.py
+│  │  ├─ tag.py
+│  ├─ tasks/
+│  │  ├─ __init__.py
+│  │  ├─ bug_task.py
+│  │  ├─ chore_task.py
+│  │  ├─ feature_task.py
+│  │  ├─ task_base.py
+│  ├─ users/
+│  │  ├─ __init__.py
+│  │  ├─ admin_user.py
+│  │  ├─ client_user.py
+│  │  ├─ manager_user.py
+│  │  ├─ team_member_user.py
+│  │  ├─ user_base.py
 ├─ Dockerfile
 ├─ docker-compose.yml
 ├─ manage.py
