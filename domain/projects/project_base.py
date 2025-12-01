@@ -59,7 +59,6 @@ class ProjectBase(Reportable):
             raise ValueError("User not a member")
         self._members.remove(user)
 
-
     def add_task(self, task: TaskBase):
         if not isinstance(task, TaskBase):
             raise TypeError("Task must be a TaskBase instance")

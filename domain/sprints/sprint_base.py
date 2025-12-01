@@ -4,11 +4,14 @@ from domain.interfaces.reportable import Reportable
 from domain.tasks.task_base import TaskBase
 
 class SprintBase(Reportable):
-    def __init__(self, name: str):
+    def __init__(self, name: str, start_date=None, end_date=None, project=None):
         if not isinstance(name, str) or not name.strip():
             raise ValueError("Sprint name must be a non-empty string")
         self._name = name
         self._tasks: List[TaskBase] = []
+        self._start_date = start_date
+        self._end_date = end_date
+        self._project = project
 
     def get_name(self) -> str:
         return self._name
@@ -21,6 +24,12 @@ class SprintBase(Reportable):
             return 0.0
         completed = sum(1 for t in self._tasks if t.get_status() == "done")
         return completed / len(self._tasks) * 100
+
+    def get_project(self):
+        return self._project
+
+    def set_project(self, project):
+        self._project = project
 
     def add_task(self, task: TaskBase):
         if not isinstance(task, TaskBase):
