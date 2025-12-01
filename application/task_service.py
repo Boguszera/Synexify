@@ -35,7 +35,6 @@ class TaskService:
 
         task.assign_user(assignee)
         self.task_repo.save(task)
-        self.notifications.notify_task_update(task, event=f"assigned to {assignee.get_name()}")
 
     def update_status(self, task, user, new_status):
         if not self.auth.can_edit_task(user, task):
@@ -43,7 +42,6 @@ class TaskService:
 
         task.update_status(new_status)
         self.task_repo.save(task)
-        self.notifications.notify_task_update(task, event=f"status changed to {new_status}")
 
     def add_attachment(self, task, user, file):
         if not self.auth.can_view_task(user, task):
