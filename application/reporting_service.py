@@ -1,70 +1,75 @@
+# application/reporting_service.py
 from datetime import datetime
-from domain.exceptions.exceptions import PermissionDenied
-from domain.interfaces.reportable import Reportable
 from domain.users.user_base import UserBase
 from domain.projects.project_base import ProjectBase
 
-
 class ReportingService:
-    def __init__(self, auth_service):
+    def __init__(self, auth_service, task_repo):
         self.auth_service = auth_service
+        self.task_repo = task_repo
 
     def team_workload(self, project: ProjectBase, user: UserBase) -> dict:
-        """Counts the number of tasks assigned to each project member."""
         self.auth_service.check_manage_project(user, project)
-        report_data = project.get_report_data()
         workload = {}
-        for member in report_data.get("members", []):
-            workload[member.get_id()] = sum(
-                1 for task in project.get_all_tasks() if member in task.get_assignees()
-            )
+        for member_id in project.get_member_ids():
+            tasks_for_member = [
+                task for task_id in project.get_task_ids()
+                if (task := self.task_repo.get(task_id))
+                and member_id in task.get_assignees_ids()
+            ]
+            workload[member_id] = len(tasks_for_member)
         return workload
 
     def project_progress(self, project: ProjectBase, user: UserBase) -> dict:
-        """Returns project completion percentage and tasks done."""
         self.auth_service.check_view_project(user, project)
-        report_data = project.get_report_data()
+        total_tasks = len(project.get_task_ids())
+        tasks_done = 0
+        for task_id in project.get_task_ids():
+            task = self.task_repo.get(task_id)
+            if task and task.get_status().lower() == "done":
+                tasks_done += 1
+        completion_percentage = (tasks_done / total_tasks * 100) if total_tasks else 0
         return {
-            "completion_percentage": report_data["completion_percentage"],
-            "total_tasks": report_data["total_tasks"],
-            "tasks_done": report_data["tasks_done"]
+            "completion_percentage": completion_percentage,
+            "total_tasks": total_tasks,
+            "tasks_done": tasks_done
         }
 
     def deadline_report(self, project: ProjectBase, user: UserBase) -> dict:
-        """Report on overdue tasks and average delay."""
         self.auth_service.check_manage_project(user, project)
         now = datetime.now()
-        overdue_tasks = [
-            t for t in project.get_all_tasks()
-            if t.get_due_date() and t.get_due_date() < now and t.get_status().lower() != "done"
-        ]
-        avg_delay = (
-            sum((now - t.get_due_date()).days for t in overdue_tasks) / len(overdue_tasks)
-            if overdue_tasks else 0
-        )
+        overdue_tasks = []
+        for task_id in project.get_task_ids():
+            task = self.task_repo.get(task_id)
+            if not task:
+                continue
+            due_date = task.get_due_date()
+            if due_date and due_date < now and task.get_status().lower() != "done":
+                overdue_tasks.append(task)
+        avg_delay = sum((now - t.get_due_date()).days for t in overdue_tasks) / len(overdue_tasks) if overdue_tasks else 0
         return {
             "overdue_count": len(overdue_tasks),
             "average_delay_days": avg_delay
         }
 
     def dashboard_overview(self, user: UserBase, projects: list[ProjectBase]) -> list[dict]:
-        """Returns dashboard overview for user projects."""
         overview = []
         for project in projects:
             if not self.auth_service.can_view_project(user, project):
                 continue
-            report_data = project.get_report_data()
-            member_task_counts = {
-                m.get_id(): len([t for t in project.get_all_tasks() if m in t.get_assignees()])
-                for m in report_data.get("members", [])
-            }
+            member_task_counts = {}
+            for member_id in project.get_member_ids():
+                tasks_for_member = [
+                    task for task_id in project.get_task_ids()
+                    if (task := self.task_repo.get(task_id))
+                    and member_id in task.get_assignees_ids()
+                ]
+                member_task_counts[member_id] = len(tasks_for_member)
+
+            progress = self.project_progress(project, user)
             overview.append({
                 "project": project,
-                "progress": {
-                    "completion_percentage": report_data["completion_percentage"],
-                    "total_tasks": report_data["total_tasks"],
-                    "tasks_done": report_data["tasks_done"]
-                },
+                "progress": progress,
                 "members_task_counts": member_task_counts
             })
         return overview

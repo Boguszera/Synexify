@@ -13,6 +13,9 @@ class Comment:
         self._author = author
         self._created_at: datetime = datetime.now(timezone.utc)
 
+    def get_id(self) -> str:
+        return self._id
+
     def get_content(self) -> str:
         return self._content
 

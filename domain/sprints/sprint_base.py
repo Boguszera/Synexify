@@ -1,58 +1,67 @@
 # domain/sprints/sprint_base.py
-from typing import List, Dict
+from typing import List, Optional, Callable
 from domain.interfaces.reportable import Reportable
-from domain.tasks.task_base import TaskBase
 
 class SprintBase(Reportable):
-    def __init__(self, name: str, start_date=None, end_date=None, project=None):
-        if not isinstance(name, str) or not name.strip():
+    def __init__(self, sprint_id: int, name: str, start_date=None, end_date=None, project_id: Optional[int] = None):
+        if not name or not name.strip():
             raise ValueError("Sprint name must be a non-empty string")
+        self._id = sprint_id
         self._name = name
-        self._tasks: List[TaskBase] = []
+        self._task_ids: List[str] = []
         self._start_date = start_date
         self._end_date = end_date
-        self._project = project
+        self._project_id = project_id
+
+    def get_id(self) -> int:
+        return self._id
 
     def get_name(self) -> str:
         return self._name
 
-    def get_tasks(self) -> List[TaskBase]:
-        return list(self._tasks)
+    def get_task_ids(self) -> List[str]:
+        return list(self._task_ids)
 
-    def get_completion_rate(self) -> float:
-        if not self._tasks:
-            return 0.0
-        completed = sum(1 for t in self._tasks if t.get_status() == "done")
-        return completed / len(self._tasks) * 100
+    def get_project_id(self) -> Optional[int]:
+        return self._project_id
 
-    def get_project(self):
-        return self._project
-
-    def set_project(self, project):
-        self._project = project
-
-    def add_task(self, task: TaskBase):
-        if not isinstance(task, TaskBase):
-            raise TypeError("task must be a TaskBase instance")
-        if task in self._tasks:
+    def add_task_id(self, task_id: str):
+        if task_id in self._task_ids:
             return
-        self._tasks.append(task)
+        self._task_ids.append(task_id)
 
-    def remove_task(self, task: TaskBase):
-        if not isinstance(task, TaskBase):
-            raise TypeError("task must be a TaskBase instance")
-        if task not in self._tasks:
+    def remove_task_id(self, task_id: str):
+        if task_id not in self._task_ids:
             raise ValueError("Task not in sprint")
-        self._tasks.remove(task)
+        self._task_ids.remove(task_id)
 
-    def get_report_data(self) -> Dict:
-        total_tasks = len(self.get_tasks())
-        done_tasks = len([t for t in self.get_tasks() if t.get_status().lower() == "done"])
-        completion = (done_tasks / total_tasks * 100) if total_tasks else 0.0
+    def get_completion_rate(self, task_loader_callable=None) -> float:
+        """
+        If you need full Task objects to compute completion, pass task_loader_callable(task_id)->TaskBase
+        """
+        if not self._task_ids:
+            return 0.0
+        if task_loader_callable is None:
+            # can't compute without loader, return 0
+            return 0.0
+        tasks = [task_loader_callable(tid) for tid in self._task_ids]
+        completed = sum(1 for t in tasks if t.get_status() == "done")
+        return completed / len(tasks) * 100
 
+    def get_report_data(self, task_loader_callable: Optional[Callable[[str], object]] = None) -> dict:
+        total = len(self._task_ids)
+        completion = self.get_completion_rate(task_loader_callable)
+        if task_loader_callable is None:
+            done = 0
+        else:
+            tasks = [task_loader_callable(tid) for tid in self._task_ids]
+            done = len([t for t in tasks if t.get_status() == "done"])
         return {
-            "sprint_name": self.get_name(),
-            "total_tasks": total_tasks,
-            "tasks_done": done_tasks,
-            "completion_percentage": completion
+            "sprint_id": self._id,
+            "sprint_name": self._name,
+            "total_tasks": total,
+            "tasks_done": done,
+            "completion_percentage": completion,
         }
+
+ 

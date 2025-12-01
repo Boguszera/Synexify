@@ -47,6 +47,12 @@ Synexify/
 │  │  ├─ client_project.py
 │  │  ├─ internal_project.py
 │  │  ├─ project_base.py
+│  ├─ repositories/
+│  │  ├─ __init__.py
+│  │  ├─ project_repository.py
+│  │  ├─ sprint_repository.py
+│  │  ├─ task_repository.py
+│  │  ├─ user_repository.py
 │  ├─ sprints/
 │  │  ├─ __init__.py
 │  │  ├─ sprint_base.py

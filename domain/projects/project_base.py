@@ -1,27 +1,24 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 from domain.interfaces.reportable import Reportable
-from domain.users.user_base import UserBase
-from domain.tasks.task_base import TaskBase
-from domain.sprints.sprint_base import SprintBase
+import uuid
 
 class ProjectBase(Reportable):
-    def __init__(self, project_id: int, name: str, description: str):
+    def __init__(self, name: str, description: str, project_id: Optional[str] = None):
         if not isinstance(project_id, int):
             raise TypeError("project_id must be an integer")
         if not isinstance(name, str) or not name.strip():
             raise ValueError("name must be a non-empty string")
         if not isinstance(description, str):
             raise TypeError("description must be a string")
-
-        self._id = project_id
+        self._id = project_id or str(uuid.uuid4())
         self._name = name
         self._description = description
-        self._members: List[UserBase] = []
-        self._tasks: List[TaskBase] = []
-        self._sprints: List[SprintBase] = []
+        self._member_ids: List[int] = []
+        self._task_ids: List[str] = []
+        self._sprint_ids: List[int] = []
         self._archived: bool = False
 
-    def get_id(self) -> int:
+    def get_id(self) -> str:
         return self._id
 
     def get_name(self) -> str:
@@ -30,63 +27,50 @@ class ProjectBase(Reportable):
     def get_description(self) -> str:
         return self._description
 
-    def get_members(self) -> List[UserBase]:
-        return list(self._members)
+    def get_member_ids(self) -> List[int]:
+        return list(self._member_ids)
 
-    def get_tasks(self) -> List[TaskBase]:
-        return list(self._tasks)
+    def get_task_ids(self) -> List[str]:
+        return list(self._task_ids)
 
-    def get_sprints(self) -> List[SprintBase]:
-        return list(self._sprints)
+    def get_sprint_ids(self) -> List[int]:
+        return list(self._sprint_ids)
 
-    def add_member(self, user: UserBase):
-        if not isinstance(user, UserBase):
-            raise TypeError("User must be a UserBase instance")
-        if user in self._members:
+    def add_member_id(self, user_id: int):
+        if user_id in self._member_ids:
             return
-        self._members.append(user)
+        self._member_ids.append(user_id)
 
-    def remove_member(self, user: UserBase):
-        if not isinstance(user, UserBase):
-            raise TypeError("Member must be a UserBase instance")
-        if user not in self._members:
+    def remove_member_id(self, user_id: int):
+        if user_id not in self._member_ids:
             raise ValueError("User not a member")
-        self._members.remove(user)
+        self._member_ids.remove(user_id)
 
-    def add_task(self, task: TaskBase):
-        if not isinstance(task, TaskBase):
-            raise TypeError("Task must be a TaskBase instance")
-        if task in self._tasks:
+    def add_task_id(self, task_id: str):
+        if task_id in self._task_ids:
             return
-        self._tasks.append(task)
+        self._task_ids.append(task_id)
 
-    def add_sprint(self, sprint: SprintBase):
-        if not isinstance(sprint, SprintBase):
-            raise TypeError("Sprint must be a SprintBase instance")
-        if sprint in self._sprints:
+    def add_sprint_id(self, sprint_id: int):
+        if sprint_id in self._sprint_ids:
             return
-        self._sprints.append(sprint)
+        self._sprint_ids.append(sprint_id)
 
-    def get_all_tasks(self):
-        tasks = []
-        for sprint in self._sprints:
-            tasks.extend(sprint.get_tasks())
-        return tasks
-
-    def get_report_data(self) -> Dict:
-        """
-        Returns data to the report for this project.
-        Contains: number of tasks, number completed, list of members, completion rate.
-        """
-        total_tasks = len(self.get_all_tasks())
-        done_tasks = len([t for t in self.get_all_tasks() if t.get_status().lower() == "done"])
-        completion = (done_tasks / total_tasks * 100) if total_tasks else 0.0
+    def get_report_data(self, task_loader_callable=None) -> Dict:
+        total_tasks = len(self._task_ids)
+        if task_loader_callable:
+            tasks = [task_loader_callable(tid) for tid in self._task_ids]
+            done_tasks = len([t for t in tasks if t.get_status().lower() == "done"])
+            completion = (done_tasks / total_tasks * 100) if total_tasks else 0.0
+        else:
+            done_tasks = 0
+            completion = 0.0
 
         return {
             "project_name": self.get_name(),
             "total_tasks": total_tasks,
             "tasks_done": done_tasks,
             "completion_percentage": completion,
-            "members_count": len(self.get_members()),
-            "members": self.get_members()
+            "members_count": len(self._member_ids),
+            "members": list(self._member_ids)
         }

@@ -1,17 +1,18 @@
 # domain/tags/tag.py
-from typing import List
-from domain.tasks.task_base import TaskBase
-
 class Tag:
-    def __init__(self, name: str):
-        if not isinstance(name, str) or not name.strip():
-            raise ValueError("Tag name must be a non-empty string")
+    def __init__(self, tag_id: str, name: str):
+        if not name or not name.strip():
+            raise ValueError("Tag name cannot be empty")
+        self._id = tag_id
         self._name = name
-        self._tasks: List[TaskBase] = []
+
+    def get_id(self) -> str:
+        return self._id
 
     def get_name(self) -> str:
         return self._name
 
+    """
     def get_tasks(self) -> List[TaskBase]:
         return list(self._tasks)
 
@@ -28,3 +29,4 @@ class Tag:
         if task in self._tasks:
             self._tasks.remove(task)
             task.remove_tag(self)
+    """
