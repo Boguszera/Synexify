@@ -59,14 +59,13 @@ class ProjectBase(Reportable):
             raise ValueError("User not a member")
         self._members.remove(user)
 
-    """
+
     def add_task(self, task: TaskBase):
         if not isinstance(task, TaskBase):
             raise TypeError("Task must be a TaskBase instance")
         if task in self._tasks:
             return
         self._tasks.append(task)
-    """
 
     def add_sprint(self, sprint: SprintBase):
         if not isinstance(sprint, SprintBase):

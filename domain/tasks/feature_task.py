@@ -2,8 +2,8 @@
 from .task_base import TaskBase
 
 class FeatureTask(TaskBase):
-    def __init__(self, task_id: int, title: str, description: str, story_points: int):
-        super().__init__(task_id, title, description)
+    def __init__(self, title: str, description: str, story_points: int, task_id: str = None):
+        super().__init__(title=title, description=description, task_id=task_id)
         self.story_points = story_points
         self.dependencies = []
 
@@ -15,5 +15,4 @@ class FeatureTask(TaskBase):
 
     def add_dependency(self, task):
         if task not in self.dependencies:
-            return
-        self.dependencies.append(task)
+            self.dependencies.append(task)

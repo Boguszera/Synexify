@@ -1,14 +1,14 @@
 # domain/comments/comment.py
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 from domain.users.user_base import UserBase
-
+import uuid
 
 class Comment:
-    def __init__(self, comment_id: int, content: str, author: UserBase):
+    def __init__(self, content: str, author: UserBase, comment_id: Optional[str] = None):
         if not content or not content.strip():
             raise ValueError("Comment content cannot be empty")
-        self._id = comment_id
+        self._id = comment_id or str(uuid.uuid4())
         self._content: str = content
         self._author = author
         self._created_at: datetime = datetime.now(timezone.utc)

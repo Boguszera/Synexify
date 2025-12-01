@@ -1,7 +1,8 @@
 # domain/tasks/task_base.py
 from domain.interfaces.assignable import Assignable
 from domain.interfaces.commentable import Commentable
-
+from typing import Optional
+import uuid
 
 class InvalidStatusError(Exception):
     pass
@@ -10,8 +11,8 @@ class TaskBase(Assignable, Commentable):
 
     VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
 
-    def __init__(self, task_id: int, title: str, description: str):
-        self._id = task_id
+    def __init__(self, title: str, description: str, task_id: Optional[str] = None):
+        self._id = task_id or str(uuid.uuid4())
         self._title = title
         self._description = description
         self._status = "todo"
@@ -19,6 +20,7 @@ class TaskBase(Assignable, Commentable):
         self._comments = []
         self._attachments = []
         self._tags = []
+        self._project = None
 
     def get_id(self):
         return self._id
@@ -43,6 +45,12 @@ class TaskBase(Assignable, Commentable):
 
     def get_tags(self):
         return list(self._tags)
+
+    def get_project(self):
+        return self._project
+
+    def set_project(self, project):
+        self._project = project
 
     def assign_user(self, user):
         from domain.users.user_base import UserBase

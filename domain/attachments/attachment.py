@@ -1,13 +1,14 @@
 # domain/attachments/attachment.py
 from datetime import datetime, timezone
 from domain.users.user_base import UserBase
-
+from typing import Optional
+import uuid
 
 class Attachment:
-    def __init__(self, attachment_id: int, filename: str, uploaded_by):
+    def __init__(self, filename: str, uploaded_by, attachment_id: Optional[str] = None):
         if not filename or not filename.strip():
             raise ValueError("Filename cannot be empty")
-        self._id = attachment_id
+        self._id = attachment_id or str(uuid.uuid4())
         self._filename: str = filename
         self._uploaded_by = uploaded_by
         self._uploaded_at = datetime.now(timezone.utc)

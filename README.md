@@ -29,6 +29,9 @@ Synexify/
 │  ├─ comments/
 │  │  ├─ __init__.py
 │  │  ├─ comment.py
+│  ├─ exceptions/
+│  │  ├─ __init__.py
+│  │  ├─ exceptions.py
 │  ├─ interfaces/
 │  │  ├─ __init__.py
 │  │  ├─ assignable.py
