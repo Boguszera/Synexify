@@ -1,11 +1,10 @@
+# domain/events/task_events.py
 from domain.events.base_events import DomainEvent
-from domain.users.user_base import UserBase
-from domain.tasks.task_base import TaskBase
 
 class TaskStatusChangedEvent(DomainEvent):
-    def __init__(self, task: TaskBase, old_status: str, new_status: str):
+    def __init__(self, task_id: str, old_status: str, new_status: str):
         super().__init__()
-        self.task = task
+        self.task_id = task_id
         self.old_status = old_status
         self.new_status = new_status
 
@@ -14,30 +13,30 @@ class TaskStatusChangedEvent(DomainEvent):
 
 
 class TaskAssignedEvent(DomainEvent):
-    def __init__(self, task: TaskBase, assigned_user: UserBase):
+    def __init__(self, task_id: str, assigned_user_id: int):
         super().__init__()
-        self.task = task
-        self.assigned_user = assigned_user
+        self.task_id = task_id
+        self.assigned_user_id = assigned_user_id
 
     def get_event_name(self) -> str:
         return "TaskAssigned"
 
 
 class TaskCommentAddedEvent(DomainEvent):
-    def __init__(self, task: TaskBase, commenter: UserBase, comment_content: str):
+    def __init__(self, task_id: str, commenter_id: int | None, comment_id: str):
         super().__init__()
-        self.task = task
-        self.commenter = commenter
-        self.comment_content = comment_content
+        self.task_id = task_id
+        self.commenter_id = commenter_id
+        self.comment_id = comment_id
 
     def get_event_name(self) -> str:
         return "TaskCommentAdded"
 
 
 class TaskPriorityUpdatedEvent(DomainEvent):
-    def __init__(self, task: TaskBase, old_priority: int, new_priority: int):
+    def __init__(self, task_id: str, old_priority: int, new_priority: int):
         super().__init__()
-        self.task = task
+        self.task_id = task_id
         self.old_priority = old_priority
         self.new_priority = new_priority
 

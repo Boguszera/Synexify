@@ -1,7 +1,8 @@
 # domain/tasks/task_base.py
 from domain.interfaces.assignable import Assignable
 from domain.interfaces.commentable import Commentable
-from typing import Optional
+from domain.events.task_events import TaskStatusChangedEvent, TaskAssignedEvent, TaskCommentAddedEvent
+from typing import List, Optional
 import uuid
 
 class InvalidStatusError(Exception):
@@ -11,83 +12,93 @@ class TaskBase(Assignable, Commentable):
 
     VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
 
-    def __init__(self, title: str, description: str, task_id: Optional[str] = None):
+    def __init__(self, task_id: Optional[str], title: str, description: str, project_id: int = None, sprint_id: Optional[int] = None):
         self._id = task_id or str(uuid.uuid4())
         self._title = title
         self._description = description
         self._status = "todo"
-        self._assignees = []
-        self._comments = []
-        self._attachments = []
-        self._tags = []
-        self._project = None
+        self._assignee_ids: List[int] = []
+        self._comment_ids: List[str] = []
+        self._attachment_ids: List[str] = []
+        self._tag_ids: List[str] = []
+        self._project_id = project_id
+        self._sprint_id = sprint_id
+        self._domain_events = []
 
-    def get_id(self):
+    def get_id(self) -> str:
         return self._id
 
-    def get_title(self):
+    def get_title(self) -> str:
         return self._title
 
-    def get_description(self):
+    def get_description(self) -> str:
         return self._description
 
-    def get_status(self):
+    def get_status(self) -> str:
         return self._status
 
-    def get_assignees(self):
-        return list(self._assignees)
+    def get_assignee_ids(self) -> List[int]:
+        return list(self._assignee_ids)
 
-    def get_comments(self):
-        return list(self._comments)
+    def get_comments_ids(self) -> List[str]:
+        return list(self._comment_ids)
 
-    def get_attachments(self):
-        return list(self._attachments)
+    def get_attachment_ids(self) -> List[str]:
+        return list(self._attachment_ids)
 
-    def get_tags(self):
-        return list(self._tags)
+    def get_tag_ids(self) -> List[str]:
+        return list(self._tag_ids)
 
-    def get_project(self):
-        return self._project
+    def get_project_id(self) -> Optional[int]:
+        return self._project_id
 
-    def set_project(self, project):
-        self._project = project
+    def get_sprint_id(self) -> Optional[int]:
+        return self._sprint_id
 
-    def assign_user(self, user):
-        from domain.users.user_base import UserBase
-        if not isinstance(user, UserBase):
-            raise TypeError("user must be a UserBase instance")
-        if user in self._assignees:
+    def get_assignees_ids(self) -> List[int]:
+        return list(self._assignee_ids)
+
+    # behavior
+    def assign_user_id(self, user_id: int):
+        if user_id in self._assignee_ids:
             return
-        self._assignees.append(user)
+        self._assignee_ids.append(user_id)
+        # raise domain event
+        self._domain_events.append(TaskAssignedEvent(task_id=self._id, assigned_user_id=user_id))
 
-    def update_status(self, new_status):
+    def update_status(self, new_status: str):
         if new_status not in self.VALID_STATUSES:
             raise InvalidStatusError(f'Invalid status "{new_status}"')
-        self._status = new_status
-
-    def add_comment(self, comment):
-        from domain.comments.comment import Comment
-        if not isinstance(comment, Comment):
-            raise TypeError("comment must be a Comment instance")
-        self._comments.append(comment)
-
-    def attach_file(self, file):
-        from domain.attachments.attachment import Attachment
-        if not isinstance(file, Attachment):
-            raise TypeError("file must be an Attachment instance")
-        self._attachments.append(file)
-
-    def add_tag(self, tag):
-        from domain.tags.tag import Tag
-        if not isinstance(tag, Tag):
-            raise TypeError("tag must be a Tag instance")
-        if tag in self._tags:
+        old = self._status
+        if old == new_status:
             return
-        self._tags.append(tag)
+        self._status = new_status
+        self._domain_events.append(TaskStatusChangedEvent(task_id=self._id, old_status=old, new_status=new_status))
 
-    def remove_tag(self, tag):
-        from domain.tags.tag import Tag
-        if not isinstance(tag, Tag):
-            raise TypeError("tag must be a Tag instance")
-        if tag in self._tags:
-            self._tags.remove(tag)
+    def add_comment(self, comment_id: str, commenter_id: Optional[int] = None) -> None:
+        if comment_id in self._comment_ids:
+            return
+        self._comment_ids.append(comment_id)
+        # domain event includes commenter_id (maybe None)
+        self._domain_events.append(
+            TaskCommentAddedEvent(task_id=self._id, commenter_id=commenter_id, comment_id=comment_id))
+
+    def attach_file_id(self, attachment_id: str):
+        if attachment_id in self._attachment_ids:
+            return
+        self._attachment_ids.append(attachment_id)
+
+    def add_tag_id(self, tag_id: str):
+        if tag_id in self._tag_ids:
+            return
+        self._tag_ids.append(tag_id)
+
+    def remove_tag_id(self, tag_id: str):
+        if tag_id in self._tag_ids:
+            self._tag_ids.remove(tag_id)
+
+    # domain events accessor
+    def pull_domain_events(self):
+        events = list(self._domain_events)
+        self._domain_events.clear()
+        return events
