@@ -1,0 +1,39 @@
+from domain.exceptions.exceptions import PermissionDenied
+from domain.users.admin_user import AdminUser
+from domain.users.manager_user import ManagerUser
+from domain.users.team_member_user import  TeamMemberUser
+from domain.users.client_user import ClientUser
+from domain.users.user_base import UserBase
+
+class AuthorizationService:
+
+    def can_edit_task(self, user: UserBase, task) -> bool:
+        return isinstance(user, (AdminUser, ManagerUser)) or user in task.get_assignees()
+
+    def can_assign_task(self, user: UserBase, task) -> bool:
+        return isinstance(user, (AdminUser, ManagerUser))
+
+    def can_view_project(self, user: UserBase, project) -> bool:
+        if isinstance(user, AdminUser):
+            return True
+        if isinstance(user, (ManagerUser, TeamMemberUser, ClientUser)):
+            return user in project.get_members()
+        return False
+
+    def can_manage_user(self, user: UserBase, target_user: UserBase) -> bool:
+        return isinstance(user, AdminUser)
+
+    def can_manage_project(self, user: UserBase, project) -> bool:
+        if isinstance(user, AdminUser):
+            return True
+        if isinstance(user, ManagerUser):
+            return user in project.get_members()
+        return False
+
+    def check_manage_project(self, user: UserBase, project):
+        if not self.can_manage_project(user, project):
+            raise PermissionDenied("User cannot manage project")
+
+    def check_view_project(self, user: UserBase, project):
+        if not self.can_view_project(user, project):
+            raise PermissionDenied("User cannot view project")
