@@ -79,7 +79,6 @@ class TaskBase(Assignable, Commentable):
         if comment_id in self._comment_ids:
             return
         self._comment_ids.append(comment_id)
-        # domain event includes commenter_id (maybe None)
         self._domain_events.append(
             TaskCommentAddedEvent(task_id=self._id, commenter_id=commenter_id, comment_id=comment_id))
 

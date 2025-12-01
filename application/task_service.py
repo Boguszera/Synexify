@@ -15,9 +15,7 @@ class TaskService:
         self.notifications = notification_service
 
     def create_task(self, project, title, description, task_type, user, severity=None, story_points=None):
-        if not self.auth.can_manage_project(user, project):
-            raise PermissionDenied("User not allowed to create tasks")
-
+        self.auth.check_manage_project(user, project)
         task_id = str(uuid.uuid4())
         if task_type == "bug":
             task = BugTask(title=title, description=description, severity=severity, task_id=task_id)
@@ -27,57 +25,44 @@ class TaskService:
             task = ChoreTask(title=title, description=description, task_id=task_id)
         else:
             raise ValueError("Invalid task type")
-        project.add_task(task)
+
+        project.add_task_id(task.get_id())
+        self.task_repo.save(task)
+        self.project_repo.save(project)
+        return task
 
     def assign_task(self, task, user, assignee):
         if not self.auth.can_assign_task(user, task):
-            raise PermissionDenied("User not allowed to assign this task")
-
-        task.assign_user(assignee)
+            raise PermissionDenied(user.get_id(), action="assign_task", resource=f"task:{task.get_id()}")
+        task.assign_user_id(assignee.get_id())
         self.task_repo.save(task)
 
     def update_status(self, task, user, new_status):
         if not self.auth.can_edit_task(user, task):
-            raise PermissionDenied("User not allowed to update this task")
-
+            raise PermissionDenied(user.get_id(), action="update_status", resource=f"task:{task.get_id()}")
         task.update_status(new_status)
         self.task_repo.save(task)
 
-    def add_attachment(self, task, user, file):
-        if not self.auth.can_view_task(user, task):
-            raise PermissionDenied("No permission to add attachment.")
-
-        attachment = Attachment(file.filename, user)
-        task.attach_file(attachment)
-        self.task_repo.save(task)
-        return attachment
-
     def add_comment(self, task, user, content):
-        if not self.auth.can_view_task(user, task):
-            raise PermissionDenied("User cannot comment on this task.")
-
+        # Tworzymy obiekt Comment z autorem jako UserBase
         comment = Comment(content=content, author=user)
-        task.add_comment(comment)
+        # Dodajemy komentarz do taska przez jego ID i autora jako obiekt UserBase
+        task.add_comment(comment.get_id(), comment.get_author())
         self.task_repo.save(task)
         return comment
 
-    def add_tag(self, task, tag, user):
-        if not self.auth.can_manage_project(user, task.project):
-            raise PermissionDenied("Not allowed to add tags.")
+    def add_attachment(self, task, user, file):
+        # Tworzymy Attachment z uploaded_by jako UserBase
+        attachment = Attachment(filename=file.filename, uploaded_by=user)
+        # Dodajemy attachment do taska przez jego ID
+        task.attach_file_id(attachment.get_id())
+        self.task_repo.save(task)
+        return attachment
 
-        task.add_tag(tag)
+    def add_tag(self, task, tag):
+        task.add_tag_id(tag.get_id())
         self.task_repo.save(task)
 
-    def remove_tag(self, task, tag, user):
-        if not self.auth.can_manage_project(user, task.project):
-            raise PermissionDenied("Not allowed to remove tags.")
-
-        task.remove_tag(tag)
+    def remove_tag(self, task, tag):
+        task.remove_tag_id(tag.get_id())
         self.task_repo.save(task)
-
-    def get_task_filters(self, project=None, user=None, status=None, tag=None, priority=None):
-        tasks = self.task_repo.filter(project, user, status, tag, priority)
-        return tasks
-
-    def notify_task_update(self, task, event):
-        self.notifications.notify(event, task)

@@ -18,7 +18,7 @@ class Attachment:
     def get_filename(self) -> str:
         return self._filename
 
-    def get_uploaded_by_id(self) -> int:
+    def get_uploaded_by_id(self) -> str:
         return self._uploaded_by
 
     def get_uploaded_at(self) -> datetime:

@@ -1,15 +1,16 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 from domain.interfaces.reportable import Reportable
+import uuid
 
 class ProjectBase(Reportable):
-    def __init__(self, project_id: int, name: str, description: str):
+    def __init__(self, name: str, description: str, project_id: Optional[str] = None):
         if not isinstance(project_id, int):
             raise TypeError("project_id must be an integer")
         if not isinstance(name, str) or not name.strip():
             raise ValueError("name must be a non-empty string")
         if not isinstance(description, str):
             raise TypeError("description must be a string")
-        self._id = project_id
+        self._id = project_id or str(uuid.uuid4())
         self._name = name
         self._description = description
         self._member_ids: List[int] = []
@@ -17,7 +18,7 @@ class ProjectBase(Reportable):
         self._sprint_ids: List[int] = []
         self._archived: bool = False
 
-    def get_id(self) -> int:
+    def get_id(self) -> str:
         return self._id
 
     def get_name(self) -> str:

@@ -1,36 +1,55 @@
+# application/admin_panel_service.py
+from domain.users.user_base import UserBase
+from domain.projects.project_base import ProjectBase
+
 class AdminPanelService:
-    def __init__(self, auth_service):
+    def __init__(self, auth_service, user_repo, project_repo):
         self.auth_service = auth_service
+        self.user_repo = user_repo
+        self.project_repo = project_repo
 
-    def list_users(self, filters=None, user=None):
+    # ---- Users ----
+    def list_users(self, filters=None, user: UserBase = None):
         self.auth_service.check_manage_user(user, user)
-        # repo/persistence
-        pass
+        users = self.user_repo.list_all()
+        return users
 
-    def create_user(self, name, email, role, login, user):
+    def create_user(self, name, email, role, login, user: UserBase):
         self.auth_service.check_manage_user(user, user)
-        pass
+        new_user = UserBase(name=name, email=email, role=role, login=login)
+        self.user_repo.save(new_user)
+        return new_user
 
-    def update_user(self, target_user, fields, user):
+    def update_user(self, target_user: UserBase, fields: dict, user: UserBase):
         self.auth_service.check_manage_user(user, target_user)
-        pass
+        for k, v in fields.items():
+            setattr(target_user, k, v)
+        self.user_repo.save(target_user)
 
-    def delete_user(self, target_user, user):
+    def delete_user(self, target_user: UserBase, user: UserBase):
         self.auth_service.check_manage_user(user, target_user)
-        pass
+        self.user_repo.delete(target_user.get_id())
 
-    def list_projects(self, filters=None, user=None):
+    # ---- Projects ----
+    def list_projects(self, filters=None, user: UserBase = None):
         self.auth_service.check_manage_user(user, user)
-        pass
+        projects = self.project_repo.list_all()
+        return projects
 
-    def create_project(self, name, description, manager=None, user=None):
+    def create_project(self, name, description, manager=None, user: UserBase = None):
         self.auth_service.check_manage_user(user, user)
-        pass
+        project = ProjectBase(name=name, description=description)
+        if manager:
+            project.add_member_id(manager.get_id())
+        self.project_repo.save(project)
+        return project
 
-    def update_project(self, project, fields, user):
+    def update_project(self, project: ProjectBase, fields: dict, user: UserBase):
         self.auth_service.check_manage_user(user, user)
-        pass
+        for k, v in fields.items():
+            setattr(project, k, v)
+        self.project_repo.save(project)
 
-    def delete_project(self, project, user):
+    def delete_project(self, project: ProjectBase, user: UserBase):
         self.auth_service.check_manage_user(user, user)
-        pass
+        self.project_repo.delete(project.get_id())
