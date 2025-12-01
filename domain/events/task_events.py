@@ -1,4 +1,4 @@
-from domain.events.base_event import DomainEvent
+from domain.events.base_events import DomainEvent
 from domain.users.user_base import UserBase
 from domain.tasks.task_base import TaskBase
 

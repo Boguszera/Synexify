@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from domain.interfaces.reportable import Reportable
 from domain.users.user_base import UserBase
 from domain.tasks.task_base import TaskBase
@@ -39,12 +39,6 @@ class ProjectBase(Reportable):
     def get_sprints(self) -> List[SprintBase]:
         return list(self._sprints)
 
-    def get_progress(self) -> float:
-        if not self._tasks:
-            return 0.0
-        completed = sum(1 for t in self._tasks if t.get_status() == "done")
-        return completed / len(self._tasks) * 100
-
     def add_member(self, user: UserBase):
         if not isinstance(user, UserBase):
             raise TypeError("User must be a UserBase instance")
@@ -79,15 +73,20 @@ class ProjectBase(Reportable):
             tasks.extend(sprint.get_tasks())
         return tasks
 
-    def generate_report(self) -> str:
-        total_tasks = sum(len(sprint.get_tasks()) for sprint in self._sprints)
-        completed_tasks = sum(
-            1 for sprint in self._sprints for task in sprint.get_tasks() if task.get_status() == "done"
-        )
-        progress = (completed_tasks / total_tasks * 100) if total_tasks else 0.0
+    def get_report_data(self) -> Dict:
+        """
+        Returns data to the report for this project.
+        Contains: number of tasks, number completed, list of members, completion rate.
+        """
+        total_tasks = len(self.get_all_tasks())
+        done_tasks = len([t for t in self.get_all_tasks() if t.get_status().lower() == "done"])
+        completion = (done_tasks / total_tasks * 100) if total_tasks else 0.0
 
-        return (
-            f"Project {self._name}: {total_tasks} tasks, "
-            f"{len(self._members)} members, "
-            f"{progress:.1f}% complete"
-        )
+        return {
+            "project_name": self.get_name(),
+            "total_tasks": total_tasks,
+            "tasks_done": done_tasks,
+            "completion_percentage": completion,
+            "members_count": len(self.get_members()),
+            "members": self.get_members()
+        }

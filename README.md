@@ -1,6 +1,7 @@
 # Synexify
 
-Minimal Django 5 + PostgreSQL project running in Docker.
+Project Management System implemented in **Python** with **Domain-Driven Design (DDD)** principles.  
+Supports projects, sprints, tasks, users, notifications, and reporting.
 
 ---
 
@@ -29,6 +30,10 @@ Synexify/
 │  ├─ comments/
 │  │  ├─ __init__.py
 │  │  ├─ comment.py
+│  ├─ events/
+│  │  ├─ __init__.py
+│  │  ├─ base_events.py
+│  │  ├─ task_events.py
 │  ├─ exceptions/
 │  │  ├─ __init__.py
 │  │  ├─ exceptions.py
@@ -66,6 +71,7 @@ Synexify/
 │  ├─ admin_panel_service.py                     
 │  ├─ authorization_service.py                     
 │  ├─ backlog_service.py                     
+│  ├─ notifications_service.py                     
 │  ├─ reporting_service.py                     
 │  ├─ sprint_service.py                     
 │  └─ task_service.py  

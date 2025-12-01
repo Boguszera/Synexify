@@ -6,7 +6,7 @@ from domain.events.task_events import (
 )
 from domain.users.user_base import UserBase
 from domain.tasks.task_base import TaskBase
-from domain.events.base_event import DomainEvent
+from domain.events.base_events import DomainEvent
 
 class NotificationsService:
     def __init__(self, notification_sender):

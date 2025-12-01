@@ -1,5 +1,5 @@
 # domain/sprints/sprint_base.py
-from typing import List
+from typing import List, Dict
 from domain.interfaces.reportable import Reportable
 from domain.tasks.task_base import TaskBase
 
@@ -45,5 +45,14 @@ class SprintBase(Reportable):
             raise ValueError("Task not in sprint")
         self._tasks.remove(task)
 
-    def generate_report(self) -> str:
-        return f"Sprint {self._name}: {len(self._tasks)} tasks, {self.get_completion_rate():.1f}% complete"
+    def get_report_data(self) -> Dict:
+        total_tasks = len(self.get_tasks())
+        done_tasks = len([t for t in self.get_tasks() if t.get_status().lower() == "done"])
+        completion = (done_tasks / total_tasks * 100) if total_tasks else 0.0
+
+        return {
+            "sprint_name": self.get_name(),
+            "total_tasks": total_tasks,
+            "tasks_done": done_tasks,
+            "completion_percentage": completion
+        }

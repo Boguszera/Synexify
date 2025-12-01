@@ -3,5 +3,6 @@ from abc import ABC, abstractmethod
 
 class Reportable(ABC):
     @abstractmethod
-    def generate_report(self):
+    def get_report_data(self) -> dict:
+        """returns report metrics for further processing in the application"""
         pass
