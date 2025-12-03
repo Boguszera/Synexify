@@ -17,7 +17,7 @@ class TaskBase(Assignable, Commentable):
         self._title = title
         self._description = description
         self._status = "todo"
-        self._assignee_ids: List[int] = []
+        self._assignee_ids: List[str] = []
         self._comment_ids: List[str] = []
         self._attachment_ids: List[str] = []
         self._tag_ids: List[str] = []
@@ -37,7 +37,7 @@ class TaskBase(Assignable, Commentable):
     def get_status(self) -> str:
         return self._status
 
-    def get_assignee_ids(self) -> List[int]:
+    def get_assignee_ids(self) -> List[str]:
         return list(self._assignee_ids)
 
     def get_comments_ids(self) -> List[str]:
@@ -55,11 +55,11 @@ class TaskBase(Assignable, Commentable):
     def get_sprint_id(self) -> Optional[int]:
         return self._sprint_id
 
-    def get_assignees_ids(self) -> List[int]:
+    def get_assignees_ids(self) -> List[str]:
         return list(self._assignee_ids)
 
     # behavior
-    def assign_user_id(self, user_id: int):
+    def assign_user_id(self, user_id: str):
         if user_id in self._assignee_ids:
             return
         self._assignee_ids.append(user_id)

@@ -13,7 +13,7 @@ class TaskStatusChangedEvent(DomainEvent):
 
 
 class TaskAssignedEvent(DomainEvent):
-    def __init__(self, task_id: str, assigned_user_id: int):
+    def __init__(self, task_id: str, assigned_user_id: str):
         super().__init__()
         self.task_id = task_id
         self.assigned_user_id = assigned_user_id

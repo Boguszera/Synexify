@@ -13,7 +13,7 @@ class ProjectBase(Reportable):
         self._id = project_id or str(uuid.uuid4())
         self._name = name
         self._description = description
-        self._member_ids: List[int] = []
+        self._member_ids: List[str] = []
         self._task_ids: List[str] = []
         self._sprint_ids: List[int] = []
         self._archived: bool = False
@@ -27,7 +27,7 @@ class ProjectBase(Reportable):
     def get_description(self) -> str:
         return self._description
 
-    def get_member_ids(self) -> List[int]:
+    def get_member_ids(self) -> List[str]:
         return list(self._member_ids)
 
     def get_task_ids(self) -> List[str]:
@@ -36,12 +36,12 @@ class ProjectBase(Reportable):
     def get_sprint_ids(self) -> List[int]:
         return list(self._sprint_ids)
 
-    def add_member_id(self, user_id: int):
+    def add_member_id(self, user_id: str):
         if user_id in self._member_ids:
             return
         self._member_ids.append(user_id)
 
-    def remove_member_id(self, user_id: int):
+    def remove_member_id(self, user_id: str):
         if user_id not in self._member_ids:
             raise ValueError("User not a member")
         self._member_ids.remove(user_id)
