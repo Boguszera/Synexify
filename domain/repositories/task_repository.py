@@ -16,7 +16,7 @@ class TaskRepository(ABC):
         pass
 
     @abstractmethod
-    def list_by_project(self, project_id: int) -> List[TaskBase]:
+    def list_by_project(self, project_id: str) -> List[TaskBase]:
         pass
 
     @abstractmethod
