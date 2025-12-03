@@ -82,6 +82,7 @@ Synexify/
 │  │  ├─ project_model.py
 │  │  ├─ sprint_model.py
 │  │  ├─ task_model.py
+│  │  ├─ tag_model.py
 │  │  ├─ user_model.py
 ├─ Dockerfile
 ├─ docker-compose.yml
