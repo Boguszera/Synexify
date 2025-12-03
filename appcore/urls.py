@@ -1,3 +1,4 @@
+#appcore/urls.py
 """
 URL configuration for appcore project.
 

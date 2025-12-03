@@ -4,7 +4,7 @@ from domain.users.user_base import UserBase
 
 class UserRepository(ABC):
     @abstractmethod
-    def get_by_id(self, user_id: int) -> Optional[UserBase]:
+    def get_by_id(self, user_id: str) -> Optional[UserBase]:
         pass
 
     @abstractmethod

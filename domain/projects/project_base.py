@@ -4,8 +4,8 @@ import uuid
 
 class ProjectBase(Reportable):
     def __init__(self, name: str, description: str, project_id: Optional[str] = None):
-        if not isinstance(project_id, int):
-            raise TypeError("project_id must be an integer")
+        if project_id is not None and not isinstance(project_id, str):
+            raise TypeError("project_id must be a string UUID or None")
         if not isinstance(name, str) or not name.strip():
             raise ValueError("name must be a non-empty string")
         if not isinstance(description, str):

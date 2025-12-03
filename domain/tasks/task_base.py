@@ -12,7 +12,7 @@ class TaskBase(Assignable, Commentable):
 
     VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
 
-    def __init__(self, task_id: Optional[str], title: str, description: str, project_id: int = None, sprint_id: Optional[int] = None):
+    def __init__(self, task_id: Optional[str], title: str, description: str, project_id: int = None, sprint_id: Optional[str] = None):
         self._id = task_id or str(uuid.uuid4())
         self._title = title
         self._description = description
