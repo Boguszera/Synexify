@@ -1,51 +1,39 @@
-from rest_framework.views import APIView
+from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework import status
+from infrastructure.api.serializers.project_serializers import ProjectSerializer
 from infrastructure.di import Container
-from infrastructure.api.serializers.project_serializers import ProjectSerializer, ProjectCreateUpdateSerializer
 
 container = Container()
 
-class ProjectListCreateAPIView(APIView):
-    def get(self, request):
-        projects = container.project_repo.list_all()
+class ProjectViewSet(viewsets.ViewSet):
+
+    def list(self, request):
+        projects = container.admin_panel.list_projects()
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = ProjectCreateUpdateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        project = container.admin_panel.create_project(
-            name=data['name'],
-            description=data['description']
-        )
-        output_serializer = ProjectSerializer(project)
-        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
-
-
-class ProjectDetailAPIView(APIView):
-    def get(self, request, project_id):
-        project = container.project_repo.get_by_id(project_id)
+    def retrieve(self, request, pk=None):
+        project = container.project_repo.get_by_id(pk)
         if not project:
-            return Response({"detail": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
         serializer = ProjectSerializer(project)
         return Response(serializer.data)
 
-    def put(self, request, project_id):
-        project = container.project_repo.get_by_id(project_id)
-        if not project:
-            return Response({"detail": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = ProjectCreateUpdateSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
-        updated_project = container.admin_panel.update_project(project, **data)
-        output_serializer = ProjectSerializer(updated_project)
-        return Response(output_serializer.data)
+    def create(self, request):
+        project = container.admin_panel.create_project(
+            name=request.data["name"],
+            description=request.data.get("description", ""),
+            manager=None
+        )
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete(self, request, project_id):
-        project = container.project_repo.get_by_id(project_id)
-        if not project:
-            return Response({"detail": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
-        container.admin_panel.delete_project(project)
+    def update(self, request, pk=None):
+        project = container.project_repo.get_by_id(pk)
+        updated_project = container.admin_panel.update_project(project, **request.data)
+        serializer = ProjectSerializer(updated_project)
+        return Response(serializer.data)
+
+    def destroy(self, request, pk=None):
+        container.admin_panel.delete_project(container.project_repo.get_by_id(pk))
         return Response(status=status.HTTP_204_NO_CONTENT)

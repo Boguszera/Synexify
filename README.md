@@ -83,7 +83,8 @@ Synexify/
 │   │   ├── sprint_serializers.py
 │   │   ├── reporting_serializers.py
 │   │   ├── task_serializers.py
-│   │   └── comment_attachment_serializers.py
+│   │   └── comment_serializers.py
+│   │   └── attachment_serializers.py
 │   └── permissions/
 │       ├── project_permissions.py
 │       ├── task_permissions.py
