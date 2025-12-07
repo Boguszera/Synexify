@@ -69,6 +69,24 @@ Synexify/
 │  ├─ sprint_service.py                     
 │  └─ task_service.py  
 ├─ infrastructure/    
+└── api/
+│   ├── urls.py                # routing REST API
+│   ├── views/
+│   │   ├── users.py           # CRUD użytkowników (AdminPanelService)
+│   │   ├── projects.py        # CRUD projektów
+│   │   ├── sprints.py         # CRUD sprintów
+│   │   ├── tasks.py           # CRUD tasków, komentarze, załączniki
+│   │   └── reporting.py       # raporty, dashboard
+│   ├── serializers/
+│   │   ├── user_serializers.py
+│   │   ├── project_serializers.py
+│   │   ├── sprint_serializers.py
+│   │   ├── task_serializers.py
+│   │   └── comment_attachment_serializers.py
+│   └── permissions/
+│       ├── project_permissions.py
+│       ├── task_permissions.py
+│       └── user_permissions.py
 │  ├─ mappers/
 │  │  ├─ attachment_mapper.py
 │  │  ├─ comment_mapper.py
@@ -89,7 +107,7 @@ Synexify/
 │  │  ├─ sprint_django_repository.py
 │  │  ├─ task_django_repository.py
 │  │  ├─ user_django_repository.py
-│  │  ├─ factories.py
+│  │  ├─ di.py
 ├─ Dockerfile
 ├─ docker-compose.yml
 ├─ manage.py
