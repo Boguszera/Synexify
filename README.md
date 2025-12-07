@@ -69,6 +69,26 @@ Synexify/
 │  ├─ sprint_service.py                     
 │  └─ task_service.py  
 ├─ infrastructure/    
+└── api/
+│   ├── urls.py                # routing REST API
+│   ├── views/
+│   │   ├── users.py           
+│   │   ├── projects.py        
+│   │   ├── sprints.py         
+│   │   ├── tasks.py           
+│   │   └── reporting.py       
+│   ├── serializers/
+│   │   ├── user_serializers.py
+│   │   ├── project_serializers.py
+│   │   ├── sprint_serializers.py
+│   │   ├── reporting_serializers.py
+│   │   ├── task_serializers.py
+│   │   └── comment_serializers.py
+│   │   └── attachment_serializers.py
+│   └── permissions/
+│       ├── project_permissions.py
+│       ├── task_permissions.py
+│       └── user_permissions.py
 │  ├─ mappers/
 │  │  ├─ attachment_mapper.py
 │  │  ├─ comment_mapper.py
@@ -89,7 +109,7 @@ Synexify/
 │  │  ├─ sprint_django_repository.py
 │  │  ├─ task_django_repository.py
 │  │  ├─ user_django_repository.py
-│  │  ├─ factories.py
+│  │  ├─ di.py
 ├─ Dockerfile
 ├─ docker-compose.yml
 ├─ manage.py
