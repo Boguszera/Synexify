@@ -84,6 +84,11 @@ Synexify/
 │  │  ├─ task_model.py
 │  │  ├─ tag_model.py
 │  │  ├─ user_model.py
+│  ├─ repositories/
+│  │  ├─ project_django_repository.py
+│  │  ├─ sprint_django_repository.py
+│  │  ├─ task_django_repository.py
+│  │  ├─ user_django_repository.py
 ├─ Dockerfile
 ├─ docker-compose.yml
 ├─ manage.py
