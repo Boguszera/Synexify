@@ -9,13 +9,10 @@ from domain.tasks.task_base import TaskBase
 from domain.events.base_events import DomainEvent
 
 class NotificationsService:
-    def __init__(self, notification_sender, task_repo, user_repo):
-        """
-        notification_sender: abstraction responsible for notifications delivery
-        """
-        self.notification_sender = notification_sender
+    def __init__(self, task_repo, user_repo):
         self.task_repo = task_repo
         self.user_repo = user_repo
+        self.notifications: list[dict] = []
 
     def notify(self, event: DomainEvent):
         if isinstance(event, TaskStatusChangedEvent):
@@ -78,4 +75,5 @@ class NotificationsService:
         }
         if extra_data:
             payload.update(extra_data)
-        self.notification_sender.send(payload)
+        self.notifications.append(payload)
+        print(f"[NOTIFICATION] {payload}")

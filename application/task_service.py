@@ -37,24 +37,41 @@ class TaskService:
         task.assign_user_id(assignee.get_id())
         self.task_repo.save(task)
 
+        from domain.events.task_events import TaskAssignedEvent
+        event = TaskAssignedEvent(task_id=task.get_id(), assigned_user_id=assignee.get_id())
+        self.notifications.notify(event)
+
     def update_status(self, task, user, new_status):
         if not self.auth.can_edit_task(user, task):
             raise PermissionDenied(user.get_id(), action="update_status", resource=f"task:{task.get_id()}")
+        old_status = task.get_status()
         task.update_status(new_status)
         self.task_repo.save(task)
 
+        from domain.events.task_events import TaskStatusChangedEvent
+        event = TaskStatusChangedEvent(
+            task_id=task.get_id(),
+            old_status=old_status,
+            new_status=new_status
+        )
+        self.notifications.notify(event)
+
     def add_comment(self, task, user, content):
-        # Tworzymy obiekt Comment z autorem jako UserBase
         comment = Comment(content=content, author=user)
-        # Dodajemy komentarz do taska przez jego ID i autora jako obiekt UserBase
         task.add_comment(comment.get_id(), comment.get_author())
         self.task_repo.save(task)
+
+        from domain.events.task_events import TaskCommentAddedEvent
+        event = TaskCommentAddedEvent(
+            task_id=task.get_id(),
+            comment_id=comment.get_id(),
+            commenter_id=user.get_id()
+        )
+        self.notifications.notify(event)
         return comment
 
     def add_attachment(self, task, user, file):
-        # Tworzymy Attachment z uploaded_by jako UserBase
         attachment = Attachment(filename=file.filename, uploaded_by=user)
-        # Dodajemy attachment do taska przez jego ID
         task.attach_file_id(attachment.get_id())
         self.task_repo.save(task)
         return attachment

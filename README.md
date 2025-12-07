@@ -89,6 +89,7 @@ Synexify/
 │  │  ├─ sprint_django_repository.py
 │  │  ├─ task_django_repository.py
 │  │  ├─ user_django_repository.py
+│  │  ├─ factories.py
 ├─ Dockerfile
 ├─ docker-compose.yml
 ├─ manage.py
