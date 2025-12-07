@@ -72,15 +72,16 @@ Synexify/
 └── api/
 │   ├── urls.py                # routing REST API
 │   ├── views/
-│   │   ├── users.py           # CRUD użytkowników (AdminPanelService)
-│   │   ├── projects.py        # CRUD projektów
-│   │   ├── sprints.py         # CRUD sprintów
-│   │   ├── tasks.py           # CRUD tasków, komentarze, załączniki
-│   │   └── reporting.py       # raporty, dashboard
+│   │   ├── users.py           
+│   │   ├── projects.py        
+│   │   ├── sprints.py         
+│   │   ├── tasks.py           
+│   │   └── reporting.py       
 │   ├── serializers/
 │   │   ├── user_serializers.py
 │   │   ├── project_serializers.py
 │   │   ├── sprint_serializers.py
+│   │   ├── reporting_serializers.py
 │   │   ├── task_serializers.py
 │   │   └── comment_attachment_serializers.py
 │   └── permissions/
