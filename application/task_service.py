@@ -83,3 +83,16 @@ class TaskService:
     def remove_tag(self, task, tag):
         task.remove_tag_id(tag.get_id())
         self.task_repo.save(task)
+
+    def get_task_filters(self, project=None, user=None, status=None, tag=None, priority=None):
+        tasks = self.task_repo.get_all()
+
+        if project:
+            tasks = [t for t in tasks if t.get_project_id() == project.get_id()]
+        if user:
+            tasks = [t for t in tasks if user.get_id() in t.get_assignees_ids()]
+        if status:
+            tasks = [t for t in tasks if t.get_status() == status]
+        if tag:
+            tasks = [t for t in tasks if any(tid == tag.get_id() for tid in t.get_tag_ids())]
+        return tasks

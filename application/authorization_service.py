@@ -30,10 +30,14 @@ class AuthorizationService:
             return user in project.get_members()
         return False
 
-    def check_manage_project(self, user: UserBase, project):
+    def check_manage_project(self, user, project):
         if not self.can_manage_project(user, project):
-            raise PermissionDenied("User cannot manage project")
+            raise PermissionDenied(user.get_id(), action="manage_project", resource=project.get_id())
 
-    def check_view_project(self, user: UserBase, project):
+    def check_view_project(self, user, project):
         if not self.can_view_project(user, project):
-            raise PermissionDenied("User cannot view project")
+            raise PermissionDenied(user.get_id(), action="view_project", resource=project.get_id())
+
+    def check_manage_user(self, user, target_user):
+        if not self.can_manage_user(user, target_user):
+            raise PermissionDenied(user.get_id(), action="manage_user", resource=target_user.get_id())

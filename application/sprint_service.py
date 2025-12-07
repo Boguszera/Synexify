@@ -23,6 +23,9 @@ class SprintService:
         sprint.remove_task_id(task.get_id())
         self.sprint_repo.save(sprint)
 
+    def get_all(self):
+        return self.sprint_repo.list_all()
+
     """    
     def get_sprint_tasks(self, sprint, filters=None):
         tasks = sprint.get_tasks()
