@@ -1,4 +1,5 @@
 # infrastructure/api/serializers/reporting_serializer.py
+
 from rest_framework import serializers
 
 class ProjectReportSerializer(serializers.Serializer):

@@ -1,3 +1,5 @@
+# infrastructure/api/serializers/user_serializers.py
+
 from rest_framework import serializers
 
 class UserSerializer(serializers.Serializer):

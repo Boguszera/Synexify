@@ -1,3 +1,5 @@
+# infrastructure/api/views/users.py
+
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from infrastructure.api.serializers.user_serializers import UserSerializer
@@ -6,7 +8,6 @@ from infrastructure.di import Container
 container = Container()
 
 class UserViewSet(viewsets.ViewSet):
-    """CRUD User"""
 
     def list(self, request):
         users = container.admin_panel.list_users()

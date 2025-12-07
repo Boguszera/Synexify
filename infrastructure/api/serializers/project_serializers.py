@@ -1,3 +1,5 @@
+# infrastructure/api/serializers/project_serializers.py
+
 from rest_framework import serializers
 
 class ProjectSerializer(serializers.Serializer):

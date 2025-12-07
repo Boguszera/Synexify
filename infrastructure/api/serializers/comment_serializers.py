@@ -1,3 +1,5 @@
+# infrastructure/api/serializers/comment_serializers.py
+
 from rest_framework import serializers
 
 class CommentSerializer(serializers.Serializer):

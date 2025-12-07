@@ -1,3 +1,5 @@
+# infrastructure/api/serializers/attachment_serializers.py
+
 from rest_framework import serializers
 
 class AttachmentSerializer(serializers.Serializer):
