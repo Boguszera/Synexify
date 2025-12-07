@@ -20,6 +20,7 @@ Synexify/
 ├─ appcore/                 # Django core configuration
 │  ├─ settings.py           
 │  ├─ urls.py               
+│  ├─ utils.py               
 │  ├─ wsgi.py               
 │  └─ asgi.py          
 ├─ domain/                  # Busines domain logic (DDD)
@@ -76,7 +77,7 @@ Synexify/
 │   │   ├── projects.py        
 │   │   ├── sprints.py         
 │   │   ├── tasks.py           
-│   │   └── reporting.py       
+│   │   └── reporting.py      
 │   ├── serializers/
 │   │   ├── user_serializers.py
 │   │   ├── project_serializers.py
@@ -89,6 +90,10 @@ Synexify/
 │       ├── project_permissions.py
 │       ├── task_permissions.py
 │       └── user_permissions.py
+└── orm/
+│  ├─ management/
+│  │   ├── commands
+│  │   │   ├── seed.py        
 │  ├─ mappers/
 │  │  ├─ attachment_mapper.py
 │  │  ├─ comment_mapper.py
@@ -109,12 +114,14 @@ Synexify/
 │  │  ├─ sprint_django_repository.py
 │  │  ├─ task_django_repository.py
 │  │  ├─ user_django_repository.py
-│  │  ├─ di.py
+│  ├─ di.py
+│  ├─ apps.py
 ├─ Dockerfile
 ├─ docker-compose.yml
 ├─ manage.py
 ├─ .env
 ├─ .env.example
+├─ wait-for-db.sh
 └─ README.md
 ```
 
@@ -162,11 +169,26 @@ You should see the Django default page or your own view.
 
 ## Database Setup / Migrations
 
-Before creating a superuser or using the admin panel, apply migrations:
+Before running the project or using the admin panel, apply migrations
 
 ```bash
+docker compose exec web python manage.py makemigrations
 docker compose exec web python manage.py migrate
 ```
+
+## Seeding the Database
+
+To create test users, projects, sprints, tasks, comments, and attachments:
+```bash
+docker compose exec web python manage.py seed
+```
+This will create:
+
+Users: root (admin), mgr1 (manager), member1 (team member), client1 (client)
+
+Sample projects with sprints and tasks assigned
+
+Sample comments and attachments
 
 ## Superuser / Admin Panel
 

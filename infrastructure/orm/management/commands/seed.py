@@ -33,7 +33,14 @@ class Command(BaseCommand):
         print("Creating users...")
         users = {}
 
-        for role, login in [("admin", "root"), ("manager", "mgr1"), ("team_member", "member1"), ("client", "client1")]:
+        role_map = [
+            ("admin", "root"),
+            ("manager", "mgr1"),
+            ("team_member", "member1"),
+            ("client", "client1")
+        ]
+
+        for role, login in role_map:
             if role == "admin":
                 user = AdminUser(name=login, email=f"{login}@example.com", role=role, login=login)
             elif role == "manager":
@@ -44,7 +51,8 @@ class Command(BaseCommand):
                 user = ClientUser(name=login, email=f"{login}@example.com", role=role, login=login)
 
             user_repo.save(user)
-            users[login] = user
+
+            users[role] = user
 
             User.objects.update_or_create(
                 username=user.get_login(),
@@ -71,25 +79,29 @@ class Command(BaseCommand):
                              end_date=datetime.now() + timedelta(days=30))
         sprint_repo.save(sprint1)
         sprint_repo.save(sprint2)
+
         project1.add_sprint_id(sprint1.get_id())
         project1.add_sprint_id(sprint2.get_id())
         project_repo.save(project1)
 
         # --- TASKS ---
         print("Creating tasks...")
-        task1 = BugTask(title="Fix login bug", description="Cannot login with correct credentials", severity="high", task_id=str(uuid.uuid4()))
+        task1 = BugTask(title="Fix login bug", description="Cannot login with correct credentials",
+                        severity="high", task_id=str(uuid.uuid4()))
         task1.assign_user_id(users["team_member"].get_id())
         project1.add_task_id(task1.get_id())
         sprint1.add_task_id(task1.get_id())
         task_repo.save(task1)
 
-        task2 = FeatureTask(title="Add user profile page", description="Create profile page for users", story_points=5, task_id=str(uuid.uuid4()))
+        task2 = FeatureTask(title="Add user profile page", description="Create profile page for users",
+                            story_points=5, task_id=str(uuid.uuid4()))
         task2.assign_user_id(users["team_member"].get_id())
         project1.add_task_id(task2.get_id())
         sprint1.add_task_id(task2.get_id())
         task_repo.save(task2)
 
-        task3 = ChoreTask(title="Setup CI/CD", description="Configure GitHub Actions pipelines", task_id=str(uuid.uuid4()))
+        task3 = ChoreTask(title="Setup CI/CD", description="Configure GitHub Actions pipelines",
+                          task_id=str(uuid.uuid4()))
         task3.assign_user_id(users["manager"].get_id())
         project2.add_task_id(task3.get_id())
         task_repo.save(task3)
