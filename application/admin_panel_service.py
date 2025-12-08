@@ -20,15 +20,28 @@ class AdminPanelService:
         self.user_repo.save(new_user)
         return new_user
 
-    def update_user(self, target_user: UserBase, fields: dict, user: UserBase):
+    def update_user(self, user_id: str, fields: dict, user: UserBase):
+        target_user = self.get_user_by_id(user_id)
+        if not target_user:
+            raise ValueError("User not found")
         self.auth_service.check_manage_user(user, target_user)
+        allowed_fields = {"name", "email", "role", "login"}
         for k, v in fields.items():
-            setattr(target_user, k, v)
+            if k in allowed_fields:
+                setattr(target_user, f"_{k}", v)
         self.user_repo.save(target_user)
+        return target_user
 
-    def delete_user(self, target_user: UserBase, user: UserBase):
+    def delete_user(self, user_id: str, user: UserBase):
+        target_user = self.get_user_by_id(user_id)
+        if not target_user:
+            raise ValueError("User not found")
         self.auth_service.check_manage_user(user, target_user)
         self.user_repo.delete(target_user.get_id())
+
+    def get_user_by_id(self, user_id: str):
+        user = self.user_repo.get_by_id(user_id)
+        return user
 
     # ---- Projects ----
     def list_projects(self, filters=None, user: UserBase = None):

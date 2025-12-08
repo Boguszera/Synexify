@@ -13,3 +13,4 @@ venv/
 *.log
 
 sys
+infrastructure/orm/migrations/0001_initial.py

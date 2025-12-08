@@ -1,41 +1,56 @@
 # infrastructure/api/views/users.py
-from rest_framework import viewsets, status
+from rest_framework import viewsets, mixins, status
 from rest_framework.response import Response
-from infrastructure.api.serializers.user_serializers import UserSerializer
-from infrastructure.adapters.user_adapter import to_domain_user
+from rest_framework.permissions import IsAuthenticated, BasePermission
+from infrastructure.adapters.user_adapter import to_domain_user, to_dict
 from domain.exceptions.exceptions import PermissionDenied
 
-class UserViewSet(viewsets.ViewSet):
+class IsAdminUser(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.user
+            and request.user.is_authenticated
+            and getattr(request.user, "role", None) == "admin"
+        )
+
+class UserViewSet(
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
     def get_container(self):
         from infrastructure.di import Container
         return Container()
 
-    def list(self, request):
+    def list(self, request, *args, **kwargs):
         container = self.get_container()
+        domain_user = to_domain_user(request.user)
         try:
-            domain_user = to_domain_user(request.user)
             users = container.admin_panel.list_users(user=domain_user)
-            serializer = UserSerializer(users, many=True)
-            return Response(serializer.data)
+            return Response([to_dict(u) for u in users])
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None, *args, **kwargs):
         container = self.get_container()
+        domain_user = to_domain_user(request.user)
         try:
-            domain_user = to_domain_user(request.user)
             user = container.admin_panel.get_user_by_id(pk)
             if not user:
                 return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
-            serializer = UserSerializer(user)
-            return Response(serializer.data)
+            return Response(to_dict(user))
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         container = self.get_container()
+        domain_user = to_domain_user(request.user)
         try:
-            domain_user = to_domain_user(request.user)
             user = container.admin_panel.create_user(
                 name=request.data["name"],
                 email=request.data["email"],
@@ -43,28 +58,37 @@ class UserViewSet(viewsets.ViewSet):
                 login=request.data["login"],
                 user=domain_user
             )
-            serializer = UserSerializer(user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(to_dict(user), status=status.HTTP_201_CREATED)
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def update(self, request, pk=None):
+    def update(self, request, pk=None, *args, **kwargs):
         container = self.get_container()
+        domain_user = to_domain_user(request.user)
         try:
-            domain_user = to_domain_user(request.user)
             target_user = container.admin_panel.get_user_by_id(pk)
-            updated_user = container.admin_panel.update_user(target_user, request.data, user=domain_user)
-            serializer = UserSerializer(updated_user)
-            return Response(serializer.data)
+            if not target_user:
+                return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+            updated_user = container.admin_panel.update_user(
+                user_id=pk,
+                fields=request.data,
+                user=domain_user
+            )
+            return Response(to_dict(updated_user))
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request, *args, **kwargs):
         container = self.get_container()
+        domain_user = to_domain_user(request.user)
+        user_id = kwargs.get("pk")
+        target_user = container.admin_panel.get_user_by_id(user_id)
+
+        if not target_user:
+            return Response({"detail": "Not found"}, status=404)
+
         try:
-            domain_user = to_domain_user(request.user)
-            target_user = container.admin_panel.get_user_by_id(pk)
-            container.admin_panel.delete_user(target_user, user=domain_user)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            container.admin_panel.delete_user(user_id, user=domain_user)
+            return Response(status=204)
         except PermissionDenied as e:
-            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": str(e)}, status=403)

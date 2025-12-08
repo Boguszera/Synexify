@@ -9,7 +9,6 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-
   web:
     build: .
     command: ["./wait-for-db.sh", "db", "python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -1,38 +1,66 @@
-from django.db import transaction
-from django.apps import apps
-from domain.repositories.user_repository import UserRepository
-from domain.users.user_base import UserBase
-from infrastructure.orm.mappers.user_mapper import UserMapper
+# infrastructure/repositories/user_django_repository.py
+from infrastructure.orm.models.user_model import UserModel
+from domain.users.admin_user import AdminUser
+from domain.users.manager_user import ManagerUser
+from domain.users.team_member_user import TeamMemberUser
+from domain.users.client_user import ClientUser
 
+ROLE_CLASS_MAP = {
+    "admin": AdminUser,
+    "manager": ManagerUser,
+    "team_member": TeamMemberUser,
+    "client": ClientUser,
+}
 
-class UserDjangoRepository(UserRepository):
+class UserDjangoRepository:
 
-    def get_by_id(self, user_id: str) -> UserBase | None:
-        UserModel = apps.get_model('infrastructure', 'UserModel')
-        model = UserModel.objects.filter(id=user_id).first()
-        if not model:
+    def _to_domain(self, orm_obj):
+        cls = ROLE_CLASS_MAP.get(orm_obj.role)
+        if not cls:
+            raise ValueError(f"Unknown role: {orm_obj.role}")
+        return cls(
+            user_id=str(orm_obj.id),
+            name=orm_obj.name,
+            email=orm_obj.email,
+            role=orm_obj.role,
+            login=orm_obj.login
+        )
+
+    def get_by_login(self, login):
+        try:
+            user = UserModel.objects.get(login=login)
+            return self._to_domain(user)
+        except UserModel.DoesNotExist:
             return None
-        return UserMapper.to_domain(model)
 
-    def get_by_login(self, login: str) -> UserBase | None:
-        UserModel = apps.get_model('infrastructure', 'UserModel')
-        model = UserModel.objects.filter(login=login).first()
-        if not model:
+    def get_by_id(self, user_id):
+        try:
+            user = UserModel.objects.get(id=user_id)
+            return self._to_domain(user)
+        except UserModel.DoesNotExist:
             return None
-        return UserMapper.to_domain(model)
 
-    def list_all(self) -> list[UserBase]:
-        UserModel = apps.get_model('infrastructure', 'UserModel')
-        return [UserMapper.to_domain(u) for u in UserModel.objects.all()]
+    def list_all(self):
+        return [self._to_domain(u) for u in UserModel.objects.all()]
 
-    def save(self, user: UserBase) -> UserBase:
-        UserModel = apps.get_model('infrastructure', 'UserModel')
-        with transaction.atomic():
-            model = UserModel.objects.filter(id=user.get_id()).first()
-            model = UserMapper.to_orm(user, model)
-            model.save()
-        return UserMapper.to_domain(model)
+    def save(self, domain_user, password=None):
+        try:
+            user = UserModel.objects.get(login=domain_user.get_login())
+            user.name = domain_user.get_name()
+            user.email = domain_user.get_email()
+            user.role = domain_user.get_role()
+            if password:
+                user.set_password(password)
+            user.save()
+        except UserModel.DoesNotExist:
+            user = UserModel.objects.create_user(
+                login=domain_user.get_login(),
+                email=domain_user.get_email(),
+                name=domain_user.get_name(),
+                role=domain_user.get_role(),
+                password=password or "test123"
+            )
+        return self._to_domain(user)
 
-    def delete(self, user_id: str) -> None:
-        UserModel = apps.get_model('infrastructure', 'UserModel')
+    def delete(self, user_id: str):
         UserModel.objects.filter(id=user_id).delete()

@@ -1,4 +1,6 @@
 #appcore/urls.py
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from infrastructure.api.auth.login_with_login import LoginObtainPairView
 """
 URL configuration for appcore project.
 

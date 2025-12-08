@@ -7,8 +7,8 @@ import uuid
 class CommentModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     content = models.TextField()
-    task = models.ForeignKey('infrastructure.TaskModel', on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey('infrastructure.UserModel', on_delete=models.SET_NULL, null=True)
+    task = models.ForeignKey('orm.TaskModel', on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey('orm.UserModel', on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

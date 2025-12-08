@@ -8,14 +8,14 @@ from infrastructure.orm.mappers.task_mapper import TaskMapper
 class TaskDjangoRepository(TaskRepository):
 
     def get_by_id(self, task_id: str) -> TaskBase | None:
-        TaskModel = apps.get_model('infrastructure', 'TaskModel')
+        TaskModel = apps.get_model('orm', 'TaskModel')
         model = TaskModel.objects.filter(id=task_id).first()
         if not model:
             return None
         return TaskMapper.to_domain(model)
 
     def save(self, task: TaskBase) -> TaskBase:
-        TaskModel = apps.get_model('infrastructure', 'TaskModel')
+        TaskModel = apps.get_model('orm', 'TaskModel')
         from infrastructure.orm.models.user_model import UserModel
         from infrastructure.orm.models.tag_model import TagModel
 
@@ -34,19 +34,19 @@ class TaskDjangoRepository(TaskRepository):
         return TaskMapper.to_domain(model)
 
     def delete(self, task_id: str) -> None:
-        TaskModel = apps.get_model('infrastructure', 'TaskModel')
+        TaskModel = apps.get_model('orm', 'TaskModel')
         TaskModel.objects.filter(id=task_id).delete()
 
     def get_all(self) -> list[TaskBase]:
-        TaskModel = apps.get_model('infrastructure', 'TaskModel')
+        TaskModel = apps.get_model('orm', 'TaskModel')
         return [TaskMapper.to_domain(m) for m in TaskModel.objects.all()]
 
     def list_by_project(self, project_id: str) -> list[TaskBase]:
-        TaskModel = apps.get_model('infrastructure', 'TaskModel')
+        TaskModel = apps.get_model('orm', 'TaskModel')
         models = TaskModel.objects.filter(project_id=project_id)
         return [TaskMapper.to_domain(m) for m in models]
 
     def list_by_sprint(self, sprint_id: int) -> list[TaskBase]:
-        TaskModel = apps.get_model('infrastructure', 'TaskModel')
+        TaskModel = apps.get_model('orm', 'TaskModel')
         models = TaskModel.objects.filter(sprint_id=sprint_id)
         return [TaskMapper.to_domain(m) for m in models]

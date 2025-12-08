@@ -9,11 +9,7 @@ class SprintModel(models.Model):
     name = models.CharField(max_length=255)
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(default=timezone.now)
-    project = models.ForeignKey(
-        ProjectModel,
-        on_delete=models.CASCADE,
-        related_name="sprints",
-    )
+    project = models.ForeignKey('orm.ProjectModel', on_delete=models.CASCADE, related_name="sprints")
 
     class Meta:
         db_table = "sprints"

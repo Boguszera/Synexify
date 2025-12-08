@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -13,6 +14,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'infrastructure.orm.apps.OrmConfig',
 ]
+AUTH_USER_MODEL = "orm.UserModel"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -45,8 +47,7 @@ TEMPLATES = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -54,6 +55,15 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'appcore.utils.custom_exception_handler',
 }
 
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
+
+AUTHENTICATION_BACKENDS = [
+    "infrastructure.api.auth.login_backend.LoginBackend",
+]
 
 load_dotenv()
 

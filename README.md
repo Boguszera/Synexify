@@ -166,16 +166,6 @@ http://127.0.0.1:8000/
 You should see the Django default page or your own view.
 
 ---
-
-## Database Setup / Migrations
-
-Before running the project or using the admin panel, apply migrations
-
-```bash
-docker compose exec web python manage.py makemigrations
-docker compose exec web python manage.py migrate
-```
-
 ## Seeding the Database
 
 To create test users, projects, sprints, tasks, comments, and attachments:
