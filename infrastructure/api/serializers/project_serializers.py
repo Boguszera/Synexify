@@ -8,5 +8,5 @@ class ProjectSerializer(serializers.Serializer):
     description = serializers.CharField()
     member_ids = serializers.ListField(child=serializers.CharField(), read_only=True)
     task_ids = serializers.ListField(child=serializers.CharField(), read_only=True)
-    sprint_ids = serializers.ListField(child=serializers.IntegerField(), read_only=True)
+    sprint_id = serializers.CharField(required=False, allow_null=True)
     archived = serializers.BooleanField(read_only=True)

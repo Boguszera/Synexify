@@ -1,18 +1,16 @@
-# infrastructure/orm/mappers/sprint_mapper.py
 from infrastructure.orm.models.sprint_model import SprintModel
 from domain.sprints.sprint_base import SprintBase
 from typing import Optional
-from infrastructure.orm.models.task_model import TaskModel
 
 class SprintMapper:
     @staticmethod
     def to_domain(model: SprintModel) -> SprintBase:
         sprint = SprintBase(
-            sprint_id=int(model.id),
+            sprint_id=str(model.id),
             name=model.name,
             start_date=model.start_date,
             end_date=model.end_date,
-            project_id=int(model.project.id) if model.project else None
+            project_id=str(model.project.id) if model.project else None
         )
 
         # Populate task ids
@@ -25,7 +23,7 @@ class SprintMapper:
             model = SprintModel()
 
         model.name = sprint.get_name()
-        model.project_id = sprint.get_project_id()
+        model.project_id = sprint.get_project_id()  # string UUID
         model.start_date = getattr(sprint, "_start_date", None)
         model.end_date = getattr(sprint, "_end_date", None)
 

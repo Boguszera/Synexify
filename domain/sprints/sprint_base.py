@@ -3,7 +3,7 @@ from typing import List, Optional, Callable
 from domain.interfaces.reportable import Reportable
 
 class SprintBase(Reportable):
-    def __init__(self, sprint_id: int, name: str, start_date=None, end_date=None, project_id: Optional[int] = None):
+    def __init__(self, sprint_id: str, name: str, start_date=None, end_date=None, project_id: Optional[str] = None):
         if not name or not name.strip():
             raise ValueError("Sprint name must be a non-empty string")
         self._id = sprint_id
@@ -13,7 +13,7 @@ class SprintBase(Reportable):
         self._end_date = end_date
         self._project_id = project_id
 
-    def get_id(self) -> int:
+    def get_id(self) -> str:
         return self._id
 
     def get_name(self) -> str:
@@ -22,7 +22,7 @@ class SprintBase(Reportable):
     def get_task_ids(self) -> List[str]:
         return list(self._task_ids)
 
-    def get_project_id(self) -> Optional[int]:
+    def get_project_id(self) -> Optional[str]:
         return self._project_id
 
     def add_task_id(self, task_id: str):

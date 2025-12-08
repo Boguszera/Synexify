@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 class SprintSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
+    id = serializers.CharField(read_only=True)
     name = serializers.CharField()
     start_date = serializers.DateField()
     end_date = serializers.DateField()

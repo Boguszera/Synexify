@@ -4,7 +4,7 @@ from domain.projects.project_base import ProjectBase
 
 class ProjectRepository(ABC):
     @abstractmethod
-    def get_by_id(self, project_id: int) -> Optional[ProjectBase]:
+    def get_by_id(self, project_id: str) -> Optional[ProjectBase]:
         pass
 
     @abstractmethod
@@ -12,7 +12,7 @@ class ProjectRepository(ABC):
         pass
 
     @abstractmethod
-    def delete(self, project_id: int) -> None:
+    def delete(self, project_id: str) -> None:
         pass
 
     @abstractmethod

@@ -1,14 +1,19 @@
 # infrastructure/orm/models/sprint_model.py
 from django.db import models
+from django.utils import timezone
 from infrastructure.orm.models.project_model import ProjectModel
-# import uuid
+import uuid
 
 class SprintModel(models.Model):
-    id = models.AutoField(primary_key=True)  # integer PK
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    project = models.ForeignKey(ProjectModel, on_delete=models.CASCADE, related_name="sprints")
-    start_date = models.DateTimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
+    start_date = models.DateTimeField(default=timezone.now)
+    end_date = models.DateTimeField(default=timezone.now)
+    project = models.ForeignKey(
+        ProjectModel,
+        on_delete=models.CASCADE,
+        related_name="sprints",
+    )
 
     class Meta:
         db_table = "sprints"

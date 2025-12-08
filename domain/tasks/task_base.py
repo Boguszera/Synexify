@@ -12,7 +12,7 @@ class TaskBase(Assignable, Commentable):
 
     VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
 
-    def __init__(self, task_id: Optional[str], title: str, description: str, project_id: int = None, sprint_id: Optional[str] = None):
+    def __init__(self, task_id: Optional[str], title: str, description: str, project_id: str = None, sprint_id: Optional[str] = None):
         self._id = task_id or str(uuid.uuid4())
         self._title = title
         self._description = description
@@ -49,10 +49,10 @@ class TaskBase(Assignable, Commentable):
     def get_tag_ids(self) -> List[str]:
         return list(self._tag_ids)
 
-    def get_project_id(self) -> Optional[int]:
+    def get_project_id(self) -> Optional[str]:
         return self._project_id
 
-    def get_sprint_id(self) -> Optional[int]:
+    def get_sprint_id(self) -> Optional[str]:
         return self._sprint_id
 
     def get_assignees_ids(self) -> List[str]:
@@ -75,7 +75,7 @@ class TaskBase(Assignable, Commentable):
         self._status = new_status
         self._domain_events.append(TaskStatusChangedEvent(task_id=self._id, old_status=old, new_status=new_status))
 
-    def add_comment(self, comment_id: str, commenter_id: Optional[int] = None) -> None:
+    def add_comment(self, comment_id: str, commenter_id: Optional[str] = None) -> None:
         if comment_id in self._comment_ids:
             return
         self._comment_ids.append(comment_id)

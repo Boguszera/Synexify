@@ -4,7 +4,7 @@ from domain.sprints.sprint_base import SprintBase
 
 class SprintRepository(ABC):
     @abstractmethod
-    def get_by_id(self, sprint_id: int) -> Optional[SprintBase]:
+    def get_by_id(self, sprint_id: str) -> Optional[SprintBase]:
         pass
 
     @abstractmethod
@@ -12,9 +12,9 @@ class SprintRepository(ABC):
         pass
 
     @abstractmethod
-    def delete(self, sprint_id: int) -> None:
+    def delete(self, sprint_id: str) -> None:
         pass
 
     @abstractmethod
-    def list_by_project(self, project_id: int) -> List[SprintBase]:
+    def list_by_project(self, project_id: str) -> List[SprintBase]:
         pass

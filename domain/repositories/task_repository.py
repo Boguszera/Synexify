@@ -20,5 +20,5 @@ class TaskRepository(ABC):
         pass
 
     @abstractmethod
-    def list_by_sprint(self, sprint_id: int) -> List[TaskBase]:
+    def list_by_sprint(self, sprint_id: str) -> List[TaskBase]:
         pass

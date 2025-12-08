@@ -12,4 +12,4 @@ class TaskSerializer(serializers.Serializer):
     attachment_ids = serializers.ListField(child=serializers.CharField(), read_only=True)
     tag_ids = serializers.ListField(child=serializers.CharField(), read_only=True)
     project_id = serializers.CharField()
-    sprint_id = serializers.IntegerField(required=False, allow_null=True)
+    sprint_id = serializers.CharField(required=False, allow_null=True)

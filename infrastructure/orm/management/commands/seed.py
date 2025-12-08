@@ -32,7 +32,6 @@ class Command(BaseCommand):
         # --- USERS ---
         print("Creating users...")
         users = {}
-
         role_map = [
             ("admin", "root"),
             ("manager", "mgr1"),
@@ -41,6 +40,12 @@ class Command(BaseCommand):
         ]
 
         for role, login in role_map:
+            existing_user = user_repo.get_by_login(login)
+            if existing_user:
+                print(f"User {login} already exists, skipping...")
+                users[role] = existing_user
+                continue
+
             if role == "admin":
                 user = AdminUser(name=login, email=f"{login}@example.com", role=role, login=login)
             elif role == "manager":
@@ -51,78 +56,138 @@ class Command(BaseCommand):
                 user = ClientUser(name=login, email=f"{login}@example.com", role=role, login=login)
 
             user_repo.save(user)
-
             users[role] = user
 
-            User.objects.update_or_create(
-                username=user.get_login(),
-                defaults={"email": user.get_email(), "password": "zaq1@WSX"}
-            )
-
-        # --- PROJECT ---
+        # --- PROJECTS ---
         print("Creating projects...")
-        project1 = ProjectBase(name="Website Redesign", description="Redesign company website")
-        project1.add_member_id(users["manager"].get_id())
-        project1.add_member_id(users["team_member"].get_id())
-        project_repo.save(project1)
 
-        project2 = ProjectBase(name="Mobile App", description="Develop mobile application")
-        project2.add_member_id(users["manager"].get_id())
-        project2.add_member_id(users["team_member"].get_id())
-        project_repo.save(project2)
+        def create_project_if_not_exists(name, description, member_ids):
+            # Sprawdź po nazwie, czy projekt już istnieje
+            existing = next((p for p in project_repo.list_all() if p.get_name() == name), None)
+            if existing:
+                print(f"Project {name} already exists, skipping...")
+                return existing
+            proj = ProjectBase(name=name, description=description)
+            for uid in member_ids:
+                proj.add_member_id(uid)
+            project_repo.save(proj)
+            return proj
+
+        project1 = create_project_if_not_exists(
+            "Website Redesign", "Redesign company website",
+            [users["manager"].get_id(), users["team_member"].get_id()]
+        )
+
+        project2 = create_project_if_not_exists(
+            "Mobile App", "Develop mobile application",
+            [users["manager"].get_id(), users["team_member"].get_id()]
+        )
 
         # --- SPRINTS ---
         print("Creating sprints...")
-        sprint1 = SprintBase(sprint_id=1, name="Sprint 1", start_date=datetime.now(),
-                             end_date=datetime.now() + timedelta(days=14))
-        sprint2 = SprintBase(sprint_id=2, name="Sprint 2", start_date=datetime.now() + timedelta(days=15),
-                             end_date=datetime.now() + timedelta(days=30))
-        sprint_repo.save(sprint1)
-        sprint_repo.save(sprint2)
 
-        project1.add_sprint_id(sprint1.get_id())
-        project1.add_sprint_id(sprint2.get_id())
-        project_repo.save(project1)
+        def create_sprint_if_not_exists(name, start_date, end_date, project):
+            existing = next(
+                (s for s in sprint_repo.list_by_project(project.get_id()) if s.get_name() == name),
+                None
+            )
+            if existing:
+                print(f"Sprint {name} already exists in project {project.get_name()}, skipping...")
+                return existing
+            sprint = SprintBase(
+                sprint_id=str(uuid.uuid4()),
+                name=name,
+                start_date=start_date,
+                end_date=end_date,
+                project_id=project.get_id()
+            )
+            project.add_sprint_id(sprint.get_id())
+            project_repo.save(project)
+            sprint_repo.save(sprint)
+            return sprint
+
+        sprint1 = create_sprint_if_not_exists(
+            "Sprint 1", datetime.now(), datetime.now() + timedelta(days=14), project1
+        )
+
+        sprint2 = create_sprint_if_not_exists(
+            "Sprint 2", datetime.now() + timedelta(days=15), datetime.now() + timedelta(days=30), project1
+        )
 
         # --- TASKS ---
         print("Creating tasks...")
-        task1 = BugTask(title="Fix login bug", description="Cannot login with correct credentials",
-                        severity="high", task_id=str(uuid.uuid4()))
-        task1.assign_user_id(users["team_member"].get_id())
-        project1.add_task_id(task1.get_id())
-        sprint1.add_task_id(task1.get_id())
-        task_repo.save(task1)
 
-        task2 = FeatureTask(title="Add user profile page", description="Create profile page for users",
-                            story_points=5, task_id=str(uuid.uuid4()))
-        task2.assign_user_id(users["team_member"].get_id())
-        project1.add_task_id(task2.get_id())
-        sprint1.add_task_id(task2.get_id())
-        task_repo.save(task2)
+        def create_task_if_not_exists(task_class, title, description, assignee_id, project, sprint=None, **kwargs):
+            existing = next(
+                (t for t in task_repo.get_all() if t.get_title() == title),
+                None
+            )
+            if existing:
+                print(f"Task {title} already exists, skipping...")
+                return existing
+            task = task_class(title=title, description=description, task_id=str(uuid.uuid4()), **kwargs)
+            task.assign_user_id(assignee_id)
+            project.add_task_id(task.get_id())
+            if sprint:
+                sprint.add_task_id(task.get_id())
+            task_repo.save(task)
+            project_repo.save(project)
+            if sprint:
+                sprint_repo.save(sprint)
+            return task
 
-        task3 = ChoreTask(title="Setup CI/CD", description="Configure GitHub Actions pipelines",
-                          task_id=str(uuid.uuid4()))
-        task3.assign_user_id(users["manager"].get_id())
-        project2.add_task_id(task3.get_id())
-        task_repo.save(task3)
+        task1 = create_task_if_not_exists(
+            BugTask, "Fix login bug",
+            "Cannot login with correct credentials",
+            users["team_member"].get_id(),
+            project1,
+            sprint1,
+            severity="high"
+        )
 
-        project_repo.save(project1)
-        project_repo.save(project2)
+        task2 = create_task_if_not_exists(
+            FeatureTask, "Add user profile page",
+            "Create profile page for users",
+            users["team_member"].get_id(),
+            project1,
+            sprint1,
+            story_points=5
+        )
+
+        task3 = create_task_if_not_exists(
+            ChoreTask, "Setup CI/CD",
+            "Configure GitHub Actions pipelines",
+            users["manager"].get_id(),
+            project2
+        )
 
         # --- COMMENTS ---
         print("Adding comments...")
-        comment1 = Comment(content="Started working on bug", author=users["team_member"])
-        task1.add_comment(comment1.get_id(), comment1.get_author())
-        task_repo.save(task1)
 
-        comment2 = Comment(content="Remember to add tests", author=users["manager"])
-        task2.add_comment(comment2.get_id(), comment2.get_author())
-        task_repo.save(task2)
+        def add_comment_to_task(task, content, author):
+            existing_comments = [c_id for c_id in task.get_comments_ids()]
+            if existing_comments:
+                print(f"Task {task.get_id()} already has comments, skipping...")
+                return
+            comment = Comment(content=content, author=author)
+            task.add_comment(comment.get_id(), comment.get_author())
+            task_repo.save(task)
+
+        add_comment_to_task(task1, "Started working on bug", users["team_member"])
+        add_comment_to_task(task2, "Remember to add tests", users["manager"])
 
         # --- ATTACHMENTS ---
         print("Adding attachments...")
-        attachment1 = Attachment(filename="screenshot.png", uploaded_by=users["team_member"])
-        task1.attach_file_id(attachment1.get_id())
-        task_repo.save(task1)
+
+        def add_attachment_to_task(task, filename, uploader):
+            existing_attachments = [a_id for a_id in task.get_attachment_ids()]
+            if existing_attachments:
+                print(f"Task {task.get_id()} already has attachments, skipping...")
+                return
+            attachment = Attachment(filename=filename, uploaded_by=uploader)
+            task.attach_file_id(attachment.get_id())
+            task_repo.save(task)
+
+        add_attachment_to_task(task1, "screenshot.png", users["team_member"])
 
         print("Seeding complete!")

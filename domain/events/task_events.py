@@ -23,7 +23,7 @@ class TaskAssignedEvent(DomainEvent):
 
 
 class TaskCommentAddedEvent(DomainEvent):
-    def __init__(self, task_id: str, commenter_id: int | None, comment_id: str):
+    def __init__(self, task_id: str, commenter_id: str | None, comment_id: str):
         super().__init__()
         self.task_id = task_id
         self.commenter_id = commenter_id

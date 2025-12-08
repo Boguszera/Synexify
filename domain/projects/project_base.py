@@ -15,7 +15,7 @@ class ProjectBase(Reportable):
         self._description = description
         self._member_ids: List[str] = []
         self._task_ids: List[str] = []
-        self._sprint_ids: List[int] = []
+        self._sprint_ids: List[str] = []
         self._archived: bool = False
 
     def get_id(self) -> str:
@@ -33,7 +33,7 @@ class ProjectBase(Reportable):
     def get_task_ids(self) -> List[str]:
         return list(self._task_ids)
 
-    def get_sprint_ids(self) -> List[int]:
+    def get_sprint_ids(self) -> List[str]:
         return list(self._sprint_ids)
 
     def add_member_id(self, user_id: str):
@@ -51,7 +51,7 @@ class ProjectBase(Reportable):
             return
         self._task_ids.append(task_id)
 
-    def add_sprint_id(self, sprint_id: int):
+    def add_sprint_id(self, sprint_id: str):
         if sprint_id in self._sprint_ids:
             return
         self._sprint_ids.append(sprint_id)
