@@ -7,6 +7,7 @@ from application.reporting_service import ReportingService
 from application.sprint_service import SprintService
 from application.task_service import TaskService
 from application.authorization_service import AuthorizationService
+from application.project_service import ProjectService
 
 from infrastructure.repositories.user_django_repository import UserDjangoRepository
 from infrastructure.repositories.project_django_repository import ProjectDjangoRepository
@@ -21,30 +22,24 @@ class Container:
         self.task_repo = TaskDjangoRepository()
         self.sprint_repo = SprintDjangoRepository()
 
-        # --- SERVICES (domain / external) ---
+        # --- SERVICES ---
         self.auth = AuthorizationService()
 
         # --- APPLICATION SERVICES ---
+        self.project_service = ProjectService(
+            auth_service=self.auth,
+            project_repo=self.project_repo
+        )
+
         self.admin_panel = AdminPanelService(
             auth_service=self.auth,
             user_repo=self.user_repo,
-            project_repo=self.project_repo,
+            project_repo=self.project_repo
         )
 
-        self.backlog = BacklogService(
-            auth_service=self.auth,
-            task_repo=self.task_repo,
-        )
-
-        self.notifications = NotificationsService(
-            task_repo=self.task_repo,
-            user_repo=self.user_repo,
-        )
-
-        self.reporting = ReportingService(
-            auth_service=self.auth,
-            task_repo=self.task_repo,
-        )
+        self.backlog = BacklogService(auth_service=self.auth, task_repo=self.task_repo)
+        self.notifications = NotificationsService(task_repo=self.task_repo, user_repo=self.user_repo)
+        self.reporting = ReportingService(auth_service=self.auth, task_repo=self.task_repo)
 
         self.sprints = SprintService(
             auth_service=self.auth,

@@ -14,6 +14,7 @@ class ProjectBase(Reportable):
         self._name = name
         self._description = description
         self._member_ids: List[str] = []
+        self._manager_ids: List[str] = []
         self._task_ids: List[str] = []
         self._sprint_ids: List[str] = []
         self._archived: bool = False
@@ -23,6 +24,9 @@ class ProjectBase(Reportable):
 
     def get_name(self) -> str:
         return self._name
+
+    def get_archived(self) -> bool:
+        return self._archived
 
     def get_description(self) -> str:
         return self._description
@@ -50,6 +54,13 @@ class ProjectBase(Reportable):
         if task_id in self._task_ids:
             return
         self._task_ids.append(task_id)
+
+    def add_manager_id(self, user_id: str):
+        if user_id not in self._manager_ids:
+            self._manager_ids.append(user_id)
+
+    def is_manager(self, user_id: str) -> bool:
+        return user_id in self._manager_ids
 
     def add_sprint_id(self, sprint_id: str):
         if sprint_id in self._sprint_ids:

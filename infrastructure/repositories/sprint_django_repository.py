@@ -1,3 +1,5 @@
+# # infrastructure/repositories/sprint_django_repository.py
+
 from django.db import transaction
 from django.apps import apps
 from domain.repositories.sprint_repository import SprintRepository
@@ -29,5 +31,10 @@ class SprintDjangoRepository(SprintRepository):
     def list_by_project(self, project_id: str) -> list[SprintBase]:
         SprintModel = apps.get_model('orm', 'SprintModel')
         models = SprintModel.objects.filter(project_id=project_id)
+        return [SprintMapper.to_domain(m) for m in models]
+
+    def list_all(self) -> list[SprintBase]:
+        SprintModel = apps.get_model('orm', 'SprintModel')
+        models = SprintModel.objects.all()
         return [SprintMapper.to_domain(m) for m in models]
 

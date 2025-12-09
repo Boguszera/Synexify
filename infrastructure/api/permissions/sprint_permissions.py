@@ -1,24 +1,16 @@
-#infrastructure/api/permissions/project_permissions.py
+#infrastructure/api/permissions/sprint_permissions.py
 
-class ProjectPermissions:
+class SprintPermissions:
     @staticmethod
-    def can_view(user, project):
+    def can_view(user, sprint, project):
         if user.get_role() == "admin":
             return True
-        if user.get_role() == "team_member" and user.get_id() in project.get_member_ids():
+        if user.get_role() in ("manager", "team_member") and user.get_id() in project.get_member_ids():
             return True
         return False
 
     @staticmethod
-    def can_edit(user, project):
-        if user.get_role() == "admin":
-            return True
-        if user.get_role() == "manager" and user.get_id() in project.get_member_ids():
-            return True
-        return False
-
-    @staticmethod
-    def can_delete(user, project):
+    def can_edit(user, sprint, project):
         if user.get_role() == "admin":
             return True
         if user.get_role() == "manager" and user.get_id() in project.get_member_ids():
@@ -26,5 +18,13 @@ class ProjectPermissions:
         return False
 
     @staticmethod
-    def can_create(user):
-        return user.get_role() in ["admin", "manager"]
+    def can_delete(user, sprint, project):
+        return SprintPermissions.can_edit(user, sprint, project)
+
+    @staticmethod
+    def can_create(user, project):
+        if user.get_role() == "admin":
+            return True
+        if user.get_role() == "manager" and user.get_id() in project.get_member_ids():
+            return True
+        return False

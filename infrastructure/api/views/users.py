@@ -50,15 +50,19 @@ class UserViewSet(
     def create(self, request, *args, **kwargs):
         container = self.get_container()
         domain_user = to_domain_user(request.user)
+
         try:
-            user = container.admin_panel.create_user(
-                name=request.data["name"],
-                email=request.data["email"],
-                role=request.data["role"],
-                login=request.data["login"],
+            created = container.admin_panel.create_user(
+                name=request.data.get("name"),
+                email=request.data.get("email"),
+                role=request.data.get("role"),
+                login=request.data.get("login"),
+                password=request.data.get("password"),
                 user=domain_user
             )
-            return Response(to_dict(user), status=status.HTTP_201_CREATED)
+
+            return Response(to_dict(created), status=status.HTTP_201_CREATED)
+
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
 

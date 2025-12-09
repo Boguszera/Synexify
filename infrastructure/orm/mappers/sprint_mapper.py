@@ -21,9 +21,10 @@ class SprintMapper:
     def to_orm(sprint: SprintBase, model: Optional[SprintModel] = None) -> SprintModel:
         if model is None:
             model = SprintModel()
+            model.id = sprint.get_id()
 
         model.name = sprint.get_name()
-        model.project_id = sprint.get_project_id()  # string UUID
+        model.project_id = sprint.get_project_id()
         model.start_date = getattr(sprint, "_start_date", None)
         model.end_date = getattr(sprint, "_end_date", None)
 

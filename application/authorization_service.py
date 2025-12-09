@@ -17,7 +17,7 @@ class AuthorizationService:
         if isinstance(user, AdminUser):
             return True
         if isinstance(user, (ManagerUser, TeamMemberUser, ClientUser)):
-            return user in project.get_members()
+            return user in project.get_member_ids()
         return False
 
     def can_manage_user(self, user: UserBase, target_user: UserBase) -> bool:
@@ -27,7 +27,7 @@ class AuthorizationService:
         if isinstance(user, AdminUser):
             return True
         if isinstance(user, ManagerUser):
-            return user in project.get_members()
+            return user.get_id() in project.get_member_ids()
         return False
 
     def check_manage_project(self, user, project):

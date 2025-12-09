@@ -1,12 +1,13 @@
 # domain/sprints/sprint_base.py
 from typing import List, Optional, Callable
 from domain.interfaces.reportable import Reportable
+import uuid
 
 class SprintBase(Reportable):
-    def __init__(self, sprint_id: str, name: str, start_date=None, end_date=None, project_id: Optional[str] = None):
+    def __init__(self, name: str, start_date=None, end_date=None, project_id: Optional[str] = None, sprint_id: Optional[str] = None):
         if not name or not name.strip():
             raise ValueError("Sprint name must be a non-empty string")
-        self._id = sprint_id
+        self._id = sprint_id or str(uuid.uuid4())
         self._name = name
         self._task_ids: List[str] = []
         self._start_date = start_date
@@ -24,6 +25,12 @@ class SprintBase(Reportable):
 
     def get_project_id(self) -> Optional[str]:
         return self._project_id
+
+    def get_start_date(self):
+        return self._start_date
+
+    def get_end_date(self):
+        return self._end_date
 
     def add_task_id(self, task_id: str):
         if task_id in self._task_ids:

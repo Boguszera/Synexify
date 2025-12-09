@@ -1,4 +1,4 @@
-# infrastructure/api/views/users.py
+# infrastructure/api/serializers/user_serializers
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, BasePermission
