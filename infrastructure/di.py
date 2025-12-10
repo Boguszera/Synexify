@@ -45,6 +45,7 @@ class Container:
             auth_service=self.auth,
             sprint_repo=self.sprint_repo,
             project_repo=self.project_repo,
+            task_repo=self.task_repo,
         )
 
         self.tasks = TaskService(
@@ -52,4 +53,5 @@ class Container:
             task_repo=self.task_repo,
             project_repo=self.project_repo,
             notification_service=self.notifications,
+            user_repo=self.user_repo,
         )

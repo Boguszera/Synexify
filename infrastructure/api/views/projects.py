@@ -35,6 +35,12 @@ class ProjectViewSet(viewsets.ViewSet):
     def create(self, request):
         container = self.get_container()
         domain_user = to_domain_user(request.user)
+
+        # 1. FAIL FAST: Check if the user is authorized to CREATE the project
+        if not ProjectPermissions.can_create(domain_user):
+            # We return 403 immediately without relying on service exceptions
+            return Response({"detail": "Forbidden: User role cannot create projects"}, status=403)
+
         try:
             project = container.project_service.create_project(
                 name=request.data["name"],
@@ -43,6 +49,7 @@ class ProjectViewSet(viewsets.ViewSet):
             )
             return Response(project_to_dict(project), status=201)
         except PermissionDenied:
+            # This catch is now redundant but kept for safety if permissions are re-checked in service
             return Response({"detail": "Forbidden"}, status=403)
 
     def update(self, request, pk=None):

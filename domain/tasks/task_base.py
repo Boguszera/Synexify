@@ -96,6 +96,9 @@ class TaskBase(Assignable, Commentable):
         if tag_id in self._tag_ids:
             self._tag_ids.remove(tag_id)
 
+    def set_sprint_id(self, sprint_id: str):
+        self._sprint_id = sprint_id
+
     # domain events accessor
     def pull_domain_events(self):
         events = list(self._domain_events)

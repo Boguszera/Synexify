@@ -116,3 +116,25 @@ class TaskViewSet(viewsets.ViewSet):
         attachments = [container.tasks.get_attachment_by_id(aid) for aid in task.get_attachment_ids()]
         serializer = AttachmentSerializer(attachments, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['patch'])
+    def assign(self, request, pk=None):
+        container = self.get_container()
+        domain_user = to_domain_user(request.user)
+
+        task = container.tasks.task_repo.get_by_id(pk)
+        if not task:
+            return Response({"detail": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        assignee_id = request.data.get("assignee_id")
+        if not assignee_id:
+            return Response({"detail": "assignee_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            container.tasks.assign_task_by_id(task, domain_user, assignee_id)
+            return Response({"status": f"Task assigned to {assignee_id}"}, status=status.HTTP_200_OK)
+
+        except PermissionDenied as e:
+            return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)

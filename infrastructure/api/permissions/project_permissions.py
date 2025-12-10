@@ -5,7 +5,7 @@ class ProjectPermissions:
     def can_view(user, project):
         if user.get_role() == "admin":
             return True
-        if user.get_role() == "team_member" and user.get_id() in project.get_member_ids():
+        if user.get_role() in ("manager", "team_member") and user.get_id() in project.get_member_ids():
             return True
         return False
 

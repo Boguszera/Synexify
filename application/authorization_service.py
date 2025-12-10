@@ -8,7 +8,9 @@ from domain.users.user_base import UserBase
 class AuthorizationService:
 
     def can_edit_task(self, user: UserBase, task) -> bool:
-        return isinstance(user, (AdminUser, ManagerUser)) or user in task.get_assignees()
+        if isinstance(user, AdminUser) or isinstance(user, ManagerUser):
+            return True
+        return False
 
     def can_assign_task(self, user: UserBase, task) -> bool:
         return isinstance(user, (AdminUser, ManagerUser))
@@ -31,6 +33,8 @@ class AuthorizationService:
         return False
 
     def check_manage_project(self, user, project):
+        if project is None:
+            raise PermissionDenied(user.get_id(), action="manage_project", resource="Project is None")
         if not self.can_manage_project(user, project):
             raise PermissionDenied(user.get_id(), action="manage_project", resource=project.get_id())
 

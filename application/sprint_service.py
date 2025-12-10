@@ -3,10 +3,11 @@
 from domain.sprints.sprint_base import SprintBase
 
 class SprintService:
-    def __init__(self, auth_service, sprint_repo, project_repo):
+    def __init__(self, auth_service, sprint_repo, project_repo, task_repo):
         self.auth = auth_service
         self.sprint_repo = sprint_repo
         self.project_repo = project_repo
+        self.task_repo = task_repo
 
     # ---- CRUD Sprints ----
     def list_sprints(self, user):
@@ -49,17 +50,25 @@ class SprintService:
         self.auth.check_manage_project(user, project)
         self.sprint_repo.delete(sprint.get_id())
 
-    def add_task_to_sprint(self, sprint, task, user):
-        project = self.project_repo.get_by_id(sprint.get_project_id())
-        self.auth.check_manage_project(user, project)
-        sprint.add_task_id(task.get_id())
-        self.sprint_repo.save(sprint)
-
     def remove_task_from_sprint(self, sprint, task, user):
         project = self.project_repo.get_by_id(sprint.get_project_id())
         self.auth.check_manage_project(user, project)
         sprint.remove_task_id(task.get_id())
         self.sprint_repo.save(sprint)
+
+    def add_task_to_sprint(self, sprint, task, user):
+        project = self.project_repo.get_by_id(sprint.get_project_id())
+        self.auth.check_manage_project(user, project)
+        sprint.add_task_id(task.get_id())
+        task.set_sprint_id(sprint.get_id())
+        self.task_repo.save(task)
+
+    def remove_task_from_sprint(self, sprint, task, user):
+        project = self.project_repo.get_by_id(sprint.get_project_id())
+        self.auth.check_manage_project(user, project)
+        sprint.set_task_id(task.get_id())
+        task.assign_sprint_id(None)
+        self.task_repo.save(sprint)
 
     def can_view(self, user, sprint, project):
         role = user.get_role()
