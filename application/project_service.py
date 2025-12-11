@@ -55,3 +55,4 @@ class ProjectService:
         if role == "manager" or role == "team_member":
             return user.get_id() in project.get_member_ids()
         return False
+

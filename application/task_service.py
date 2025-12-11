@@ -127,9 +127,4 @@ class TaskService:
             return
         project = self.project_repo.get_by_id(task.get_project_id())
         self.auth.check_manage_project(user, project)
-
-        # 3. Usuń Task z Projektu (nie wiem, trzeba zobaczyc implementacje ProjectBase)
-        # project.remove_task_id(task.get_id())
-        # self.project_repo.save(project)
-
         self.task_repo.delete(task_id)

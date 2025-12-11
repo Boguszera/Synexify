@@ -8,11 +8,15 @@ from application.sprint_service import SprintService
 from application.task_service import TaskService
 from application.authorization_service import AuthorizationService
 from application.project_service import ProjectService
+from application.comment_service import CommentService
+from application.attachment_service import AttachmentService
 
 from infrastructure.repositories.user_django_repository import UserDjangoRepository
 from infrastructure.repositories.project_django_repository import ProjectDjangoRepository
 from infrastructure.repositories.task_django_repository import TaskDjangoRepository
 from infrastructure.repositories.sprint_django_repository import SprintDjangoRepository
+from infrastructure.repositories.comment_django_repository import CommentDjangoRepository
+from infrastructure.repositories.attachment_django_repository import AttachmentDjangoRepository
 
 class Container:
     def __init__(self):
@@ -21,6 +25,8 @@ class Container:
         self.project_repo = ProjectDjangoRepository()
         self.task_repo = TaskDjangoRepository()
         self.sprint_repo = SprintDjangoRepository()
+        self.comment_repo = CommentDjangoRepository(user_repo=self.user_repo)
+        self.attachment_repo = AttachmentDjangoRepository(user_repo=self.user_repo)
 
         # --- SERVICES ---
         self.auth = AuthorizationService()
@@ -30,6 +36,9 @@ class Container:
             auth_service=self.auth,
             project_repo=self.project_repo
         )
+
+        self.comments = CommentService(self.auth, self.comment_repo, self.task_repo, self.user_repo)
+        self.attachments = AttachmentService(self.auth, self.attachment_repo, self.task_repo)
 
         self.admin_panel = AdminPanelService(
             auth_service=self.auth,

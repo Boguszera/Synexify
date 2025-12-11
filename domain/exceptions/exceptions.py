@@ -4,7 +4,7 @@ class DomainError(Exception):
     pass
 
 class PermissionDenied(DomainError):
-    def __init__(self, user_id: int, action: str, resource: str = None):
+    def __init__(self, user_id: str, action: str, resource: str = None):
         self.user_id = user_id
         self.action = action
         self.resource = resource
