@@ -1,3 +1,5 @@
+# application/comment_service
+
 from domain.users.user_base import UserBase
 from domain.comments.comment import Comment
 from domain.exceptions.exceptions import PermissionDenied
@@ -11,8 +13,6 @@ class CommentService:
         self.user_repo = user_repo
 
     def add_comment(self, task_id: str, user: UserBase, content: str) -> Comment:
-        # Zakładamy, że ViewSet sprawdził już dostęp do Projektu/Taska.
-        # Serwis tworzy i zapisuje.
         comment = Comment(content=content, author=user)
         return self.comment_repo.save(comment, task_id)
 
@@ -21,9 +21,8 @@ class CommentService:
         if not comment:
             raise ValueError("Comment not found")
 
-        task_id = comment.get_task_id()  # Pobieramy task_id z encji
+        task_id = comment.get_task_id()
 
-        # Logika uprawnień: tylko autor lub administrator może edytować
         if comment.get_author_id() != user.get_id() and user.get_role() not in ["admin", "manager"]:
             raise PermissionDenied(user.get_id(), action="update_comment", resource=comment_id)
 
@@ -35,7 +34,6 @@ class CommentService:
         if not comment:
             return
 
-        # Logika uprawnień: tylko autor lub administrator może usunąć
         if comment.get_author_id() != user.get_id() and user.get_role() not in ["admin", "manager"]:
             raise PermissionDenied(user.get_id(), action="delete_comment", resource=comment_id)
 

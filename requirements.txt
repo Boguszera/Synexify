@@ -1,3 +1,7 @@
+model-bakery
+pytest
+pytest-django
+factory-boy
 djangorestframework-simplejwt
 djangorestframework>=3.15
 Django>=6.0rc1

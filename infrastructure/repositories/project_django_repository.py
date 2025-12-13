@@ -11,7 +11,7 @@ class ProjectDjangoRepository(ProjectRepository):
 
     def get_by_id(self, project_id: str) -> ProjectBase | None:
         ProjectModel = apps.get_model('orm', 'ProjectModel')
-        model = ProjectModel.objects.filter(id=project_id).first()
+        model = ProjectModel.objects.filter(id=project_id).prefetch_related('members').first()
         if not model:
             return None
         return ProjectMapper.to_domain(model)

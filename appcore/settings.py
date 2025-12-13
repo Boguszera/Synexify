@@ -29,6 +29,10 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'appcore.urls'
 WSGI_APPLICATION = 'appcore.wsgi.application'
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

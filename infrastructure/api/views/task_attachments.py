@@ -6,7 +6,7 @@ from infrastructure.adapters.user_adapter import to_domain_user
 from infrastructure.api.serializers.attachment_serializers import AttachmentSerializer
 from infrastructure.api.permissions.project_permissions import ProjectPermissions
 
-
+# infrastructure/api/views/task_attachments.py
 class AttachmentViewSet(viewsets.ViewSet):
     def get_container(self):
         from infrastructure.di import Container

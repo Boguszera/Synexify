@@ -1,3 +1,5 @@
+# application/attachment_service.py
+
 from domain.users.user_base import UserBase
 from domain.attachments.attachment import Attachment
 from domain.exceptions.exceptions import PermissionDenied
@@ -20,7 +22,13 @@ class AttachmentService:
             raise ValueError(f"File {file.name} already exists for this task.")
 
         attachment = Attachment(filename=file.name, uploaded_by=user)
-        return self.attachment_repo.save(attachment, task_id, file_data=file)
+        saved_attachment = self.attachment_repo.save(attachment, task_id, file_data=file)
+        task = self.task_repo.get_by_id(task_id)
+        if task:
+            task.attach_file_id(saved_attachment.get_id())
+            self.task_repo.save(task)
+
+        return saved_attachment
 
     def list_attachments_for_task(self, task_id: str, user: UserBase):
         return self.attachment_repo.list_by_task(task_id)

@@ -1,3 +1,5 @@
+# application/authorization_service.py
+
 from domain.exceptions.exceptions import PermissionDenied
 from domain.users.admin_user import AdminUser
 from domain.users.manager_user import ManagerUser
@@ -19,7 +21,7 @@ class AuthorizationService:
         if isinstance(user, AdminUser):
             return True
         if isinstance(user, (ManagerUser, TeamMemberUser, ClientUser)):
-            return user in project.get_member_ids()
+            return user.get_id() in project.get_member_ids()
         return False
 
     def can_manage_user(self, user: UserBase, target_user: UserBase) -> bool:

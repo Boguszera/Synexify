@@ -63,4 +63,6 @@ class Container:
             project_repo=self.project_repo,
             notification_service=self.notifications,
             user_repo=self.user_repo,
+            attachment_repo=self.attachment_repo,
+            comment_repo=self.comment_repo
         )

@@ -17,7 +17,12 @@ class TaskViewSet(viewsets.ViewSet):
         container = self.get_container()
         try:
             domain_user = to_domain_user(request.user)
-            tasks = container.tasks.get_task_filters(user=domain_user)
+            filters = {}
+
+            if 'status' in request.query_params:
+                filters['status'] = request.query_params['status']
+
+            tasks = container.tasks.get_task_filters(user=domain_user, **filters)
             serializer = TaskSerializer(tasks, many=True)
             return Response(serializer.data)
         except PermissionDenied as e:
@@ -65,6 +70,8 @@ class TaskViewSet(viewsets.ViewSet):
             return Response(serializer.data)
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
         container = self.get_container()
@@ -91,8 +98,17 @@ class TaskViewSet(viewsets.ViewSet):
     @action(detail=True, methods=["get"])
     def comments(self, request, pk=None):
         container = self.get_container()
+        domain_user = to_domain_user(request.user)
         task = container.tasks.task_repo.get_by_id(pk)
-        comments = [container.tasks.get_comment_by_id(cid) for cid in task.get_comment_ids()]
+
+        if not task:
+            return Response({"detail": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        project = container.project_service.get_project(task.get_project_id())
+        if not project or not container.project_service.can_view(domain_user, project):
+            return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+
+        comments = container.comments.list_comments_for_task(pk, domain_user)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
@@ -103,11 +119,20 @@ class TaskViewSet(viewsets.ViewSet):
             domain_user = to_domain_user(request.user)
             task = container.tasks.task_repo.get_by_id(pk)
             file = request.FILES["file"]
-            attachment = container.tasks.add_attachment(task, domain_user, file)
+            attachment = container.attachments.add_attachment(
+                task_id=task.get_id(),
+                user=domain_user,
+                file=file
+            )
             serializer = AttachmentSerializer(attachment)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
+        except Exception as e:
+            # Pokaż błąd I/O w konsoli, aby zdebugować problem z uprawnieniami/ścieżką
+            print(f"FATAL UPLOAD ERROR: {type(e).__name__} - {e}")
+            return Response({"detail": f"Internal Server Error during upload: {type(e).__name__}"},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=["get"])
     def attachments(self, request, pk=None):

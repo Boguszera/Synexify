@@ -1,3 +1,5 @@
+# infrastructure/repositories/attachment_django_repository.py
+
 from django.db import transaction
 from django.apps import apps
 from django.conf import settings
@@ -11,7 +13,10 @@ ATTACHMENT_ROOT = os.path.join(settings.BASE_DIR, 'media', 'attachments')
 
 class AttachmentDjangoRepository(AttachmentRepository):
     def __init__(self, user_repo):
-        os.makedirs(ATTACHMENT_ROOT, exist_ok=True)
+        if not hasattr(settings, 'MEDIA_ROOT'):
+            raise RuntimeError("MEDIA_ROOT is not defined in settings")
+        self.upload_dir = os.path.join(settings.MEDIA_ROOT, 'attachments')
+        os.makedirs(self.upload_dir, exist_ok=True)
         self.user_repo = user_repo
 
     def get_by_id(self, attachment_id: str) -> Optional[Attachment]:

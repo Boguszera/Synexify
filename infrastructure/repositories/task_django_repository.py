@@ -4,12 +4,11 @@ from domain.repositories.task_repository import TaskRepository
 from domain.tasks.task_base import TaskBase
 from infrastructure.orm.mappers.task_mapper import TaskMapper
 
-
 class TaskDjangoRepository(TaskRepository):
 
     def get_by_id(self, task_id: str) -> TaskBase | None:
         TaskModel = apps.get_model('orm', 'TaskModel')
-        model = TaskModel.objects.filter(id=task_id).first()
+        model = TaskModel.objects.filter(id=task_id).select_related('project', 'sprint').first()
         if not model:
             return None
         return TaskMapper.to_domain(model)
@@ -31,7 +30,7 @@ class TaskDjangoRepository(TaskRepository):
             tags = TagModel.objects.filter(id__in=task.get_tag_ids())
             model.tags.set(tags)
 
-        return TaskMapper.to_domain(model)
+        return self.get_by_id(task.get_id())
 
     def delete(self, task_id: str) -> None:
         TaskModel = apps.get_model('orm', 'TaskModel')

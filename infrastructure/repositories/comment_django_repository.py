@@ -1,3 +1,5 @@
+# infrastructure/repositories/comment_django_repository.py
+
 from django.db import transaction
 from django.apps import apps
 from domain.repositories.comment_repository import CommentRepository
