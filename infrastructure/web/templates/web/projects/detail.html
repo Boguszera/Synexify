@@ -1,0 +1,73 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ project.get_name }} - Dashboard{% endblock %}
+
+{% block content %}
+<div class="bg-white p-4 rounded shadow-sm mb-4 border-start border-5 border-primary">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h1 class="h2 fw-bold mb-1">{{ project.get_name }}</h1>
+            <p class="text-muted mb-0">{{ project.get_description|default:"Brak opisu" }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'web:sprint_create' project_id=project.get_id %}" class="btn btn-outline-dark btn-sm">
+                <i class="bi bi-calendar-plus"></i> Nowy Sprint
+            </a>
+            <a href="{% url 'web:task_create' project_id=project.get_id %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-plus-lg"></i> Nowe Zadanie
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-3">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white fw-bold">Sprinty</div>
+            <div class="list-group list-group-flush">
+                {% if sprints %}
+                    {% for sprint in sprints %}
+                    <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-semibold">{{ sprint.get_name }}</div>
+                            <small class="text-muted" style="font-size: 0.7rem;">
+                                {{ sprint.get_start_date|date:"d.m" }} - {{ sprint.get_end_date|date:"d.m" }}
+                            </small>
+                        </div>
+                        {% if forloop.first %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                             <span class="badge bg-secondary">Plan</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="p-3 text-center text-muted small">Brak aktywnych sprintów</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0 bg-primary text-white">
+            <div class="card-body">
+                <h6 class="card-title opacity-75">Postęp Projektu</h6>
+                <div class="progress bg-white bg-opacity-25 mt-2" style="height: 6px;">
+                    <div class="progress-bar bg-white" role="progressbar" style="width: 45%"></div>
+                </div>
+                <div class="mt-2 small opacity-75">45% zadań ukończonych</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        {% include "web/projects/partials/kanban_board.html" %}
+    </div>
+</div>
+
+<style>
+    /* Custom Scrollbar dla kolumn */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+</style>
+{% endblock %}
