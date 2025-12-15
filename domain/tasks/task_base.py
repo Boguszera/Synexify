@@ -10,13 +10,13 @@ class InvalidStatusError(Exception):
 
 class TaskBase(Assignable, Commentable):
 
-    VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
+    VALID_STATUSES = {"To Do", "In Progress", "Done", "Blocked"}
 
     def __init__(self, task_id: Optional[str], title: str, description: str, project_id: str = None, sprint_id: Optional[str] = None):
         self._id = task_id or str(uuid.uuid4())
         self._title = title
         self._description = description
-        self._status = "todo"
+        self._status = "To Do"
         self._assignee_ids: List[str] = []
         self._comment_ids: List[str] = []
         self._attachment_ids: List[str] = []

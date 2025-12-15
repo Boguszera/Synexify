@@ -20,7 +20,7 @@ from infrastructure.repositories.attachment_django_repository import AttachmentD
 
 class Container:
     def __init__(self):
-        # --- REPOSITORIES ---
+        # REPOSITORIES
         self.user_repo = UserDjangoRepository()
         self.project_repo = ProjectDjangoRepository()
         self.task_repo = TaskDjangoRepository()
@@ -28,10 +28,10 @@ class Container:
         self.comment_repo = CommentDjangoRepository(user_repo=self.user_repo)
         self.attachment_repo = AttachmentDjangoRepository(user_repo=self.user_repo)
 
-        # --- SERVICES ---
+        # SERVICES
         self.auth = AuthorizationService()
 
-        # --- APPLICATION SERVICES ---
+        # APPLICATION SERVICES
         self.project_service = ProjectService(
             auth_service=self.auth,
             project_repo=self.project_repo
@@ -46,7 +46,7 @@ class Container:
             project_repo=self.project_repo
         )
 
-        self.backlog = BacklogService(auth_service=self.auth, task_repo=self.task_repo)
+        self.backlog = BacklogService(auth_service=self.auth, task_repo=self.task_repo, sprint_repo=self.sprint_repo)
         self.notifications = NotificationsService(task_repo=self.task_repo, user_repo=self.user_repo)
         self.reporting = ReportingService(auth_service=self.auth, task_repo=self.task_repo)
 

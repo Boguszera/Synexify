@@ -5,6 +5,7 @@ from django.http import HttpResponseForbidden
 
 from domain.exceptions.exceptions import PermissionDenied
 from .utils import get_container, get_domain_user
+from application.backlog_service import BacklogService
 
 
 @login_required(login_url='web:login')
@@ -13,10 +14,9 @@ def project_list(request):
     domain_user = get_domain_user(request)
 
     try:
-        # Pobieramy projekty z serwisu aplikacyjnego
         projects = container.project_service.list_projects(user=domain_user)
     except PermissionDenied as e:
-        messages.error(request, f"Brak uprawnień: {str(e)}")
+        messages.error(request, f"No permissions: {str(e)}")
         projects = []
 
     return render(request, "web/projects/list.html", {"projects": projects})
@@ -37,68 +37,42 @@ def project_create(request):
                 description=description,
                 user=domain_user
             )
-            messages.success(request, "Projekt został utworzony.")
+            messages.success(request, "The project has been created.")
             return redirect("web:project_list")
         except PermissionDenied:
-            messages.error(request, "Nie masz uprawnień do tworzenia projektów.")
+            messages.error(request, "You do not have permission to create projects.")
         except Exception as e:
-            messages.error(request, f"Błąd: {str(e)}")
+            messages.error(request, f"Error: {str(e)}")
 
     return render(request, "web/projects/create.html")
 
 
 @login_required(login_url='web:login')
 def project_detail(request, pk):
-    """
-    Ten widok obsługuje tablicę Kanban i listę sprintów.
-    """
     container = get_container()
     domain_user = get_domain_user(request)
-
-    # 1. Pobierz projekt
     project = container.project_service.get_project(str(pk))
 
-    if not project:
-        messages.error(request, "Projekt nie istnieje.")
-        return redirect("web:project_list")
+    if not project or not container.project_service.can_view(domain_user, project):
+        return HttpResponseForbidden("Access denied or project does not exist.")
 
-    # 2. Sprawdź uprawnienia do wyświetlania
-    if not container.project_service.can_view(domain_user, project):
-        return HttpResponseForbidden("Nie masz dostępu do tego projektu.")
-
-    # 3. Pobierz dane do Kanbana
-    try:
-        # Użycie container.backlog
-        board_data = container.backlog.kanban_board(project, domain_user)
-    except AttributeError:
-        # Fallback (powinien zostać usunięty po poprawnej konfiguracji DI)
-        from application.backlog_service import BacklogService
-        backlog_service = BacklogService(container.auth, container.tasks.task_repo)
-        board_data = backlog_service.kanban_board(project, domain_user)
-    except PermissionDenied:
-        # Zabezpieczenie na wypadek, gdyby serwis z jakiegoś powodu znowu sprawdzał uprawnienia
-        return HttpResponseForbidden("Nie masz dostępu do Kanbana w tym projekcie.")
-
-    # 4. POBIERANIE DANYCH SPRINTÓW [NOWA LOGIKA]
+    backlog_service = getattr(container, 'backlog',
+                              BacklogService(container.auth,
+                                             container.tasks.task_repo,
+                                             container.sprints.sprint_repo))
     sprints = []
-    # Zakładamy, że projekt ma listę ID sprintów, a SprintService ma metodę get_sprint
-    sprint_ids = project.get_sprint_ids()
-    if sprint_ids:
-        for sprint_id in sprint_ids:
-            sprint = container.sprints.get_sprint(sprint_id)
-            if sprint:
-                sprints.append(sprint)
+    for s_id in project.get_sprint_ids():
+        s = container.sprints.get_sprint(s_id)
+        if s: sprints.append(s)
+    try:
+        backlog_tasks = backlog_service.get_backlog(project, domain_user)
+    except Exception as e:
+        messages.warning(request, f"Backlog loading error: {str(e)}")
+        backlog_tasks = []
 
-    # 5. Mapowanie kluczy domenowych na klucze template'u
-    kanban_context = {
-        "todo": board_data.get("To Do", []),
-        "in_progress": board_data.get("In Progress", []),
-        "done": board_data.get("Done", []),
-        "blocked": board_data.get("Blocked", [])
-    }
 
-    return render(request, "web/projects/detail.html", {
+    return render(request, "web/projects/dashboard.html", {
         "project": project,
-        "kanban": kanban_context,
-        "sprints": sprints,  # Przekazujemy pełne obiekty sprintów
+        "sprints": sprints,
+        "backlog": backlog_tasks
     })

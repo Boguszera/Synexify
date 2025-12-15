@@ -9,15 +9,14 @@ def login_view(request):
         login_str = request.POST.get("login")
         password = request.POST.get("password")
 
-        # Używamy standardowego mechanizmu Django do autentykacji sesji
+        # standard Django mechanism for session auth
         user = authenticate(request, username=login_str, password=password)
 
         if user is not None:
             login(request, user)
-            # Przekierowanie po udanym logowaniu
             return redirect("web:project_list")
         else:
-            messages.error(request, "Nieprawidłowy login lub hasło.")
+            messages.error(request, "Incorrect login or password.")
 
     return render(request, "web/auth/login.html")
 

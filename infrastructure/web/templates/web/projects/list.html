@@ -2,14 +2,14 @@
 
 {% extends "layouts/base.html" %}
 
-{% block title %}Lista Projektów{% endblock %}
+{% block title %}Project List{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Projekty</h1>
+    <h1 class="h2">Projects</h1>
     <div class="btn-toolbar mb-2 mb-md-0">
         <a href="{% url 'web:project_create' %}" class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-plus-lg"></i> Nowy Projekt
+            <i class="bi bi-plus-lg"></i> New Project
         </a>
     </div>
 </div>
@@ -26,14 +26,14 @@
             </div>
             <div class="card-footer bg-transparent border-top-0">
                 <a href="{% url 'web:project_detail' pk=project.get_id %}" class="btn btn-primary btn-sm w-100">
-                    Szczegóły
+                    Details
                 </a>
             </div>
         </div>
     </div>
     {% empty %}
     <div class="col-12">
-        <div class="alert alert-info">Brak projektów do wyświetlenia.</div>
+        <div class="alert alert-info">No projects to display.</div>
     </div>
     {% endfor %}
 </div>

@@ -1,23 +1,34 @@
+# infrastructure/web/urls.py
 from django.urls import path
-from .views import project_views, auth_views, task_views, sprint_views  # [NOWY IMPORT]
+from .views import project_views, auth_views, task_views, sprint_views
 
 app_name = 'web'
 
 urlpatterns = [
-    # ... Auth ...
+    # AUTH
     path('login/', auth_views.login_view, name='login'),
     path('logout/', auth_views.logout_view, name='logout'),
 
-    # ... Projects ...
+    # PROJECTS (Dashboard)
     path('', project_views.project_list, name='project_list'),
     path('projects/create/', project_views.project_create, name='project_create'),
     path('projects/<uuid:pk>/', project_views.project_detail, name='project_detail'),
 
-    # ... Sprints [NOWE] ...
-    # Tworzenie nowego sprintu dla danego projektu
+    # SPRINTS (Kanban Board)
     path('projects/<uuid:project_id>/sprints/create/', sprint_views.sprint_create, name='sprint_create'),
+    path('sprints/<uuid:pk>/board/', sprint_views.sprint_board, name='sprint_board'),
 
-    # ... Tasks ...
+    # TASKS (CRUD + Details + Moves)
     path('projects/<uuid:project_id>/tasks/create/', task_views.task_create, name='task_create'),
+    path('tasks/<uuid:pk>/', task_views.task_detail, name='task_detail'),
     path('tasks/<uuid:pk>/move/<str:new_status>/', task_views.task_move, name='task_move'),
+
+    # Tasks Operations
+    path('tasks/<uuid:pk>/comment/', task_views.add_comment, name='task_add_comment'),
+    path('tasks/<uuid:pk>/attach/', task_views.add_attachment, name='task_add_attachment'),
+    path('tasks/<uuid:pk>/assign/', task_views.assign_task, name='assign_task'),
+    path('tasks/<uuid:pk>/to_sprint/', task_views.add_task_to_sprint, name='add_task_to_sprint'),
+    path('tasks/<uuid:pk>/comment/', task_views.add_comment, name='task_add_comment'),
+    path('tasks/<uuid:pk>/attach/', task_views.add_attachment, name='task_add_attachment'),
+    path('tasks/<uuid:pk>/assign/', task_views.assign_task, name='assign_task'),
 ]
