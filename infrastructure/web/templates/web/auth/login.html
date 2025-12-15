@@ -1,0 +1,45 @@
+<!-- # infrastructure/web/templates/web/auth/login.html -->
+
+{% extends "layouts/base.html" %}
+
+{% block title %}Logowanie - Synexify{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center">
+                <h4>Zaloguj się</h4>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{% url 'web:login' %}">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="login" class="form-label">Login</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="login" name="login" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Hasło</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Zaloguj</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center text-muted">
+                <small>Synexify Project Manager</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'infrastructure.orm.apps.OrmConfig',
+    'infrastructure.web.apps.WebConfig',
 ]
 AUTH_USER_MODEL = "orm.UserModel"
 
@@ -72,6 +73,10 @@ AUTHENTICATION_BACKENDS = [
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+LOGIN_URL = 'web:login'
+LOGIN_REDIRECT_URL = 'web:project_list'
+LOGOUT_REDIRECT_URL = 'web:login'
 
 # dynamic loading of environment variables - if key doesn't exist: default value
 DEBUG = os.getenv("DEBUG", "False") == "True"
