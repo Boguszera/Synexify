@@ -1,0 +1,72 @@
+<div class="card mb-3 shadow-sm border-0 border-start border-4 border-{{ color }} task-card-hover">
+
+    <div class="card-body p-2">
+
+        <h6 class="card-title mb-1 small fw-bold text-truncate">
+            <a href="{% url 'web:task_detail' pk=task.get_id %}" class="text-decoration-none text-dark stretched-link">
+                {{ task.get_title }}
+            </a>
+        </h6>
+
+        <div class="d-flex justify-content-between align-items-center mt-1">
+
+            <span class="badge rounded-pill text-bg-{{ color }} me-1" style="font-size: 0.6em;">
+                {{ task.task_type|upper }}
+            </span>
+
+            {% if task.task_type == 'feature' %}
+                <span class="badge text-bg-warning text-dark me-1" style="font-size: 0.6em;">
+                    SP: {{ task.get_story_points }}
+                </span>
+            {% elif task.task_type == 'bug' %}
+                <span class="badge text-bg-danger" style="font-size: 0.6em;">
+                    {{ task.get_severity|upper }}
+                </span>
+            {% endif %}
+
+            {% if task.get_assignees_ids %}
+            <span class="badge text-bg-info text-dark" style="font-size: 0.6em;">
+                <i class="bi bi-person-fill"></i> {{ task.get_assignees_ids|length }}
+            </span>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+        <div class="btn-group">
+            {% if task.get_status == 'To Do' %}
+                <button
+                    hx-get="{% url 'web:task_move' pk=task.get_id new_status='in_progress' %}"
+                    hx-target="#kanban-container"
+                    hx-swap="outerHTML"
+                    class="btn btn-sm btn-light text-primary"
+                    title="Start">
+                    <i class="bi bi-play-fill"></i>
+                </button>
+            {% elif task.get_status == 'In Progress' %}
+                <button
+                    hx-get="{% url 'web:task_move' pk=task.get_id new_status='todo' %}"
+                    hx-target="#kanban-container"
+                    hx-swap="outerHTML"
+                    class="btn btn-sm btn-light text-secondary"
+                    title="Undo">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </button>
+                <button
+                    hx-get="{% url 'web:task_move' pk=task.get_id new_status='done' %}"
+                    hx-target="#kanban-container"
+                    hx-swap="outerHTML"
+                    class="btn btn-sm btn-light text-success"
+                    title="Finish">
+                    <i class="bi bi-check-lg"></i>
+                </button>
+            {% endif %}
+
+            <a href="{% url 'web:task_detail' pk=task.get_id %}" class="btn btn-sm btn-light text-muted" title="Details">
+                 <i class="bi bi-info-circle"></i>
+            </a>
+
+        </div>
+    </div>
+</div>

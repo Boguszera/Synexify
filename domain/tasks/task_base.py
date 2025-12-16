@@ -1,7 +1,7 @@
 # domain/tasks/task_base.py
 from domain.interfaces.assignable import Assignable
 from domain.interfaces.commentable import Commentable
-from domain.events.task_events import TaskStatusChangedEvent, TaskAssignedEvent, TaskCommentAddedEvent
+from domain.events.task_events import TaskStatusChangedEvent, TaskAssignedEvent, TaskCommentAddedEvent, TaskUnassignedEvent
 from typing import List, Optional
 import uuid
 
@@ -10,13 +10,13 @@ class InvalidStatusError(Exception):
 
 class TaskBase(Assignable, Commentable):
 
-    VALID_STATUSES = {"todo", "in_progress", "done", "blocked"}
+    VALID_STATUSES = {"To Do", "In Progress", "Done", "Blocked"}
 
     def __init__(self, task_id: Optional[str], title: str, description: str, project_id: str = None, sprint_id: Optional[str] = None):
         self._id = task_id or str(uuid.uuid4())
         self._title = title
         self._description = description
-        self._status = "todo"
+        self._status = "To Do"
         self._assignee_ids: List[str] = []
         self._comment_ids: List[str] = []
         self._attachment_ids: List[str] = []
@@ -65,6 +65,11 @@ class TaskBase(Assignable, Commentable):
         self._assignee_ids.append(user_id)
         # raise domain event
         self._domain_events.append(TaskAssignedEvent(task_id=self._id, assigned_user_id=user_id))
+
+    def unassign_user_id(self, user_id: str):
+        if user_id in self._assignee_ids:
+            self._assignee_ids.remove(user_id)
+            self._domain_events.append(TaskUnassignedEvent(task_id=self._id, unassigned_user_id=user_id))
 
     def update_status(self, new_status: str):
         if new_status not in self.VALID_STATUSES:

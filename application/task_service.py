@@ -7,8 +7,18 @@ import uuid
 from domain.comments.comment import Comment
 from domain.attachments.attachment import Attachment
 
+# Mapowanie slugów z interfejsu/URL na KANONICZNY format DOMENOWY (np. "To Do")
+CANONICAL_STATUS_MAP = {
+    "todo": "To Do",
+    "in_progress": "In Progress",
+    "done": "Done",
+    "blocked": "Blocked",
+}
+
+
 class TaskService:
-    def __init__(self, auth_service, task_repo, project_repo, notification_service, user_repo, attachment_repo, comment_repo):
+    def __init__(self, auth_service, task_repo, project_repo, notification_service, user_repo, attachment_repo,
+                 comment_repo):
         self.auth = auth_service
         self.task_repo = task_repo
         self.project_repo = project_repo
@@ -21,16 +31,22 @@ class TaskService:
         self.auth.check_manage_project(user, project)
         task_id = str(uuid.uuid4())
         project_id = project.get_id()
+
         if task_type == "bug":
-            task = BugTask(title=title, description=description, severity=severity, task_id=task_id)
+            task = BugTask(title=title, description=description, severity=severity, task_id=task_id,
+                           project_id=project_id)
         elif task_type == "feature":
-            task = FeatureTask(title=title, description=description, story_points=story_points, task_id=task_id)
+            task = FeatureTask(title=title, description=description, story_points=story_points, task_id=task_id,
+                               project_id=project_id)
         elif task_type == "chore":
-            task = ChoreTask(title=title, description=description, task_id=task_id)
+            task = ChoreTask(title=title, description=description, task_id=task_id,
+                             project_id=project_id)
         else:
             raise ValueError("Invalid task type")
 
+        task.update_status(CANONICAL_STATUS_MAP["todo"])
         project.add_task_id(task.get_id())
+
         self.task_repo.save(task)
         self.project_repo.save(project)
         return task
@@ -49,20 +65,34 @@ class TaskService:
         event = TaskAssignedEvent(task_id=task.get_id(), assigned_user_id=assignee.get_id())
         self.notifications.notify(event)
 
-    def update_status(self, task, user, new_status):
+    def unassign_user_by_id(self, task, user, assignee_id: str):
+        assignee = self.user_repo.get_by_id(assignee_id)
+        if assignee is None:
+            raise ValueError(f"Assignee user ID {assignee_id} not found.")
+        task.unassign_user_id(assignee.get_id())
+        self.task_repo.save(task)
+        events = task.pull_domain_events()
+        for event in events:
+            self.notifications.notify(event)
+
+    def update_status(self, task, user, new_status_raw):
         if not self.auth.can_edit_task(user, task):
             raise PermissionDenied(user.get_id(), action="update_status", resource=f"task:{task.get_id()}")
+        normalized_status = CANONICAL_STATUS_MAP.get(new_status_raw.lower().replace(" ", "_"), new_status_raw)
+
         old_status = task.get_status()
-        task.update_status(new_status)
+        task.update_status(normalized_status)
         self.task_repo.save(task)
 
         from domain.events.task_events import TaskStatusChangedEvent
         event = TaskStatusChangedEvent(
             task_id=task.get_id(),
             old_status=old_status,
-            new_status=new_status
+            new_status=normalized_status
         )
         self.notifications.notify(event)
+
+        return task
 
     def add_comment(self, task, user, content):
         project = self.project_repo.get_by_id(task.get_project_id())
@@ -96,7 +126,7 @@ class TaskService:
 
         if project:
             tasks = [t for t in tasks if t.get_project_id() == project.get_id()]
-        #if user:
+        # if user:
         #    tasks = [t for t in tasks if user.get_id() in t.get_assignees_ids()]
         if status:
             tasks = [t for t in tasks if t.get_status() == status]
@@ -120,6 +150,7 @@ class TaskService:
             tasks = [t for t in tasks if t.get_project_id() == project.get_id()]
 
         if status:
+            # UWAGA: status z query_params musi być również w formacie kanonicznym, jeśli jest filtrowany
             tasks = [t for t in tasks if t.get_status() == status]
 
         if tag:
@@ -172,6 +203,7 @@ class TaskService:
         saved_task = self.task_repo.save(task)
 
         if status_changed and new_status:
+            # Używamy nowej metody update_status, która normalizuje status
             return self.update_status(saved_task, user, new_status)
         return saved_task
 

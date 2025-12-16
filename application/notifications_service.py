@@ -3,16 +3,17 @@ from domain.events.task_events import (
     TaskAssignedEvent,
     TaskCommentAddedEvent,
     TaskPriorityUpdatedEvent,
+    TaskUnassignedEvent,
 )
 from domain.users.user_base import UserBase
 from domain.tasks.task_base import TaskBase
 from domain.events.base_events import DomainEvent
+from infrastructure.orm.models.notification_model import NotificationModel
 
 class NotificationsService:
     def __init__(self, task_repo, user_repo):
         self.task_repo = task_repo
         self.user_repo = user_repo
-        self.notifications: list[dict] = []
 
     def notify(self, event: DomainEvent):
         if isinstance(event, TaskStatusChangedEvent):
@@ -23,6 +24,8 @@ class NotificationsService:
             self._notify_task_comment_added(event)
         elif isinstance(event, TaskPriorityUpdatedEvent):
             self._notify_task_priority_updated(event)
+        elif isinstance(event, TaskUnassignedEvent):
+            self._notify_task_unassigned(event)
         else:
             raise ValueError(f"Unsupported event type: {type(event)}")
 
@@ -41,6 +44,18 @@ class NotificationsService:
         task = self.task_repo.get_by_id(event.task_id)
         user = self.user_repo.get_by_id(event.assigned_user_id)
         self._send_notification(user, task, event.get_event_name())
+
+    def _notify_task_unassigned(self, event: TaskUnassignedEvent):
+        task = self.task_repo.get_by_id(event.task_id)
+        user = self.user_repo.get_by_id(event.unassigned_user_id)
+
+        if user and task:
+            self._send_notification(
+                user,
+                task,
+                event.get_event_name(),
+                extra_data={"unassigned_user_id": event.unassigned_user_id}
+            )
 
     def _notify_task_comment_added(self, event: TaskCommentAddedEvent):
         task = self.task_repo.get_by_id(event.task_id)
@@ -67,13 +82,23 @@ class NotificationsService:
                 extra_data={"old_priority": event.old_priority, "new_priority": event.new_priority}
             )
 
-    def _send_notification(self, user: UserBase, task: TaskBase, event_name: str, extra_data: dict = None):
-        payload = {
-            "user_id": user.get_id(),
-            "task_id": task.get_id(),
-            "event": event_name,
-        }
-        if extra_data:
-            payload.update(extra_data)
-        self.notifications.append(payload)
-        print(f"[NOTIFICATION] {payload}")
+    def _send_notification(self, user, task, event_name: str, extra_data: dict = None):
+        title = "New event"
+        message = f"Event {event_name} in task {task.get_title()}"
+
+        if event_name == "TaskUnassigned":
+            title = "Assignment removed"
+            message = f"You have been disconnected from the task: {task.get_title()}"
+        elif event_name == "TaskAssigned":
+            title = "Nowe zadanie"
+            message = f"You have been assigned to the task: {task.get_title()}"
+        elif event_name == "TaskCommentAdded":
+            title = "New comment"
+            message = f"Comment added in task: {task.get_title()}"
+        NotificationModel.objects.create(
+            user_id=user.get_id(),
+            task_id=task.get_id(),
+            title=title,
+            message=message
+        )
+        print(f"[NOTIFICATION SAVED] User: {user.get_email()} | Msg: {message}")

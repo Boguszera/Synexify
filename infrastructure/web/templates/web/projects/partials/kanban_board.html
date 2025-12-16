@@ -1,0 +1,46 @@
+<div class="row h-100" id="kanban-container">
+
+    <div class="col-md-4">
+        <div class="card bg-light h-100 border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom-0 fw-bold text-uppercase text-secondary d-flex justify-content-between">
+                <span><i class="bi bi-circle"></i> To Do</span>
+                <span class="badge bg-secondary rounded-pill">{{ kanban.todo|length }}</span>
+            </div>
+            <div class="card-body p-2 overflow-auto custom-scrollbar" style="max-height: 75vh;">
+                {% for task in kanban.todo %}
+                    {% include "web/projects/components/task_card.html" with task=task color="secondary" %}
+                {% empty %}
+                    <div class="text-center text-muted mt-5 opacity-50"><i class="bi bi-inbox fs-1"></i><br>Empty</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light h-100 border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom-0 fw-bold text-uppercase text-primary d-flex justify-content-between">
+                <span><i class="bi bi-arrow-repeat spin"></i> In Progress</span>
+                <span class="badge bg-primary rounded-pill">{{ kanban.in_progress|length }}</span>
+            </div>
+            <div class="card-body p-2 overflow-auto custom-scrollbar" style="max-height: 75vh;">
+                {% for task in kanban.in_progress %}
+                    {% include "web/projects/components/task_card.html" with task=task color="primary" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light h-100 border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom-0 fw-bold text-uppercase text-success d-flex justify-content-between">
+                <span><i class="bi bi-check-circle-fill"></i> Done</span>
+                <span class="badge bg-success rounded-pill">{{ kanban.done|length }}</span>
+            </div>
+            <div class="card-body p-2 overflow-auto custom-scrollbar" style="max-height: 75vh;">
+                {% for task in kanban.done %}
+                    {% include "web/projects/components/task_card.html" with task=task color="success" %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

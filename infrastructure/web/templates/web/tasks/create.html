@@ -1,0 +1,78 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}New Task{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>New task in: {{ project.get_name }}</h3>
+            <a href="{% url 'web:project_detail' pk=project.get_id %}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="title" class="form-label">Title *</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="task_type" class="form-label">Typ *</label>
+                            <select class="form-select" id="task_type" name="task_type" onchange="toggleFields()">
+                                <option value="chore">Chore (Basic)</option>
+                                <option value="feature">Feature</option>
+                                <option value="bug">Bug</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div id="feature-fields" class="mb-3 d-none p-3 bg-light rounded">
+                        <label for="story_points" class="form-label">Story Points</label>
+                        <input type="number" class="form-control" id="story_points" name="story_points" min="1" max="13">
+                    </div>
+
+                    <div id="bug-fields" class="mb-3 d-none p-3 bg-light rounded">
+                        <label for="severity" class="form-label">Severity</label>
+                        <select class="form-select" id="severity" name="severity">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Create Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleFields() {
+        const type = document.getElementById('task_type').value;
+        const featureDiv = document.getElementById('feature-fields');
+        const bugDiv = document.getElementById('bug-fields');
+
+        featureDiv.classList.add('d-none');
+        bugDiv.classList.add('d-none');
+
+        if (type === 'feature') {
+            featureDiv.classList.remove('d-none');
+        } else if (type === 'bug') {
+            bugDiv.classList.remove('d-none');
+        }
+    }
+</script>
+{% endblock %}

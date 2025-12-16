@@ -10,6 +10,7 @@ from application.authorization_service import AuthorizationService
 from application.project_service import ProjectService
 from application.comment_service import CommentService
 from application.attachment_service import AttachmentService
+from application.tag_service import TagService
 
 from infrastructure.repositories.user_django_repository import UserDjangoRepository
 from infrastructure.repositories.project_django_repository import ProjectDjangoRepository
@@ -17,21 +18,23 @@ from infrastructure.repositories.task_django_repository import TaskDjangoReposit
 from infrastructure.repositories.sprint_django_repository import SprintDjangoRepository
 from infrastructure.repositories.comment_django_repository import CommentDjangoRepository
 from infrastructure.repositories.attachment_django_repository import AttachmentDjangoRepository
+from infrastructure.repositories.tag_django_repository import TagDjangoRepository
 
 class Container:
     def __init__(self):
-        # --- REPOSITORIES ---
+        # REPOSITORIES
         self.user_repo = UserDjangoRepository()
         self.project_repo = ProjectDjangoRepository()
         self.task_repo = TaskDjangoRepository()
         self.sprint_repo = SprintDjangoRepository()
         self.comment_repo = CommentDjangoRepository(user_repo=self.user_repo)
         self.attachment_repo = AttachmentDjangoRepository(user_repo=self.user_repo)
+        self.tag_repo = TagDjangoRepository()
 
-        # --- SERVICES ---
+        # SERVICES
         self.auth = AuthorizationService()
 
-        # --- APPLICATION SERVICES ---
+        # APPLICATION SERVICES
         self.project_service = ProjectService(
             auth_service=self.auth,
             project_repo=self.project_repo
@@ -46,9 +49,9 @@ class Container:
             project_repo=self.project_repo
         )
 
-        self.backlog = BacklogService(auth_service=self.auth, task_repo=self.task_repo)
+        self.backlog = BacklogService(auth_service=self.auth, task_repo=self.task_repo, sprint_repo=self.sprint_repo)
         self.notifications = NotificationsService(task_repo=self.task_repo, user_repo=self.user_repo)
-        self.reporting = ReportingService(auth_service=self.auth, task_repo=self.task_repo)
+        self.reporting = ReportingService(auth_service=self.auth, task_repo=self.task_repo, project_repo=self.project_repo, user_repo=self.user_repo)
 
         self.sprints = SprintService(
             auth_service=self.auth,
@@ -64,5 +67,12 @@ class Container:
             notification_service=self.notifications,
             user_repo=self.user_repo,
             attachment_repo=self.attachment_repo,
-            comment_repo=self.comment_repo
+            comment_repo=self.comment_repo,
+        )
+
+        self.tags = TagService(
+            auth_service=self.auth,
+            task_repo=self.task_repo,
+            tag_repo=self.tag_repo,
+            project_repo=self.project_repo,
         )
