@@ -283,7 +283,7 @@ def my_assignments(request):
 
     context = {
         'tasks': assigned_tasks,
-        'title': 'Moje Przypisane Zadania',
+        'title': 'My Assigned Tasks',
         'current_user': domain_user
     }
 

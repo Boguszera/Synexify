@@ -47,3 +47,6 @@ class AuthorizationService:
     def check_manage_user(self, user, target_user):
         if not self.can_manage_user(user, target_user):
             raise PermissionDenied(user.get_id(), action="manage_user", resource=target_user.get_id())
+
+    def is_admin_or_manager(self, user: UserBase) -> bool:
+        return isinstance(user, (AdminUser, ManagerUser))

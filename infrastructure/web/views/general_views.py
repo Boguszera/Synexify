@@ -9,11 +9,9 @@ def mark_notification_read(request, pk):
     notif.is_read = True
     notif.save()
 
-    # Jeśli powiadomienie dotyczy taska, przekieruj do niego
     if notif.task_id:
         return redirect('web:task_detail', pk=notif.task_id)
 
-    # Fallback: powrót na stronę główną
     return redirect('web:project_list')
 
 

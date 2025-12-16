@@ -8,7 +8,7 @@ class TaskDjangoRepository(TaskRepository):
 
     def get_by_id(self, task_id: str) -> TaskBase | None:
         TaskModel = apps.get_model('orm', 'TaskModel')
-        model = TaskModel.objects.filter(id=task_id).select_related('project', 'sprint').prefetch_related('assignees').first()
+        model = TaskModel.objects.filter(id=task_id).select_related('project', 'sprint').prefetch_related('assignees', 'tags').first()
         if not model:
             return None
         return TaskMapper.to_domain(model)

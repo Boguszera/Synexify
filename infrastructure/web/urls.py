@@ -1,6 +1,6 @@
 # infrastructure/web/urls.py
 from django.urls import path
-from .views import project_views, auth_views, task_views, sprint_views, general_views, report_views
+from .views import project_views, auth_views, task_views, sprint_views, general_views, report_views, tag_views
 
 app_name = 'web'
 
@@ -42,4 +42,10 @@ urlpatterns = [
     path('reports/status/', report_views.report_status_summary, name='report_status'),
     path('reports/workload/', report_views.report_team_workload, name='report_workload'),
     path('reports/velocity/', report_views.report_team_velocity, name='report_velocity'),
+
+    # Tags
+    path('manage/tags/', tag_views.tag_list, name='tag_list'),
+    path('manage/tags/create/', tag_views.tag_create, name='tag_create'),
+    # path('manage/tags/edit/<uuid:pk>/', tag_views.tag_edit, name='tag_edit'),
+    path('manage/tags/delete/<uuid:pk>/', tag_views.tag_delete, name='tag_delete'),
 ]

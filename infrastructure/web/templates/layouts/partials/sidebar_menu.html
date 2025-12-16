@@ -1,9 +1,22 @@
 <ul class="nav flex-column mb-3">
+    <li class="nav-item mt-3">
+        <span class="nav-link fw-bold text-muted text-uppercase small" style="pointer-events: none; opacity: 0.7;">
+            <i class="bi bi-gear me-2"></i> Manage
+        </span>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if request.path|slice:":13" == '/manage/tags/' %}active{% endif %}" href="{% url 'web:tag_list' %}">
+            <i class="bi bi-tags me-2"></i> Manage Tags
+        </a>
+    </li>
+</ul>
+<ul class="nav flex-column mb-3">
     <li class="nav-item">
         <a class="nav-link {% if request.path == '/projects/' %}active{% endif %}" href="{% url 'web:project_list' %}">
             <i class="bi bi-folder me-2"></i> Projects
         </a>
     </li>
+</ul>
     <li class="nav-item">
         <a class="nav-link {% if request.path|slice:":17" == '/tasks/my-assignments' %}active{% endif %}" href="{% url 'web:my_assignments' %}">
             <i class="bi bi-list-check me-2"></i> My Tasks
@@ -19,7 +32,7 @@
     </li>
     <li class="nav-item">
         <a class="nav-link {% if request.path|slice:":14" == '/reports/status' %}active{% endif %}" href="{% url 'web:report_status' %}">
-            <i class="bi bi-list-stars me-2"></i> Velocity Team
+            <i class="bi bi-list-stars me-2"></i> Task Status
         </a>
     </li>
     <li class="nav-item">

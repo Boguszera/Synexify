@@ -1,11 +1,11 @@
 {% extends "layouts/base.html" %}
 
-{% block title %}Moje Zadania{% endblock %}
+{% block title %}My Tasks{% endblock %}
 
 {% block content %}
 <div class="container py-4">
-    <h2>Moje Przypisane Zadania</h2>
-    <p class="text-muted">Lista zadań przypisanych bezpośrednio do Ciebie.</p>
+    <h2>My Assigned Tasks</h2>
+    <p class="text-muted">List of tasks assigned to you.</p>
     <hr>
 
     {% if tasks %}
@@ -31,7 +31,7 @@
     </div>
     {% else %}
     <div class="alert alert-info mt-4">
-        Nie masz obecnie przypisanych żadnych zadań. Świetna robota, albo czas poszukać nowych!
+        You currently have no assigned tasks. Great job, or it's time to look for new ones!
     </div>
     {% endif %}
 </div>
