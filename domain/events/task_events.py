@@ -21,6 +21,15 @@ class TaskAssignedEvent(DomainEvent):
     def get_event_name(self) -> str:
         return "TaskAssigned"
 
+class TaskUnassignedEvent:
+    def __init__(self, task_id: str, unassigned_user_id: str):
+        super().__init__()
+        self.task_id = task_id
+        self.unassigned_user_id = unassigned_user_id
+
+    def get_event_name(self) -> str:
+        return "TaskUnassigned"
+
 
 class TaskCommentAddedEvent(DomainEvent):
     def __init__(self, task_id: str, commenter_id: str | None, comment_id: str):

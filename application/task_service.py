@@ -30,9 +30,7 @@ class TaskService:
     def create_task(self, project, title, description, task_type, user, severity=None, story_points=None):
         self.auth.check_manage_project(user, project)
         task_id = str(uuid.uuid4())
-        project_id = project.get_id()  # Pobieramy Project ID
-
-        # Dodanie project_id do konstruktorów tasków:
+        project_id = project.get_id()
 
         if task_type == "bug":
             task = BugTask(title=title, description=description, severity=severity, task_id=task_id,
@@ -42,19 +40,15 @@ class TaskService:
                                project_id=project_id)
         elif task_type == "chore":
             task = ChoreTask(title=title, description=description, task_id=task_id,
-                             project_id=project_id)  # <-- POPRAWKA!
+                             project_id=project_id)
         else:
             raise ValueError("Invalid task type")
 
-        # Ustawienie domyślnego statusu w kanonicznym formacie ("To Do")
         task.update_status(CANONICAL_STATUS_MAP["todo"])
-
-        # WAŻNE: Odświeżamy Project, aby odnotował nowy Task ID
         project.add_task_id(task.get_id())
 
-        # Zapisujemy Task, który teraz ma już przypisany _project_id
         self.task_repo.save(task)
-        self.project_repo.save(project)  # Zapisujemy projekt z nowym task_id
+        self.project_repo.save(project)
         return task
 
     def assign_task_by_id(self, task, user, assignee_id: str):
@@ -71,22 +65,22 @@ class TaskService:
         event = TaskAssignedEvent(task_id=task.get_id(), assigned_user_id=assignee.get_id())
         self.notifications.notify(event)
 
+    def unassign_user_by_id(self, task, user, assignee_id: str):
+        assignee = self.user_repo.get_by_id(assignee_id)
+        if assignee is None:
+            raise ValueError(f"Assignee user ID {assignee_id} not found.")
+        task.unassign_user_id(assignee.get_id())
+        self.task_repo.save(task)
+        events = task.pull_domain_events()
+        for event in events:
+            self.notifications.notify(event)
+
     def update_status(self, task, user, new_status_raw):
-        """
-        Aktualizuje status. Oczekuje, że new_status_raw jest slugiem (np. 'in_progress')
-        lub kanoniczną nazwą ('In Progress'). Mapuje go na kanoniczną formę dla domeny.
-        """
         if not self.auth.can_edit_task(user, task):
             raise PermissionDenied(user.get_id(), action="update_status", resource=f"task:{task.get_id()}")
-
-        # Normalizacja statusu: 'in_progress' -> 'In Progress'.
-        # Jeśli już jest kanoniczny ('In Progress'), zostaje niezmieniony.
-        # Używamy get(slug, surowa_wartosc) na wypadek, gdyby przyszła nazwa kanoniczna.
         normalized_status = CANONICAL_STATUS_MAP.get(new_status_raw.lower().replace(" ", "_"), new_status_raw)
 
-        old_status = task.get_status()  # Stary status (w formacie kanonicznym)
-
-        # Przekazanie do domeny kanonicznego statusu
+        old_status = task.get_status()
         task.update_status(normalized_status)
         self.task_repo.save(task)
 
@@ -94,7 +88,7 @@ class TaskService:
         event = TaskStatusChangedEvent(
             task_id=task.get_id(),
             old_status=old_status,
-            new_status=normalized_status  # Używamy znormalizowanego statusu
+            new_status=normalized_status
         )
         self.notifications.notify(event)
 

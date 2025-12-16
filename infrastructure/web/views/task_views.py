@@ -243,3 +243,27 @@ def add_task_to_sprint(request, pk):
         except Exception as e:
             messages.error(request, f"Error adding to sprint: {str(e)}")
     return redirect('web:task_detail', pk=pk)
+
+
+@login_required(login_url='web:login')
+def unassign_task(request, pk, assignee_id):
+    if request.method == "POST":
+        container = get_container()
+        domain_user = get_domain_user(request)
+
+        try:
+            task = container.tasks.task_repo.get_by_id(str(pk))
+            if not task:
+                messages.error(request, "The task does not exist.")
+                return redirect('web:project_list')
+            container.tasks.unassign_user_by_id(task, domain_user, assignee_id)
+            messages.success(request, f"Assignment removed.")
+
+        except PermissionDenied as e:
+            messages.error(request, f"No permission to remove assignment: {str(e)}")
+        except ValueError as e:
+            messages.error(request, f"Unassignment error:{str(e)}")
+        except Exception as e:
+            messages.error(request, f"An unknown error occurred:{str(e)}")
+
+    return redirect('web:task_detail', pk=pk)

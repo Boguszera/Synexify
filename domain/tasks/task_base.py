@@ -1,7 +1,7 @@
 # domain/tasks/task_base.py
 from domain.interfaces.assignable import Assignable
 from domain.interfaces.commentable import Commentable
-from domain.events.task_events import TaskStatusChangedEvent, TaskAssignedEvent, TaskCommentAddedEvent
+from domain.events.task_events import TaskStatusChangedEvent, TaskAssignedEvent, TaskCommentAddedEvent, TaskUnassignedEvent
 from typing import List, Optional
 import uuid
 
@@ -65,6 +65,11 @@ class TaskBase(Assignable, Commentable):
         self._assignee_ids.append(user_id)
         # raise domain event
         self._domain_events.append(TaskAssignedEvent(task_id=self._id, assigned_user_id=user_id))
+
+    def unassign_user_id(self, user_id: str):
+        if user_id in self._assignee_ids:
+            self._assignee_ids.remove(user_id)
+            self._domain_events.append(TaskUnassignedEvent(task_id=self._id, unassigned_user_id=user_id))
 
     def update_status(self, new_status: str):
         if new_status not in self.VALID_STATUSES:

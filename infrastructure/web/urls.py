@@ -1,6 +1,6 @@
 # infrastructure/web/urls.py
 from django.urls import path
-from .views import project_views, auth_views, task_views, sprint_views
+from .views import project_views, auth_views, task_views, sprint_views, general_views
 
 app_name = 'web'
 
@@ -31,4 +31,9 @@ urlpatterns = [
     path('tasks/<uuid:pk>/comment/', task_views.add_comment, name='task_add_comment'),
     path('tasks/<uuid:pk>/attach/', task_views.add_attachment, name='task_add_attachment'),
     path('tasks/<uuid:pk>/assign/', task_views.assign_task, name='assign_task'),
+    path('tasks/<uuid:pk>/unassign/<uuid:assignee_id>/', task_views.unassign_task, name='unassign_task'),
+
+    # Notifications
+path('notifications/<uuid:pk>/read/', general_views.mark_notification_read, name='mark_notification_read'),
+    path('notifications/clear/', general_views.clear_notifications, name='clear_notifications'),
 ]

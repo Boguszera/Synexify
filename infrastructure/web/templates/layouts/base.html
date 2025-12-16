@@ -26,8 +26,46 @@
       <div class="container-fluid">
         <a class="navbar-brand" href="/">Synexify</a>
         <div class="d-flex">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+
+    <li class="nav-item dropdown me-3">
+        <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdownNotifications" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell fs-5"></i>
+
+            {% if notifications_count > 0 %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                {{ notifications_count }}
+                <span class="visually-hidden">nieprzeczytane powiadomienia</span>
+            </span>
+            {% endif %}
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdownNotifications" style="width: 300px; max-height: 400px; overflow-y: auto;">
+            <li><h6 class="dropdown-header">Powiadomienia</h6></li>
+            <li><hr class="dropdown-divider"></li>
+
+            {% for notif in notifications_list %}
+            <li>
+                <a class="dropdown-item white-space-normal" href="{% url 'web:mark_notification_read' pk=notif.id %}">
+                    <div class="d-flex flex-column">
+                        <span class="fw-bold small">{{ notif.title }}</span>
+                        <span class="text-muted small text-truncate">{{ notif.message }}</span>
+                        <span class="text-muted" style="font-size: 0.65em;">{{ notif.created_at|timesince }} temu</span>
+                    </div>
+                </a>
+            </li>
+            {% empty %}
+            <li><span class="dropdown-item text-muted small text-center">Brak nowych powiadomień</span></li>
+            {% endfor %}
+
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-center small text-primary" href="{% url 'web:clear_notifications' %}">Oznacz wszystkie jako przeczytane</a></li>
+        </ul>
+    </li>
+
+    </ul>
             {% if user.is_authenticated %}
-                <span class="navbar-text me-3">Witaj, {{ user.username }}</span>
+                <span class="navbar-text me-3">Hello, {{ user.username }}</span>
                 <a href="{% url 'web:logout' %}" class="btn btn-outline-light btn-sm">Log Out</a>
             {% else %}
                 <a href="{% url 'web:login' %}" class="btn btn-primary btn-sm">Log in</a>
