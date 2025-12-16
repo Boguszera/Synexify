@@ -1,14 +1,13 @@
-<!-- # infrastructure/web/templates/layouts/base.html -->
-
 <!doctype html>
 <html lang="pl">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Synexify{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-      <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
     <script>
         document.body.addEventListener('htmx:configRequest', (event) => {
             event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
@@ -16,86 +15,132 @@
     </script>
 
     <style>
-        body { background-color: #f8f9fa; }
-        .sidebar { min-height: 100vh; background-color: #fff; border-right: 1px solid #dee2e6; }
+        body { background-color: #f4f7fa; }
+
+        .sidebar {
+            position: fixed;
+            top: 56px;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+            background-color: #ffffff;
+            border-right: 1px solid #e0e0e0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        .sidebar .nav-link {
+            font-weight: 500;
+            color: #333;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+            padding: 0.5rem 1rem;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: #0d6efd;
+            background-color: #e9f0fe;
+        }
+        .sidebar .nav-item .nav-link.active {
+            border-left: 3px solid #0d6efd;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                margin-left: 16.666667%;
+            }
+        }
+
     </style>
   </head>
   <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">Synexify</a>
-        <div class="d-flex">
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+        {% if user.is_authenticated %}
+        <button class="navbar-toggler me-3 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {% endif %}
 
-    <li class="nav-item dropdown me-3">
-        <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdownNotifications" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-bell fs-5"></i>
-
-            {% if notifications_count > 0 %}
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                {{ notifications_count }}
-                <span class="visually-hidden">nieprzeczytane powiadomienia</span>
-            </span>
-            {% endif %}
+        <a class="navbar-brand fw-bold text-primary" href="/" style="font-size: 1.5rem;">
+            <i class="bi bi-rocket-takeoff me-2"></i> Synexify
         </a>
 
-        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdownNotifications" style="width: 300px; max-height: 400px; overflow-y: auto;">
-            <li><h6 class="dropdown-header">Powiadomienia</h6></li>
-            <li><hr class="dropdown-divider"></li>
+        <div class="d-flex">
+            <ul class="navbar-nav flex-row align-items-center">
 
-            {% for notif in notifications_list %}
-            <li>
-                <a class="dropdown-item white-space-normal" href="{% url 'web:mark_notification_read' pk=notif.id %}">
-                    <div class="d-flex flex-column">
-                        <span class="fw-bold small">{{ notif.title }}</span>
-                        <span class="text-muted small text-truncate">{{ notif.message }}</span>
-                        <span class="text-muted" style="font-size: 0.65em;">{{ notif.created_at|timesince }} temu</span>
-                    </div>
-                </a>
-            </li>
-            {% empty %}
-            <li><span class="dropdown-item text-muted small text-center">Brak nowych powiadomień</span></li>
-            {% endfor %}
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown me-3">
+                    <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdownNotifications" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-bell fs-5"></i>
+                        {% if notifications_count > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ notifications_count }}
+                            <span class="visually-hidden">Unread notifications</span>
+                        </span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdownNotifications" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><hr class="dropdown-divider"></li>
 
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-center small text-primary" href="{% url 'web:clear_notifications' %}">Oznacz wszystkie jako przeczytane</a></li>
-        </ul>
-    </li>
+                        {% for notif in notifications_list %}
+                        <li>
+                            <a class="dropdown-item" href="{% url 'web:mark_notification_read' pk=notif.id %}">
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold small">{{ notif.title }}</span>
+                                    <span class="text-muted small text-truncate">{{ notif.message }}</span>
+                                    <span class="text-muted" style="font-size: 0.65em;">{{ notif.created_at|timesince }} temu</span>
+                                </div>
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li><span class="dropdown-item text-muted small text-center">No new notifications</span></li>
+                        {% endfor %}
 
-    </ul>
-            {% if user.is_authenticated %}
-                <span class="navbar-text me-3">Hello, {{ user.username }}</span>
-                <a href="{% url 'web:logout' %}" class="btn btn-outline-light btn-sm">Log Out</a>
-            {% else %}
-                <a href="{% url 'web:login' %}" class="btn btn-primary btn-sm">Log in</a>
-            {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center small text-primary" href="{% url 'web:clear_notifications' %}">Mark all as read</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+
+                <li class="nav-item">
+                    {% if user.is_authenticated %}
+                        <span class="navbar-text me-3 text-white">
+                            Hello, <strong>{{ user.get_username }}</strong>
+                        </span>
+                        <a href="{% url 'web:logout' %}" class="btn btn-outline-light btn-sm">Log out</a>
+                    {% else %}
+                        <a href="{% url 'web:login' %}" class="btn btn-primary btn-sm">Log in</a>
+                    {% endif %}
+                </li>
+            </ul>
         </div>
       </div>
     </nav>
 
     <div class="container-fluid">
       <div class="row">
+
         {% if user.is_authenticated %}
-        <nav class="col-md-2 d-none d-md-block sidebar py-4">
-          <div class="position-sticky">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <a class="nav-link active" href="{% url 'web:project_list' %}">
-                  <i class="bi bi-folder"></i> Projects
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <i class="bi bi-list-check"></i> My Assignments
-                </a>
-              </li>
-            </ul>
-          </div>
+
+        <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-none d-md-block sidebar">
+            <div class="position-sticky pt-3">
+                {% include "layouts/partials/sidebar_menu.html" %}
+            </div>
         </nav>
+
+        <div class="offcanvas offcanvas-start bg-light" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title fw-bold" id="sidebarMenuLabel">Menu</h5>
+                <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                {% include "layouts/partials/sidebar_menu.html" %}
+            </div>
+        </div>
+
         {% endif %}
 
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 main-content">
             {% if messages %}
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -110,6 +155,6 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

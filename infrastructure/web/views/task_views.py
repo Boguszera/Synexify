@@ -267,3 +267,24 @@ def unassign_task(request, pk, assignee_id):
             messages.error(request, f"An unknown error occurred:{str(e)}")
 
     return redirect('web:task_detail', pk=pk)
+
+
+@login_required(login_url='web:login')
+def my_assignments(request):
+    container = get_container()
+    domain_user = get_domain_user(request)
+    all_tasks = container.tasks.task_repo.get_all()
+    user_id = domain_user.get_id()
+
+    assigned_tasks = [
+        t for t in all_tasks
+        if user_id in t.get_assignees_ids()
+    ]
+
+    context = {
+        'tasks': assigned_tasks,
+        'title': 'Moje Przypisane Zadania',
+        'current_user': domain_user
+    }
+
+    return render(request, "web/tasks/my_assignments.html", context)

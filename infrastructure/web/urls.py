@@ -1,6 +1,6 @@
 # infrastructure/web/urls.py
 from django.urls import path
-from .views import project_views, auth_views, task_views, sprint_views, general_views
+from .views import project_views, auth_views, task_views, sprint_views, general_views, report_views
 
 app_name = 'web'
 
@@ -32,8 +32,14 @@ urlpatterns = [
     path('tasks/<uuid:pk>/attach/', task_views.add_attachment, name='task_add_attachment'),
     path('tasks/<uuid:pk>/assign/', task_views.assign_task, name='assign_task'),
     path('tasks/<uuid:pk>/unassign/<uuid:assignee_id>/', task_views.unassign_task, name='unassign_task'),
+    path('tasks/my-assignments/', task_views.my_assignments, name='my_assignments'),
 
     # Notifications
-path('notifications/<uuid:pk>/read/', general_views.mark_notification_read, name='mark_notification_read'),
+    path('notifications/<uuid:pk>/read/', general_views.mark_notification_read, name='mark_notification_read'),
     path('notifications/clear/', general_views.clear_notifications, name='clear_notifications'),
+
+    # Reports
+    path('reports/status/', report_views.report_status_summary, name='report_status'),
+    path('reports/workload/', report_views.report_team_workload, name='report_workload'),
+    path('reports/velocity/', report_views.report_team_velocity, name='report_velocity'),
 ]

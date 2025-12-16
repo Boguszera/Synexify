@@ -8,11 +8,11 @@
         {% with sprint_id=task.get_sprint_id %}
             {% if sprint_id %}
                 <a href="{% url 'web:sprint_board' pk=sprint_id %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left"></i> Wróć do Tablicy Sprintu
+                    <i class="bi bi-arrow-left"></i> Return to the Sprint Board
                 </a>
             {% else %}
                 <a href="{% url 'web:project_detail' pk=task.get_project_id %}" class="btn btn-outline-secondary btn-sm">
-                    <i class="bi bi-arrow-left"></i> Wróć do Backlogu Projektu
+                    <i class="bi bi-arrow-left"></i> Return to Project Backlog
                 </a>
             {% endif %}
         {% endwith %}
@@ -32,12 +32,12 @@
                     {% endif %}
 
                     <hr>
-                    <h5 class="mt-4">Opis</h5>
+                    <h5 class="mt-4">Description</h5>
                     <p class="card-text">{{ task.get_description|linebreaks }}</p>
                 </div>
             </div>
 <div class="card mb-4 shadow-sm">
-    <div class="card-header fw-bold bg-white">Komentarze ({{ comments|length }})</div>
+    <div class="card-header fw-bold bg-white">Comments ({{ comments|length }})</div>
     <div class="card-body">
 
         <div class="comments-list mb-4">
@@ -45,25 +45,25 @@
             <div class="comment-item border-start border-3 ps-3 mb-3">
                 <p class="small mb-0">{{ comment.get_content|linebreaksbr }}</p>
                 <footer class="blockquote-footer mt-1">
-                    Dodano przez
+                    Added by
                     {% if comment.get_author %}
                         <strong>{{ comment.get_author.get_name }}</strong>
                     {% else %}
-                        Użytkownik usunięty
+                        User deleted
                     {% endif %}
                      w {{ comment.created_at|date:"Y-m-d H:i" }}
                 </footer>
             </div>
             {% empty %}
-            <p class="text-muted text-center py-3">Brak komentarzy.</p>
+            <p class="text-muted text-center py-3">No comments.</p>
             {% endfor %}
         </div>
 
         <form action="{% url 'web:task_add_comment' pk=task.get_id %}" method="POST">
             {% csrf_token %}
-            <h6 class="mb-2">Dodaj Komentarz</h6>
+            <h6 class="mb-2">Add a Comment</h6>
             <textarea name="content" class="form-control mb-2" rows="3" required></textarea>
-            <button type="submit" class="btn btn-sm btn-dark">Wyślij</button>
+            <button type="submit" class="btn btn-sm btn-dark">Submit</button>
         </form>
     </div>
 </div>
@@ -73,7 +73,7 @@
         <div class="col-md-4">
 
             <div class="card mb-3 shadow-sm">
-    <div class="card-header fw-bold bg-white">Przypisani (Assignees)</div>
+    <div class="card-header fw-bold bg-white">Assignees</div>
     <div class="card-body p-3">
         <ul class="list-unstyled mb-3">
             {% for user in assignees %}
@@ -82,13 +82,13 @@
 
                 <form action="{% url 'web:unassign_task' pk=task.get_id assignee_id=user.get_id %}" method="POST" class="d-inline">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1" title="Usuń przypisanie">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1" title="Remove assignment">
                         <i class="bi bi-x"></i>
                     </button>
                 </form>
             </li>
             {% empty %}
-            <li class="text-muted small">Brak przypisanych osób.</li>
+            <li class="text-muted small">No people assigned.</li>
             {% endfor %}
         </ul>
 

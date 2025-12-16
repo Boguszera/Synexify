@@ -10,7 +10,7 @@
                 {% for task in kanban.todo %}
                     {% include "web/projects/components/task_card.html" with task=task color="secondary" %}
                 {% empty %}
-                    <div class="text-center text-muted mt-5 opacity-50"><i class="bi bi-inbox fs-1"></i><br>Pusto</div>
+                    <div class="text-center text-muted mt-5 opacity-50"><i class="bi bi-inbox fs-1"></i><br>Empty</div>
                 {% endfor %}
             </div>
         </div>

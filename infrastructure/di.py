@@ -48,7 +48,7 @@ class Container:
 
         self.backlog = BacklogService(auth_service=self.auth, task_repo=self.task_repo, sprint_repo=self.sprint_repo)
         self.notifications = NotificationsService(task_repo=self.task_repo, user_repo=self.user_repo)
-        self.reporting = ReportingService(auth_service=self.auth, task_repo=self.task_repo)
+        self.reporting = ReportingService(auth_service=self.auth, task_repo=self.task_repo, project_repo=self.project_repo, user_repo=self.user_repo)
 
         self.sprints = SprintService(
             auth_service=self.auth,

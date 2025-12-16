@@ -2,13 +2,74 @@
 from datetime import datetime
 from domain.users.user_base import UserBase
 from domain.projects.project_base import ProjectBase
+from typing import List, Dict, Union
+from domain.tasks.feature_task import FeatureTask
+from domain.tasks.bug_task import BugTask
+from domain.tasks.task_base import TaskBase
 
 class ReportingService:
-    def __init__(self, auth_service, task_repo):
+    def __init__(self, auth_service, task_repo, project_repo, user_repo):
         self.auth_service = auth_service
         self.task_repo = task_repo
+        self.project_repo = project_repo
+        self.user_repo = user_repo
 
-    def team_workload(self, project: ProjectBase, user: UserBase) -> dict:
+    def get_task_status_summary_all(self, user: UserBase) -> Dict[str, int]:
+        all_tasks = self.task_repo.get_all()
+        status_counts = {"To Do": 0, "In Progress": 0, "Done": 0, "Blocked": 0}
+
+        for task in all_tasks:
+            project = self.project_repo.get_by_id(task.get_project_id())
+            if not project or not self.auth_service.can_view_project(user, project):
+                continue
+
+            status = task.get_status()
+            if status in status_counts:
+                status_counts[status] += 1
+            elif status:
+                status_counts[status] = status_counts.get(status, 0) + 1
+
+        return status_counts
+
+    def get_team_workload_summary(self, user: UserBase, project_id: str = None) -> List[
+        Dict[str, Union[str, int, UserBase]]]:
+        all_tasks = self.task_repo.get_all()
+
+        workload_map = {}
+
+        for task in all_tasks:
+
+            if project_id and task.get_project_id() != project_id:
+                continue
+            project = self.project_repo.get_by_id(task.get_project_id())
+            if not project or not self.auth_service.can_view_project(user, project):
+                continue
+
+            if task.get_status() == "Done":
+                continue
+
+            points = task.get_story_points() if isinstance(task, FeatureTask) else 0
+
+            for assignee_id in task.get_assignees_ids():
+                if assignee_id not in workload_map:
+                    workload_map[assignee_id] = {'tasks_count': 0, 'points_sum': 0}
+
+                workload_map[assignee_id]['tasks_count'] += 1
+                workload_map[assignee_id]['points_sum'] += points
+
+        result = []
+        for user_id, data in workload_map.items():
+            member = self.user_repo.get_by_id(user_id)
+            if member:
+                result.append({
+                    'user': member,
+                    'tasks_count': data['tasks_count'],
+                    'points_sum': data['points_sum'],
+                })
+
+        return sorted(result, key=lambda x: (x['points_sum'], x['tasks_count']), reverse=True)
+
+    def team_workload_by_project(self, project: ProjectBase, user: UserBase) -> dict:
         self.auth_service.check_manage_project(user, project)
         workload = {}
         for member_id in project.get_member_ids():

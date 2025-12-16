@@ -28,7 +28,7 @@
                         <h5 class="mb-1">{{ sprint.get_name }}</h5>
                         <small class="text-muted">{{ sprint.get_start_date }} - {{ sprint.get_end_date }}</small>
                     </div>
-                    <span class="badge bg-primary rounded-pill">Tablica <i class="bi bi-arrow-right"></i></span>
+                    <span class="badge bg-primary rounded-pill">Board <i class="bi bi-arrow-right"></i></span>
                 </a>
                 {% endfor %}
             </div>
@@ -59,7 +59,7 @@
                                     <option value="{{ sprint.get_id }}">{{ sprint.get_name }} ({{ sprint.get_start_date|date:"d.m" }})</option>
                                 {% endfor %}
                             </select>
-                            <button class="btn btn-sm btn-outline-primary" type="submit" title="Dodaj do Sprintu">
+                            <button class="btn btn-sm btn-outline-primary" type="submit" title="Add to Sprint">
                                 <i class="bi bi-arrow-right"></i>
                             </button>
                         </form>
