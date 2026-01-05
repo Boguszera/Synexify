@@ -288,3 +288,38 @@ def my_assignments(request):
     }
 
     return render(request, "web/tasks/my_assignments.html", context)
+
+@login_required(login_url='web:login')
+def remove_task_from_sprint(request, pk):
+    if request.method == "POST":
+        container = get_container()
+        domain_user = get_domain_user(request)
+
+        try:
+            task = container.tasks.task_repo.get_by_id(str(pk))
+            if not task:
+                messages.error(request, "Task does not exist.")
+                return redirect('web:project_list')
+
+            sprint_id = task.get_sprint_id()
+            if not sprint_id:
+                messages.warning(request, "This task is not assigned.")
+                return redirect('web:task_detail', pk=pk)
+
+            sprint = container.sprints. get_sprint(sprint_id)
+            if not sprint:
+                messages.error(request, "Sprint does not exist.")
+                return redirect('web:task_detail', pk=pk)
+
+            container.sprints.remove_task_from_sprint(sprint, task, user=domain_user)
+            messages.success(request, "Task removed from sprint.")
+            return redirect('web:task_detail', pk=pk)
+
+        except PermissionDenied as e:
+            messages.error(request, f"No permissions:  {str(e)}")
+            return redirect('web:task_detail', pk=pk)
+        except Exception as e:
+            messages.error(request, f"Error:  {str(e)}")
+            return redirect('web:task_detail', pk=pk)
+
+    return redirect('web:task_detail', pk=pk)

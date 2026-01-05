@@ -143,33 +143,6 @@ class TaskService:
                 visible_tasks.append(task)
         return visible_tasks
 
-    def get_task_filters(self, project=None, user=None, status=None, tag=None, priority=None):
-        tasks = self.task_repo.get_all()
-
-        if project:
-            tasks = [t for t in tasks if t.get_project_id() == project.get_id()]
-
-        if status:
-            # UWAGA: status z query_params musi być również w formacie kanonicznym, jeśli jest filtrowany
-            tasks = [t for t in tasks if t.get_status() == status]
-
-        if tag:
-            tasks = [t for t in tasks if any(tid == tag.get_id() for tid in t.get_tag_ids())]
-
-        visible_tasks = []
-        project_cache = {}
-
-        for task in tasks:
-            pid = task.get_project_id()
-            if pid not in project_cache:
-                project_cache[pid] = self.project_repo.get_by_id(pid)
-
-            proj = project_cache[pid]
-            if proj and self.auth.can_view_project(user, proj):
-                visible_tasks.append(task)
-
-        return visible_tasks
-
     def update_task(self, task, user, **fields):
         project_id = task.get_project_id()
         project = self.project_repo.get_by_id(project_id)
@@ -203,7 +176,6 @@ class TaskService:
         saved_task = self.task_repo.save(task)
 
         if status_changed and new_status:
-            # Używamy nowej metody update_status, która normalizuje status
             return self.update_status(saved_task, user, new_status)
         return saved_task
 

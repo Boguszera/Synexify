@@ -22,3 +22,7 @@ class TaskRepository(ABC):
     @abstractmethod
     def list_by_sprint(self, sprint_id: str) -> List[TaskBase]:
         pass
+
+    @abstractmethod
+    def get_all(self) -> List[TaskBase]:
+        pass
