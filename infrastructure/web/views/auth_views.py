@@ -10,7 +10,7 @@ def login_view(request):
         password = request.POST.get("password")
 
         # standard Django mechanism for session auth
-        user = authenticate(request, username=login_str, password=password)
+        user = authenticate(request, login=login_str, password=password)
 
         if user is not None:
             login(request, user)

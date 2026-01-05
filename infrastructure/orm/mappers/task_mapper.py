@@ -8,14 +8,14 @@ from domain.tasks.chore_task import ChoreTask
 from typing import Optional, List
 from django.apps import apps
 
-STATUS_DB_TO_DOMAIN = {
+STATUS_MAPPING = {
     "todo": "To Do",
     "in_progress": "In Progress",
     "done": "Done",
     "blocked": "Blocked"
 }
-
-STATUS_DOMAIN_TO_DB = {v: k for k, v in STATUS_DB_TO_DOMAIN.items()}
+STATUS_DB_TO_DOMAIN = STATUS_MAPPING
+STATUS_DOMAIN_TO_DB = {v: k for k, v in STATUS_MAPPING.items()}
 
 class TaskMapper:
 

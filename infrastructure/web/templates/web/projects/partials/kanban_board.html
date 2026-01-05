@@ -1,46 +1,78 @@
-<div class="row h-100" id="kanban-container">
+<style>
+    .kanban-col-scroll {
+        max-height: 75vh;
+        overflow-y: auto;
+    }
+    .kanban-col-scroll::-webkit-scrollbar { width: 6px; }
+    .kanban-col-scroll::-webkit-scrollbar-track { background: #f8f9fa; }
+    .kanban-col-scroll::-webkit-scrollbar-thumb { background: #ced4da; border-radius: 4px; }
+    .kanban-col-scroll::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
+</style>
 
-    <div class="col-md-4">
+<div class="row h-100 g-3" id="kanban-container">
+
+    <div class="col-md-3 col-sm-6">
         <div class="card bg-light h-100 border-0 shadow-sm">
-            <div class="card-header bg-white border-bottom-0 fw-bold text-uppercase text-secondary d-flex justify-content-between">
-                <span><i class="bi bi-circle"></i> To Do</span>
+            <div class="card-header bg-white fw-bold text-secondary border-bottom border-2 border-secondary d-flex justify-content-between align-items-center">
+                <span>📝 To Do</span>
                 <span class="badge bg-secondary rounded-pill">{{ kanban.todo|length }}</span>
             </div>
-            <div class="card-body p-2 overflow-auto custom-scrollbar" style="max-height: 75vh;">
+            <div class="card-body p-2 kanban-col-scroll">
                 {% for task in kanban.todo %}
                     {% include "web/projects/components/task_card.html" with task=task color="secondary" %}
                 {% empty %}
-                    <div class="text-center text-muted mt-5 opacity-50"><i class="bi bi-inbox fs-1"></i><br>Empty</div>
+                    <div class="text-center text-muted mt-5 opacity-50 small">No tasks</div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3 col-sm-6">
         <div class="card bg-light h-100 border-0 shadow-sm">
-            <div class="card-header bg-white border-bottom-0 fw-bold text-uppercase text-primary d-flex justify-content-between">
-                <span><i class="bi bi-arrow-repeat spin"></i> In Progress</span>
+            <div class="card-header bg-white fw-bold text-primary border-bottom border-2 border-primary d-flex justify-content-between align-items-center">
+                <span>🔄 In Progress</span>
                 <span class="badge bg-primary rounded-pill">{{ kanban.in_progress|length }}</span>
             </div>
-            <div class="card-body p-2 overflow-auto custom-scrollbar" style="max-height: 75vh;">
+            <div class="card-body p-2 kanban-col-scroll">
                 {% for task in kanban.in_progress %}
                     {% include "web/projects/components/task_card.html" with task=task color="primary" %}
+                {% empty %}
+                    <div class="text-center text-muted mt-5 opacity-50 small">No tasks</div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3 col-sm-6">
         <div class="card bg-light h-100 border-0 shadow-sm">
-            <div class="card-header bg-white border-bottom-0 fw-bold text-uppercase text-success d-flex justify-content-between">
-                <span><i class="bi bi-check-circle-fill"></i> Done</span>
+            <div class="card-header bg-white fw-bold text-success border-bottom border-2 border-success d-flex justify-content-between align-items-center">
+                <span>✅ Done</span>
                 <span class="badge bg-success rounded-pill">{{ kanban.done|length }}</span>
             </div>
-            <div class="card-body p-2 overflow-auto custom-scrollbar" style="max-height: 75vh;">
+            <div class="card-body p-2 kanban-col-scroll">
                 {% for task in kanban.done %}
                     {% include "web/projects/components/task_card.html" with task=task color="success" %}
+                {% empty %}
+                    <div class="text-center text-muted mt-5 opacity-50 small">No tasks</div>
                 {% endfor %}
             </div>
         </div>
     </div>
+
+    <div class="col-md-3 col-sm-6">
+        <div class="card bg-light h-100 border-0 shadow-sm">
+            <div class="card-header bg-white fw-bold text-danger border-bottom border-2 border-danger d-flex justify-content-between align-items-center">
+                <span>🚫 Blocked</span>
+                <span class="badge bg-danger rounded-pill">{{ kanban.blocked|length }}</span>
+            </div>
+            <div class="card-body p-2 kanban-col-scroll">
+                {% for task in kanban.blocked %}
+                    {% include "web/projects/components/task_card.html" with task=task color="danger" %}
+                {% empty %}
+                    <div class="text-center text-muted mt-5 opacity-50 small">No tasks</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
 </div>

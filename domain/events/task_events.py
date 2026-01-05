@@ -21,7 +21,7 @@ class TaskAssignedEvent(DomainEvent):
     def get_event_name(self) -> str:
         return "TaskAssigned"
 
-class TaskUnassignedEvent:
+class TaskUnassignedEvent(DomainEvent):
     def __init__(self, task_id: str, unassigned_user_id: str):
         super().__init__()
         self.task_id = task_id

@@ -33,6 +33,7 @@ urlpatterns = [
     path('tasks/<uuid:pk>/assign/', task_views.assign_task, name='assign_task'),
     path('tasks/<uuid:pk>/unassign/<uuid:assignee_id>/', task_views.unassign_task, name='unassign_task'),
     path('tasks/my-assignments/', task_views.my_assignments, name='my_assignments'),
+path('tasks/<pk>/remove-from-sprint/', task_views.remove_task_from_sprint, name='remove_task_from_sprint'),
 
     # Notifications
     path('notifications/<uuid:pk>/read/', general_views.mark_notification_read, name='mark_notification_read'),

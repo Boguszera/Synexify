@@ -1,6 +1,6 @@
 # application/sprint_service.py
 
-from domain.sprints.sprint_base import SprintBase
+from domain.sprints. sprint_base import SprintBase
 
 class SprintService:
     def __init__(self, auth_service, sprint_repo, project_repo, task_repo):
@@ -33,10 +33,10 @@ class SprintService:
         self.project_repo.save(project)
         return saved_sprint
 
-    def get_sprint(self, sprint_id: str):
+    def get_sprint(self, sprint_id:  str):
         return self.sprint_repo.get_by_id(sprint_id)
 
-    def update_sprint(self, sprint: SprintBase, fields: dict, user):
+    def update_sprint(self, sprint:  SprintBase, fields: dict, user):
         project = self.project_repo.get_by_id(sprint.get_project_id())
         self.auth.check_manage_project(user, project)
         allowed_fields = {"name", "start_date", "end_date"}
@@ -48,27 +48,23 @@ class SprintService:
     def delete_sprint(self, sprint: SprintBase, user):
         project = self.project_repo.get_by_id(sprint.get_project_id())
         self.auth.check_manage_project(user, project)
-        self.sprint_repo.delete(sprint.get_id())
-
-    def remove_task_from_sprint(self, sprint, task, user):
-        project = self.project_repo.get_by_id(sprint.get_project_id())
-        self.auth.check_manage_project(user, project)
-        sprint.remove_task_id(task.get_id())
-        self.sprint_repo.save(sprint)
+        self.sprint_repo.delete(sprint. get_id())
 
     def add_task_to_sprint(self, sprint, task, user):
         project = self.project_repo.get_by_id(sprint.get_project_id())
         self.auth.check_manage_project(user, project)
         sprint.add_task_id(task.get_id())
         task.set_sprint_id(sprint.get_id())
+        self.sprint_repo.save(sprint)
         self.task_repo.save(task)
 
     def remove_task_from_sprint(self, sprint, task, user):
         project = self.project_repo.get_by_id(sprint.get_project_id())
         self.auth.check_manage_project(user, project)
-        sprint.set_task_id(task.get_id())
-        task.assign_sprint_id(None)
-        self.task_repo.save(sprint)
+        sprint.remove_task_id(task.get_id())
+        task.set_sprint_id(None)
+        self.sprint_repo.save(sprint)
+        self.task_repo.save(task)
 
     def can_view(self, user, sprint, project):
         role = user.get_role()
