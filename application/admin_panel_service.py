@@ -31,12 +31,16 @@ class AdminPanelService:
         if not target_user:
             raise ValueError("User not found")
 
-        self.auth_service.check_manage_user(user, target_user)
+        self.auth_service. check_manage_user(user, target_user)
 
-        allowed_fields = {"name", "email", "role", "login"}
-        for k, v in fields.items():
-            if k in allowed_fields:
-                setattr(target_user, f"_{k}", v)
+        if "name" in fields:
+            target_user.set_name(fields["name"])
+        if "email" in fields:
+            target_user.set_email(fields["email"])
+        if "role" in fields:
+            target_user.set_role(fields["role"])
+        if "login" in fields:
+            target_user. set_login(fields["login"])
 
         return self.user_repo.save(target_user)
 

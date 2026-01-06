@@ -56,7 +56,7 @@ def sprint_board(request, pk):
         return redirect('web:project_list')
 
     project = container.project_service.get_project(sprint.get_project_id())
-    if not container.project_service.can_view(domain_user, project):
+    if not container. auth.can_view_project(domain_user, project):
         return HttpResponseForbidden("You do not have access to this sprint.")
 
     backlog_service = getattr(container, 'backlog',

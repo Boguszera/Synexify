@@ -53,7 +53,7 @@ def project_detail(request, pk):
     domain_user = get_domain_user(request)
     project = container.project_service.get_project(str(pk))
 
-    if not project or not container.project_service.can_view(domain_user, project):
+    if not project or not container. auth.can_view_project(domain_user, project):
         return HttpResponseForbidden("Access denied or project does not exist.")
 
     backlog_service = getattr(container, 'backlog',

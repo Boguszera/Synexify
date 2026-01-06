@@ -105,7 +105,7 @@ class TaskViewSet(viewsets.ViewSet):
             return Response({"detail": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
         project = container.project_service.get_project(task.get_project_id())
-        if not project or not container.project_service.can_view(domain_user, project):
+        if not project or not container.auth.eeecan_view_project(domain_user, project):
             return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
 
         comments = container.comments.list_comments_for_task(pk, domain_user)

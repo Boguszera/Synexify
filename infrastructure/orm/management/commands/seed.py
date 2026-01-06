@@ -240,7 +240,7 @@ class Command(BaseCommand):
         self.stdout.write("  ✓ Project 3: 1 sprint")
 
         # === TASKS - PROJECT 1 ===
-        self.stdout.write("📌 Seeding tasks (30+ tasks)...")
+        self.stdout.write("Seeding tasks (30+ tasks)...")
 
         # Completed tasks
         c_t1 = FeatureTask(
@@ -424,27 +424,27 @@ class Command(BaseCommand):
         self.stdout.write("  ✓ 30+ tasks seeded")
 
         # === COMMENTS ===
-        self.stdout.write("💬 Seeding comments...")
+        self.stdout.write("Seeding comments...")
         comment_data = [
-            (c_t1, dev1, "✅ Authentication layer complete"),
-            (c_t2, dev2, "✅ Registration validated and tested"),
-            (c_t3, qa1, "🐛 Bug confirmed and fixed"),
+            (c_t1, dev1, "Authentication layer complete"),
+            (c_t2, dev2, "Registration validated and tested"),
+            (c_t3, qa1, "Bug confirmed and fixed"),
         ]
 
         for task, user, text in comment_data:
             comment = Comment(content=text, author=user)
             comment_repo.save(comment, task.get_id())
 
-        self.stdout.write("  ✓ Comments added")
+        self.stdout.write("Comments added")
 
         # === SUCCESS ===
-        self.stdout.write(self.style.SUCCESS("\n=== ✅ [EXTENDED SEED COMPLETE! ] ===\n"))
+        self.stdout.write(self.style.SUCCESS("\n=== [EXTENDED SEED COMPLETE! ] ===\n"))
         print("\n" + "=" * 70)
-        print("🔐 DEMO CREDENTIALS (Password: demo123):")
+        print("DEMO CREDENTIALS (Password: demo123):")
         print("=" * 70)
-        print("\n👤 ADMIN:")
+        print("\nADMIN:")
         print("  root          (全系统访问) - Full system access")
-        print("\n👔 MANAGERS:")
+        print("\nMANAGERS:")
         print("  manager1      (WebApp Rebuild)")
         print("  manager2      (Mobile CRM + Legacy Maintenance)")
         print("  manager3      (Marketing Landing Page)")
@@ -453,22 +453,22 @@ class Command(BaseCommand):
         print("  dev2          (WebApp + CRM)")
         print("  dev3          (CRM + Internal Tool)")
         print("  dev4          (Internal Tool + Legacy)")
-        print("\n🔍 QA:")
+        print("\n QA:")
         print("  qa1           (WebApp + Landing Page)")
         print("  qa2           (CRM)")
-        print("\n👥 CLIENTS (LIMITED ACCESS):")
+        print("\nCLIENTS (LIMITED ACCESS):")
         print("  client1       (Can see:  WebApp Rebuild ONLY)")
         print("  client2       (Can see: Mobile CRM ONLY)")
         print("  client3       (Can see:  Marketing Landing Page ONLY)")
         print("\n" + "=" * 70)
-        print("📊 CREATED:")
+        print("CREATED:")
         print("  • 14 Users (2 Admin, 3 Manager, 6 Dev, 2 QA, 3 Client)")
         print("  • 5 Projects (3 with clients, 2 internal)")
         print("  • 8 Sprints (across 3 projects)")
         print("  • 35+ Tasks")
         print("  • 9 Tags")
         print("  • 3 Comments")
-        print("\n🎯 DEMO FEATURES:")
+        print("\n DEMO FEATURES:")
         print("  ✓ Permission-based access control")
         print("  ✓ Clients see ONLY their projects")
         print("  ✓ Managers see their assigned projects")

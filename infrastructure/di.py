@@ -20,6 +20,8 @@ from infrastructure.repositories.comment_django_repository import CommentDjangoR
 from infrastructure.repositories.attachment_django_repository import AttachmentDjangoRepository
 from infrastructure.repositories.tag_django_repository import TagDjangoRepository
 
+from infrastructure.orm.models.notification_model import NotificationModel
+
 class Container:
     def __init__(self):
         # REPOSITORIES

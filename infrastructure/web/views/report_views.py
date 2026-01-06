@@ -29,7 +29,7 @@ def report_team_workload(request):
     all_projects = container.project_repo.list_all()
     visible_projects = [
         p for p in all_projects
-        if container.project_service.can_view(domain_user, p)
+        if container.auth.can_view_project(domain_user, p)
     ]
 
     return render(request, "web/reports/team_workload.html", {

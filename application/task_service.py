@@ -69,6 +69,15 @@ class TaskService:
         assignee = self.user_repo.get_by_id(assignee_id)
         if assignee is None:
             raise ValueError(f"Assignee user ID {assignee_id} not found.")
+
+        if not self.auth.can_assign_task(user, task):
+            if user.get_id() != assignee_id:
+                raise PermissionDenied(
+                    user.get_id(),
+                    action="unassign_other_user",
+                    resource=f"task:{task.get_id()}"
+                )
+
         task.unassign_user_id(assignee.get_id())
         self.task_repo.save(task)
         events = task.pull_domain_events()
@@ -150,28 +159,19 @@ class TaskService:
         if project is None:
             raise PermissionDenied(user.get_id(), action="update_task", resource="Project Not Found")
         self.auth.check_manage_project(user, project)
-        allowed_fields = {"title", "description"}
 
         status_changed = False
         new_status = None
 
-        for key, value in fields.items():
-            if key in allowed_fields:
-                try:
-                    setter_method = getattr(task, f"set_{key}", None)
-                    if callable(setter_method):
-                        setter_method(value)
-                    else:
-                        setattr(task, f"_{key}", value)
-                except AttributeError:
-                    pass
-
-            elif key == "status":
-                new_status = value
-                status_changed = True
-
-            elif key == "assignee_id":
-                self.assign_task_by_id(task, user, value)
+        if "title" in fields:
+            task.set_title(fields["title"])
+        if "description" in fields:
+            task.set_description(fields["description"])
+        if "status" in fields:
+            new_status = fields["status"]
+            status_changed = True
+        if "assignee_id" in fields:
+            self.assign_task_by_id(task, user, fields["assignee_id"])
 
         saved_task = self.task_repo.save(task)
 

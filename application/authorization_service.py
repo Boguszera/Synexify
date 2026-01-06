@@ -12,6 +12,8 @@ class AuthorizationService:
     def can_edit_task(self, user: UserBase, task) -> bool:
         if isinstance(user, AdminUser) or isinstance(user, ManagerUser):
             return True
+        if isinstance(user, TeamMemberUser):
+            return user.get_id() in task.get_assignees_ids()
         return False
 
     def can_assign_task(self, user: UserBase, task) -> bool:

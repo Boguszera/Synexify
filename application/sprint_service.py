@@ -36,13 +36,17 @@ class SprintService:
     def get_sprint(self, sprint_id:  str):
         return self.sprint_repo.get_by_id(sprint_id)
 
-    def update_sprint(self, sprint:  SprintBase, fields: dict, user):
+    def update_sprint(self, sprint: SprintBase, fields: dict, user):
         project = self.project_repo.get_by_id(sprint.get_project_id())
         self.auth.check_manage_project(user, project)
-        allowed_fields = {"name", "start_date", "end_date"}
-        for k, v in fields.items():
-            if k in allowed_fields:
-                setattr(sprint, f"_{k}", v)
+
+        if "name" in fields:
+            sprint.set_name(fields["name"])
+        if "start_date" in fields:
+            sprint.set_start_date(fields["start_date"])
+        if "end_date" in fields:
+            sprint.set_end_date(fields["end_date"])
+
         return self.sprint_repo.save(sprint)
 
     def delete_sprint(self, sprint: SprintBase, user):

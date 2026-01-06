@@ -32,6 +32,20 @@ class SprintBase(Reportable):
     def get_end_date(self):
         return self._end_date
 
+    def get_task_count(self) -> int:
+        return len(self._task_ids)
+
+    def set_name(self, name: str):
+        if not name or not name.strip():
+            raise ValueError("Sprint name cannot be empty")
+        self._name = name.strip()
+
+    def set_start_date(self, start_date):
+        self._start_date = start_date
+
+    def set_end_date(self, end_date):
+        self._end_date = end_date
+
     def add_task_id(self, task_id: str):
         if task_id in self._task_ids:
             return
@@ -42,33 +56,17 @@ class SprintBase(Reportable):
             raise ValueError("Task not in sprint")
         self._task_ids.remove(task_id)
 
-    def get_completion_rate(self, task_loader_callable=None) -> float:
-        """
-        If you need full Task objects to compute completion, pass task_loader_callable(task_id)->TaskBase
-        """
-        if not self._task_ids:
-            return 0.0
-        if task_loader_callable is None:
-            # can't compute without loader, return 0
-            return 0.0
-        tasks = [task_loader_callable(tid) for tid in self._task_ids]
-        completed = sum(1 for t in tasks if t.get_status() == "done")
-        return completed / len(tasks) * 100
+    def is_empty(self) -> bool:
+        return len(self._task_ids) == 0
 
-    def get_report_data(self, task_loader_callable: Optional[Callable[[str], object]] = None) -> dict:
-        total = len(self._task_ids)
-        completion = self.get_completion_rate(task_loader_callable)
-        if task_loader_callable is None:
-            done = 0
-        else:
-            tasks = [task_loader_callable(tid) for tid in self._task_ids]
-            done = len([t for t in tasks if t.get_status() == "done"])
+    def get_report_data(self) -> dict:
         return {
             "sprint_id": self._id,
             "sprint_name": self._name,
-            "total_tasks": total,
-            "tasks_done": done,
-            "completion_percentage": completion,
+            "total_tasks": len(self._task_ids),
+            "start_date": self._start_date,
+            "end_date": self._end_date,
+            "project_id": self._project_id,
         }
 
  

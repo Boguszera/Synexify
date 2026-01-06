@@ -41,7 +41,7 @@ class BacklogService:
         return tasks_with_dates
 
     def get_backlog(self, project, user):
-        self.auth_service.check_manage_project(user, project)
+        self.auth_service.check_view_project(user, project)
         all_backlog = self.kanban_board(project, user, sprint_id=None)
 
         backlog_tasks = []

@@ -129,7 +129,7 @@ def task_detail(request, pk):
         messages.error(request, "Task does not exist.")
         return redirect('web:project_list')
     project = container.project_service.get_project(task.get_project_id())
-    if not project or not container.project_service.can_view(domain_user, project):
+    if not project or not container.auth.can_view_project(domain_user, project):
         messages.error(request, "No access to the project.")
         return redirect('web:login')
     comments = container.comments.list_comments_for_task(task.get_id(), domain_user)

@@ -85,3 +85,18 @@ class ProjectBase(Reportable):
             "members_count": len(self._member_ids),
             "members": list(self._member_ids)
         }
+
+    def set_name(self, name: str):
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("name must be a non-empty string")
+        self._name = name.strip()
+
+    def set_description(self, description: str):
+        if not isinstance(description, str):
+            raise TypeError("description must be a string")
+        self._description = description
+
+    def set_archived(self, archived: bool):
+        if not isinstance(archived, bool):
+            raise TypeError("archived must be a boolean")
+        self._archived = archived
