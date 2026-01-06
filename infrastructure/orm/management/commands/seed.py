@@ -60,14 +60,14 @@ class Command(BaseCommand):
                 login=login
             )
 
-            # domain -> Django ORM
+            # zapis domain → Django ORM
             created_user = user_repo.save(domain_user, password="test123")
 
             users[role] = created_user
 
         print("Users OK!")
 
-        # PROJECTS
+        # ---- PROJECTS ----
         project1 = ProjectBase("Website Redesign", "Redesign company website")
         project1.add_member_id(users["manager"].get_id())
         project1.add_member_id(users["team_member"].get_id())
@@ -78,7 +78,7 @@ class Command(BaseCommand):
         project2.add_member_id(users["team_member"].get_id())
         project_repo.save(project2)
 
-        # SPRINTS
+        # ---- SPRINTS ----
         sprint1 = SprintBase(
             sprint_id=str(uuid.uuid4()),
             name="Sprint 1",
@@ -88,7 +88,7 @@ class Command(BaseCommand):
         )
         sprint_repo.save(sprint1)
 
-        # TASKS
+        # ---- TASKS ----
         task1 = BugTask(
             title="Fix login bug",
             description="Cannot login",
