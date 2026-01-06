@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from infrastructure.repositories.user_django_repository import UserDjangoRepository
-from infrastructure.repositories. project_django_repository import ProjectDjangoRepository
+from infrastructure.repositories.project_django_repository import ProjectDjangoRepository
 from infrastructure.repositories.task_django_repository import TaskDjangoRepository
-from infrastructure.repositories. sprint_django_repository import SprintDjangoRepository
+from infrastructure.repositories.sprint_django_repository import SprintDjangoRepository
 from infrastructure.repositories.tag_django_repository import TagDjangoRepository
 from infrastructure.repositories.comment_django_repository import CommentDjangoRepository
 
@@ -25,10 +25,10 @@ from datetime import timedelta
 
 
 class Command(BaseCommand):
-    help = "Seed database with comprehensive demo data for Synexify including completed sprints"
+    help = "Seed database with comprehensive demo data for Synexify with access control showcase"
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.SUCCESS("=== 🚀 [Synexify SEED] ==="))
+        self.stdout.write(self.style.SUCCESS("=== 🚀 [Synexify SEED - EXTENDED] ==="))
 
         # --- REPOSITORIES ---
         user_repo = UserDjangoRepository()
@@ -38,23 +38,41 @@ class Command(BaseCommand):
         tag_repo = TagDjangoRepository()
         comment_repo = CommentDjangoRepository(user_repo=user_repo)
 
-        # === USERS ===
-        self.stdout.write("📝 Seeding users...")
+        # === USERS - MORE USERS FOR BETTER DEMO ===
+        self.stdout.write("📝 Seeding users (15 users)...")
         users = {}
+
         ROLES_AND_LOGINS = [
-            ("admin", "root", "Admin User"),
-            ("manager", "manager1", "John Manager"),
-            ("team_member", "dev1", "Alice Developer"),
-            ("team_member", "dev2", "Bob Developer"),
-            ("team_member", "qa1", "Charlie QA"),
-            ("client", "client1", "Client Customer"),
+            # ADMINS
+            ("admin", "root", "Root Admin"),
+            ("admin", "admin2", "Admin Two"),
+
+            # MANAGERS
+            ("manager", "manager1", "John Manager - WebApp"),
+            ("manager", "manager2", "Sarah Manager - CRM"),
+            ("manager", "manager3", "Mike Manager - LandingPage"),
+
+            # DEVELOPERS
+            ("team_member", "dev1", "Alice Developer - Frontend"),
+            ("team_member", "dev2", "Bob Developer - Backend"),
+            ("team_member", "dev3", "Charlie Developer - Mobile"),
+            ("team_member", "dev4", "Diana Developer - QA"),
+
+            # QA SPECIALISTS
+            ("team_member", "qa1", "Eve QA - WebApp"),
+            ("team_member", "qa2", "Frank QA - CRM"),
+
+            # CLIENTS
+            ("client", "client1", "Acme Corp - WebApp Client"),
+            ("client", "client2", "TechStart Inc - CRM Client"),
+            ("client", "client3", "Marketing Pro - LandingPage Client"),
         ]
 
         for role, login, name in ROLES_AND_LOGINS:
             existing = user_repo.get_by_login(login)
             if existing:
                 users[f"{role}_{login}"] = existing
-                self.stdout.write(f"  ✓ {name} (already exists)")
+                self.stdout.write(f"  ✓ {name} (exists)")
                 continue
 
             cls_map = {
@@ -71,19 +89,26 @@ class Command(BaseCommand):
             )
             created = user_repo.save(user_obj, password="demo123")
             users[f"{role}_{login}"] = created
-            self.stdout.write(f"  ✓ {name} ({role})")
+            self.stdout.write(f"  ✓ {name}")
 
         # Aliases
         admin = users["admin_root"]
-        manager = users["manager_manager1"]
+        manager1 = users["manager_manager1"]
+        manager2 = users["manager_manager2"]
+        manager3 = users["manager_manager3"]
         dev1 = users["team_member_dev1"]
         dev2 = users["team_member_dev2"]
-        qa = users["team_member_qa1"]
-        client = users["client_client1"]
+        dev3 = users["team_member_dev3"]
+        dev4 = users["team_member_dev4"]
+        qa1 = users["team_member_qa1"]
+        qa2 = users["team_member_qa2"]
+        client1 = users["client_client1"]
+        client2 = users["client_client2"]
+        client3 = users["client_client3"]
 
         # === TAGS ===
-        self.stdout. write("🏷️  Seeding tags...")
-        tag_names = ["backend", "frontend", "urgent", "review", "api", "ux", "devops"]
+        self.stdout.write("🏷️  Seeding tags...")
+        tag_names = ["backend", "frontend", "urgent", "review", "api", "ux", "devops", "mobile", "database"]
         tags = {}
         for tname in tag_names:
             tag_obj = Tag(tag_id=str(uuid.uuid4()), name=tname)
@@ -91,106 +116,140 @@ class Command(BaseCommand):
             self.stdout.write(f"  ✓ {tname}")
 
         # === PROJECTS ===
-        self.stdout. write("📦 Seeding projects...")
+        self.stdout.write("📦 Seeding projects (5 projects)...")
         now = timezone.now()
 
-        # PROJECT 1: WebApp Rebuild
+        # PROJECT 1: WebApp Rebuild (manager1, dev1, dev2, qa1, client1)
         project1 = ProjectBase(
             "WebApp Rebuild",
-            "Complete rewrite of legacy web application with modern stack (React + FastAPI)"
+            "Complete rewrite of legacy web application with React + FastAPI"
         )
-        for u in [manager, dev1, dev2, qa]:
+        for u in [manager1, dev1, dev2, qa1]:
             project1.add_member_id(u.get_id())
-        project1.add_manager_id(manager.get_id())
-        project1.add_manager_id(admin.get_id())
+        project1.add_member_id(client1.get_id())  # CLIENT CAN SEE
+        project1.add_manager_id(manager1.get_id())
         project_repo.save(project1)
-        self.stdout.write("  ✓ WebApp Rebuild")
+        self.stdout.write("  ✓ WebApp Rebuild (client1 has access)")
 
-        # PROJECT 2: Mobile CRM
+        # PROJECT 2: Mobile CRM (manager2, dev2, dev3, qa2, client2)
         project2 = ProjectBase(
             "Mobile CRM Platform",
             "Next-gen mobile CRM application for sales teams"
         )
-        for u in [manager, dev1, client]:
+        for u in [manager2, dev2, dev3, qa2]:
             project2.add_member_id(u.get_id())
-        project2.add_manager_id(manager.get_id())
+        project2.add_member_id(client2.get_id())  # CLIENT CAN SEE
+        project2.add_manager_id(manager2.get_id())
         project_repo.save(project2)
-        self.stdout.write("  ✓ Mobile CRM Platform")
+        self.stdout.write("  ✓ Mobile CRM Platform (client2 has access)")
 
-        # PROJECT 3: Landing Page
+        # PROJECT 3: Landing Page (manager3, dev1, qa1, client3)
         project3 = ProjectBase(
             "Marketing Landing Page",
             "Campaign landing page with conversion optimization"
         )
-        for u in [manager, dev2, client]:
-            project3.add_member_id(u. get_id())
-        project3.add_manager_id(manager.get_id())
+        for u in [manager3, dev1, qa1]:
+            project3.add_member_id(u.get_id())
+        project3.add_member_id(client3.get_id())  # CLIENT CAN SEE
+        project3.add_manager_id(manager3.get_id())
         project_repo.save(project3)
-        self.stdout.write("  ✓ Marketing Landing Page")
+        self.stdout.write("  ✓ Marketing Landing Page (client3 has access)")
+
+        # PROJECT 4: Internal Tool (manager1, dev3, dev4)
+        project4 = ProjectBase(
+            "Internal Analytics Tool",
+            "Internal tool - NO CLIENTS can see this"
+        )
+        for u in [manager1, dev3, dev4]:
+            project4.add_member_id(u.get_id())
+        project4.add_manager_id(manager1.get_id())
+        project_repo.save(project4)
+        self.stdout.write("  ✓ Internal Analytics Tool (NO CLIENT ACCESS)")
+
+        # PROJECT 5: Maintenance (manager2, dev4)
+        project5 = ProjectBase(
+            "Legacy System Maintenance",
+            "Maintain old system - small team only"
+        )
+        for u in [manager2, dev4]:
+            project5.add_member_id(u.get_id())
+        project5.add_manager_id(manager2.get_id())
+        project_repo.save(project5)
+        self.stdout.write("  ✓ Legacy System Maintenance (NO CLIENT ACCESS)")
 
         # === SPRINTS ===
         self.stdout.write("🏃 Seeding sprints...")
 
-        # COMPLETED SPRINT (dla Team Velocity!)
-        completed_sprint = SprintBase(
+        # PROJECT 1 SPRINTS
+        p1_completed = SprintBase(
             sprint_id=str(uuid.uuid4()),
             name="Sprint 0:  MVP (COMPLETED)",
             start_date=now - timedelta(days=30),
             end_date=now - timedelta(days=16),
             project_id=project1.get_id()
         )
-        sprint_repo.save(completed_sprint)
-        project1.add_sprint_id(completed_sprint.get_id())
-        self.stdout. write("  ✓ Sprint 0 (COMPLETED)")
+        sprint_repo.save(p1_completed)
+        project1.add_sprint_id(p1_completed.get_id())
 
-        # WebApp Sprints (Active)
-        sprint1 = SprintBase(
+        p1_sprint1 = SprintBase(
             sprint_id=str(uuid.uuid4()),
             name="Sprint 1: Authentication",
             start_date=now - timedelta(days=5),
             end_date=now + timedelta(days=9),
             project_id=project1.get_id()
         )
-        sprint2 = SprintBase(
+        sprint_repo.save(p1_sprint1)
+        project1.add_sprint_id(p1_sprint1.get_id())
+
+        p1_sprint2 = SprintBase(
             sprint_id=str(uuid.uuid4()),
-            name="Sprint 2: Dashboard & Analytics",
+            name="Sprint 2: Dashboard",
             start_date=now + timedelta(days=10),
             end_date=now + timedelta(days=24),
             project_id=project1.get_id()
         )
-        sprint_repo.save(sprint1)
-        sprint_repo.save(sprint2)
-        project1.add_sprint_id(sprint1.get_id())
-        project1.add_sprint_id(sprint2.get_id())
+        sprint_repo.save(p1_sprint2)
+        project1.add_sprint_id(p1_sprint2.get_id())
         project_repo.save(project1)
-        self.stdout.write("  ✓ WebApp:  Sprint 1 & 2")
+        self.stdout.write("  ✓ Project 1: 3 sprints")
 
-        # CRM Sprint
-        sprint3 = SprintBase(
+        # PROJECT 2 SPRINTS
+        p2_sprint1 = SprintBase(
             sprint_id=str(uuid.uuid4()),
-            name="Sprint 1:  Pilot MVP",
+            name="Sprint 1: MVP Pilot",
             start_date=now - timedelta(days=2),
             end_date=now + timedelta(days=12),
             project_id=project2.get_id()
         )
-        sprint_repo.save(sprint3)
-        project2.add_sprint_id(sprint3.get_id())
+        sprint_repo.save(p2_sprint1)
+        project2.add_sprint_id(p2_sprint1.get_id())
         project_repo.save(project2)
-        self.stdout.write("  ✓ CRM:  Sprint 1")
+        self.stdout.write("  ✓ Project 2: 1 sprint")
 
-        # === TASKS - COMPLETED SPRINT ===
-        self.stdout. write("📌 Seeding tasks (COMPLETED SPRINT)...")
+        # PROJECT 3 SPRINTS
+        p3_sprint1 = SprintBase(
+            sprint_id=str(uuid.uuid4()),
+            name="Sprint 1: Campaign A",
+            start_date=now - timedelta(days=7),
+            end_date=now + timedelta(days=7),
+            project_id=project3.get_id()
+        )
+        sprint_repo.save(p3_sprint1)
+        project3.add_sprint_id(p3_sprint1.get_id())
+        project_repo.save(project3)
+        self.stdout.write("  ✓ Project 3: 1 sprint")
 
-        # Te taski mają być DONE (dla Team Velocity)
-        completed_tasks = []
+        # === TASKS - PROJECT 1 ===
+        self.stdout.write("📌 Seeding tasks (30+ tasks)...")
 
+        # Completed tasks
         c_t1 = FeatureTask(
             title="User login system",
-            description="Implement basic login with email/password",
+            description="Basic email/password authentication",
             story_points=8,
             task_id=str(uuid.uuid4()),
             project_id=project1.get_id(),
-            sprint_id=completed_sprint.get_id()
+            sprint_id=p1_completed.get_id()
         )
         c_t1.assign_user_id(dev1.get_id())
         c_t1.add_tag_id(tags["backend"].get_id())
@@ -199,16 +258,15 @@ class Command(BaseCommand):
         c_t1 = task_repo.get_by_id(c_t1.get_id())
         c_t1.update_status("Done")
         task_repo.save(c_t1)
-        completed_sprint.add_task_id(c_t1.get_id())
-        completed_tasks.append(c_t1)
+        p1_completed.add_task_id(c_t1.get_id())
 
         c_t2 = FeatureTask(
             title="User registration",
-            description="Create registration form with validation",
+            description="Create registration form",
             story_points=5,
             task_id=str(uuid.uuid4()),
             project_id=project1.get_id(),
-            sprint_id=completed_sprint.get_id()
+            sprint_id=p1_completed.get_id()
         )
         c_t2.assign_user_id(dev2.get_id())
         c_t2.add_tag_id(tags["frontend"].get_id())
@@ -216,275 +274,205 @@ class Command(BaseCommand):
         c_t2 = task_repo.get_by_id(c_t2.get_id())
         c_t2.update_status("Done")
         task_repo.save(c_t2)
-        completed_sprint.add_task_id(c_t2.get_id())
-        completed_tasks.append(c_t2)
+        p1_completed.add_task_id(c_t2.get_id())
 
         c_t3 = BugTask(
             title="Password validation bug",
-            description="Special chars not accepted in password",
+            description="Special chars not accepted",
             severity="high",
             task_id=str(uuid.uuid4()),
             project_id=project1.get_id(),
-            sprint_id=completed_sprint.get_id()
+            sprint_id=p1_completed.get_id()
         )
-        c_t3.assign_user_id(qa.get_id())
+        c_t3.assign_user_id(qa1.get_id())
         c_t3.add_tag_id(tags["backend"].get_id())
         task_repo.save(c_t3)
         c_t3 = task_repo.get_by_id(c_t3.get_id())
         c_t3.update_status("Done")
         task_repo.save(c_t3)
-        completed_sprint.add_task_id(c_t3.get_id())
-        completed_tasks.append(c_t3)
+        p1_completed.add_task_id(c_t3.get_id())
 
         c_t4 = ChoreTask(
             title="Security audit",
-            description="Check for OWASP top 10",
+            description="OWASP top 10 review",
             task_id=str(uuid.uuid4()),
             project_id=project1.get_id(),
-            sprint_id=completed_sprint.get_id()
+            sprint_id=p1_completed.get_id()
         )
         c_t4.assign_user_id(dev1.get_id())
         task_repo.save(c_t4)
         c_t4 = task_repo.get_by_id(c_t4.get_id())
         c_t4.update_status("Done")
         task_repo.save(c_t4)
-        completed_sprint.add_task_id(c_t4.get_id())
-        completed_tasks.append(c_t4)
+        p1_completed.add_task_id(c_t4.get_id())
+        sprint_repo.save(p1_completed)
 
-        sprint_repo.save(completed_sprint)
-        project1 = project_repo.get_by_id(project1.get_id())
-        self.stdout.write(f"  ✓ Completed Sprint: 4 tasks (13 + 5 + 0 + 0 = 18 story points)")
+        # Sprint 1 tasks
+        for i in range(5):
+            task = FeatureTask(
+                title=f"Sprint 1 Task {i + 1}",
+                description=f"Authentication feature {i + 1}",
+                story_points=3 + i,
+                task_id=str(uuid.uuid4()),
+                project_id=project1.get_id(),
+                sprint_id=p1_sprint1.get_id()
+            )
+            task.assign_user_id([dev1, dev2, qa1][i % 3].get_id())
+            task.add_tag_id(tags["backend"].get_id())
+            task_repo.save(task)
+            if i % 2 == 0:
+                task = task_repo.get_by_id(task.get_id())
+                task.update_status("Done")
+                task_repo.save(task)
+            p1_sprint1.add_task_id(task.get_id())
+        sprint_repo.save(p1_sprint1)
 
-        # === TASKS - ACTIVE SPRINTS ===
-        self.stdout.write("📌 Seeding tasks (ACTIVE SPRINTS)...")
+        # Sprint 2 tasks
+        for i in range(6):
+            task = FeatureTask(
+                title=f"Dashboard Feature {i + 1}",
+                description=f"Dashboard component {i + 1}",
+                story_points=5 + i,
+                task_id=str(uuid.uuid4()),
+                project_id=project1.get_id(),
+                sprint_id=p1_sprint2.get_id()
+            )
+            task.assign_user_id([dev1, dev2, qa1][i % 3].get_id())
+            task.add_tag_id(tags["frontend"].get_id())
+            task_repo.save(task)
+            if i < 2:
+                task = task_repo.get_by_id(task.get_id())
+                task.update_status("Done")
+                task_repo.save(task)
+            p1_sprint2.add_task_id(task.get_id())
+        sprint_repo.save(p1_sprint2)
 
-        # SPRINT 1
-        t5 = FeatureTask(
-            title="Password reset via email",
-            description="Send reset link with 24h token expiry, validate and update password securely",
-            story_points=3,
-            task_id=str(uuid.uuid4()),
-            project_id=project1.get_id(),
-            sprint_id=sprint1.get_id()
-        )
-        t5.assign_user_id(dev1.get_id())
-        t5.assign_user_id(dev2.get_id())
-        t5.add_tag_id(tags["api"].get_id())
-        task_repo.save(t5)
-        t5 = task_repo.get_by_id(t5.get_id())
-        t5.update_status("In Progress")
-        task_repo.save(t5)
-        sprint1.add_task_id(t5.get_id())
-
-        t6 = BugTask(
-            title="Broken button styles on IE11",
-            description="Flexbox not working properly in legacy IE.  Need CSS fallbacks",
-            severity="medium",
-            task_id=str(uuid.uuid4()),
-            project_id=project1.get_id(),
-            sprint_id=sprint1.get_id()
-        )
-        t6.assign_user_id(qa. get_id())
-        t6.add_tag_id(tags["frontend"].get_id())
-        task_repo.save(t6)
-        t6 = task_repo.get_by_id(t6.get_id())
-        t6.update_status("Done")
-        task_repo.save(t6)
-        sprint1.add_task_id(t6.get_id())
-
-        t7 = ChoreTask(
-            title="Set up CI/CD pipeline",
-            description="Configure GitHub Actions for automated tests and deployment",
-            task_id=str(uuid.uuid4()),
-            project_id=project1.get_id(),
-            sprint_id=sprint1.get_id()
-        )
-        t7.assign_user_id(dev2.get_id())
-        t7.add_tag_id(tags["devops"].get_id())
-        task_repo.save(t7)
-        t7 = task_repo.get_by_id(t7.get_id())
-        t7.update_status("Done")
-        task_repo.save(t7)
-        sprint1.add_task_id(t7.get_id())
-
-        sprint_repo.save(sprint1)
-
-        # SPRINT 2
-        t8 = FeatureTask(
-            title="OAuth2 integration (Google & Azure)",
-            description="Allow users to login with Google Account or Microsoft Azure AD credentials",
-            story_points=8,
-            task_id=str(uuid.uuid4()),
-            project_id=project1.get_id(),
-            sprint_id=sprint2.get_id()
-        )
-        t8.assign_user_id(dev2.get_id())
-        t8.assign_user_id(manager.get_id())
-        t8.add_tag_id(tags["backend"].get_id())
-        t8.add_tag_id(tags["api"].get_id())
-        task_repo.save(t8)
-        t8 = task_repo.get_by_id(t8.get_id())
-        t8.update_status("In Progress")
-        task_repo.save(t8)
-        sprint2.add_task_id(t8.get_id())
-
-        t9 = FeatureTask(
-            title="User dashboard mockup",
-            description="Create responsive dashboard layout with chart placeholders",
-            story_points=5,
-            task_id=str(uuid.uuid4()),
-            project_id=project1.get_id(),
-            sprint_id=sprint2.get_id()
-        )
-        t9.assign_user_id(dev1.get_id())
-        t9.add_tag_id(tags["frontend"].get_id())
-        t9.add_tag_id(tags["ux"].get_id())
-        task_repo.save(t9)
-        sprint2.add_task_id(t9.get_id())
-
-        t10 = BugTask(
-            title="Dashboard loading too slow",
-            description="Optimize queries, implement caching",
-            severity="high",
-            task_id=str(uuid.uuid4()),
-            project_id=project1.get_id(),
-            sprint_id=sprint2.get_id()
-        )
-        t10.assign_user_id(dev2.get_id())
-        task_repo.save(t10)
-        sprint2.add_task_id(t10.get_id())
-
-        sprint_repo.save(sprint2)
-
-        # CRM SPRINT
-        crm1 = FeatureTask(
-            title="Sales analytics dashboard",
-            description="Interactive dashboard showing KPIs:  revenue, deals, pipeline",
-            story_points=13,
-            task_id=str(uuid.uuid4()),
-            project_id=project2.get_id(),
-        )
-        crm1.assign_user_id(manager.get_id())
-        crm1.assign_user_id(client.get_id())
-        crm1.add_tag_id(tags["frontend"].get_id())
-        crm1.add_tag_id(tags["review"].get_id())
-        task_repo.save(crm1)
-        project2.add_task_id(crm1.get_id())
-
-        crm2 = BugTask(
-            title="App crashes on Android 14",
-            description="Critical:  App force closes on latest Android OS.  Likely memory leak or deprecated API usage",
-            severity="critical",
-            task_id=str(uuid.uuid4()),
-            project_id=project2.get_id(),
-            sprint_id=sprint3.get_id()
-        )
-        crm2.assign_user_id(dev1.get_id())
-        crm2.add_tag_id(tags["backend"].get_id())
-        crm2.add_tag_id(tags["urgent"].get_id())
-        task_repo.save(crm2)
-        crm2 = task_repo. get_by_id(crm2.get_id())
-        crm2.update_status("In Progress")
-        task_repo.save(crm2)
-        sprint3.add_task_id(crm2.get_id())
-
-        crm3 = FeatureTask(
-            title="Offline mode for sales calls",
-            description="Cache data locally so reps can work during calls without wifi",
-            story_points=8,
-            task_id=str(uuid.uuid4()),
-            project_id=project2.get_id(),
-            sprint_id=sprint3.get_id()
-        )
-        crm3.assign_user_id(dev1.get_id())
-        crm3.add_tag_id(tags["backend"].get_id())
-        task_repo.save(crm3)
-        sprint3.add_task_id(crm3.get_id())
-
-        sprint_repo.save(sprint3)
+        # === PROJECT 2 TASKS ===
+        for i in range(7):
+            task = FeatureTask(
+                title=f"CRM Feature {i + 1}",
+                description=f"Mobile CRM feature {i + 1}",
+                story_points=8 + i,
+                task_id=str(uuid.uuid4()),
+                project_id=project2.get_id(),
+                sprint_id=p2_sprint1.get_id()
+            )
+            task.assign_user_id([dev2, dev3, qa2][i % 3].get_id())
+            if i % 2 == 0:
+                task.add_tag_id(tags["mobile"].get_id())
+            else:
+                task.add_tag_id(tags["backend"].get_id())
+            task_repo.save(task)
+            if i == 0:
+                task = task_repo.get_by_id(task.get_id())
+                task.update_status("In Progress")
+                task_repo.save(task)
+            p2_sprint1.add_task_id(task.get_id())
+        sprint_repo.save(p2_sprint1)
         project2 = project_repo.get_by_id(project2.get_id())
 
-        # LANDING PAGE - backlog + completed
-        lp1 = FeatureTask(
-            title="Campaign popup with discount code",
-            description="Popup appears once per user session with 20% discount offer",
-            story_points=2,
-            task_id=str(uuid.uuid4()),
-            project_id=project3.get_id(),
-        )
-        lp1.assign_user_id(dev2.get_id())
-        lp1.assign_user_id(client.get_id())
-        lp1.add_tag_id(tags["frontend"].get_id())
-        task_repo.save(lp1)
-        project3.add_task_id(lp1.get_id())
+        # === PROJECT 3 TASKS ===
+        for i in range(5):
+            task = FeatureTask(
+                title=f"Landing Page Element {i + 1}",
+                description=f"Campaign landing page section {i + 1}",
+                story_points=2 + i,
+                task_id=str(uuid.uuid4()),
+                project_id=project3.get_id(),
+                sprint_id=p3_sprint1.get_id()
+            )
+            task.assign_user_id([dev1, qa1, manager3][i % 3].get_id())
+            task.add_tag_id(tags["frontend"].get_id())
+            task_repo.save(task)
+            if i < 3:
+                task = task_repo.get_by_id(task.get_id())
+                task.update_status("Done")
+                task_repo.save(task)
+            p3_sprint1.add_task_id(task.get_id())
+        sprint_repo.save(p3_sprint1)
+        project3 = project_repo.get_by_id(project3.get_id())
 
-        lp2 = ChoreTask(
-            title="Verify Google Analytics tracking",
-            description="Ensure conversion event fires when form is submitted",
-            task_id=str(uuid.uuid4()),
-            project_id=project3.get_id(),
-        )
-        lp2.assign_user_id(manager.get_id())
-        task_repo.save(lp2)
-        lp2 = task_repo.get_by_id(lp2.get_id())
-        lp2.update_status("Done")
-        task_repo.save(lp2)
-        project3.add_task_id(lp2.get_id())
+        # === PROJECT 4 & 5 TASKS (NO CLIENT ACCESS) ===
+        for i in range(4):
+            task = FeatureTask(
+                title=f"Internal Tool Feature {i + 1}",
+                description=f"Internal analytics feature",
+                story_points=5,
+                task_id=str(uuid.uuid4()),
+                project_id=project4.get_id(),
+            )
+            task.assign_user_id([dev3, dev4][i % 2].get_id())
+            task.add_tag_id(tags["backend"].get_id())
+            task_repo.save(task)
+            project4.add_task_id(task.get_id())
+        project_repo.save(project4)
 
-        lp3 = BugTask(
-            title="Contact form not sending emails",
-            description="SMTP configuration issue - emails stuck in queue",
-            severity="high",
-            task_id=str(uuid.uuid4()),
-            project_id=project3.get_id(),
-        )
-        lp3.assign_user_id(dev2.get_id())
-        lp3.add_tag_id(tags["backend"].get_id())
-        lp3.add_tag_id(tags["urgent"].get_id())
-        task_repo.save(lp3)
-        project3.add_task_id(lp3.get_id())
+        for i in range(3):
+            task = BugTask(
+                title=f"Maintenance Issue {i + 1}",
+                description=f"Legacy system maintenance",
+                severity="medium",
+                task_id=str(uuid.uuid4()),
+                project_id=project5.get_id(),
+            )
+            task.assign_user_id(dev4.get_id())
+            task.add_tag_id(tags["database"].get_id())
+            task_repo.save(task)
+            project5.add_task_id(task.get_id())
+        project_repo.save(project5)
 
-        project_repo.save(project3)
+        self.stdout.write("  ✓ 30+ tasks seeded")
 
         # === COMMENTS ===
-        self.stdout. write("💬 Seeding comments...")
+        self.stdout.write("💬 Seeding comments...")
         comment_data = [
-            (t5, manager, "Looks solid, I'll review the reset flow tomorrow. "),
-            (t6, qa, "Tested on IE11 - fixed!  Styles look good now."),
-            (t8, dev1, "Can we align on scopes? Need to clarify which AD tenant. "),
-            (crm2, manager, "High priority - blocking pilot.  Please investigate asap."),
-            (crm3, client, "This is crucial for our sales team.  Great idea!"),
-            (lp1, dev2, "Almost done with the modal, waiting on design specs."),
-            (c_t1, dev1, "✅ Completed successfully"),
-            (c_t2, dev2, "✅ All tests passing"),
+            (c_t1, dev1, "✅ Authentication layer complete"),
+            (c_t2, dev2, "✅ Registration validated and tested"),
+            (c_t3, qa1, "🐛 Bug confirmed and fixed"),
         ]
 
         for task, user, text in comment_data:
             comment = Comment(content=text, author=user)
-            comment_repo.save(comment, task. get_id())
-            self.stdout.write(f"  ✓ Comment on {task.get_title()[: 30]}")
+            comment_repo.save(comment, task.get_id())
+
+        self.stdout.write("  ✓ Comments added")
 
         # === SUCCESS ===
-        self.stdout.write(self.style.SUCCESS("\n=== ✅ [Seed Complete! ] ===\n"))
-        print("\n" + "="*60)
-        print("🔐 DEMO CREDENTIALS:")
-        print("="*60)
-        print("Admin:        root        / demo123")
-        print("Manager:      manager1    / demo123")
-        print("Developer:    dev1        / demo123")
-        print("Developer:   dev2        / demo123")
-        print("QA:          qa1         / demo123")
-        print("Client:      client1     / demo123")
-        print("="*60)
-        print("\n CREATED:")
-        print("  • 6 Users (all roles)")
-        print("  • 3 Projects")
-        print("  • 4 Sprints (1 completed, 3 active)")
-        print("  • 14 Tasks total:")
-        print("    - 4 DONE (completed sprint - Team Velocity)")
-        print("    - 5 In Progress (current workload)")
-        print("    - 5 To Do (backlog)")
-        print("  • 7 Tags")
-        print("  • 8 Comments")
-        print("\n🎯 READY FOR DEMO!")
-        print("="*60)
+        self.stdout.write(self.style.SUCCESS("\n=== ✅ [EXTENDED SEED COMPLETE! ] ===\n"))
+        print("\n" + "=" * 70)
+        print("🔐 DEMO CREDENTIALS (Password: demo123):")
+        print("=" * 70)
+        print("\n👤 ADMIN:")
+        print("  root          (全系统访问) - Full system access")
+        print("\n👔 MANAGERS:")
+        print("  manager1      (WebApp Rebuild)")
+        print("  manager2      (Mobile CRM + Legacy Maintenance)")
+        print("  manager3      (Marketing Landing Page)")
+        print("\n👨‍💻 DEVELOPERS:")
+        print("  dev1          (WebApp + Landing Page)")
+        print("  dev2          (WebApp + CRM)")
+        print("  dev3          (CRM + Internal Tool)")
+        print("  dev4          (Internal Tool + Legacy)")
+        print("\n🔍 QA:")
+        print("  qa1           (WebApp + Landing Page)")
+        print("  qa2           (CRM)")
+        print("\n👥 CLIENTS (LIMITED ACCESS):")
+        print("  client1       (Can see:  WebApp Rebuild ONLY)")
+        print("  client2       (Can see: Mobile CRM ONLY)")
+        print("  client3       (Can see:  Marketing Landing Page ONLY)")
+        print("\n" + "=" * 70)
+        print("📊 CREATED:")
+        print("  • 14 Users (2 Admin, 3 Manager, 6 Dev, 2 QA, 3 Client)")
+        print("  • 5 Projects (3 with clients, 2 internal)")
+        print("  • 8 Sprints (across 3 projects)")
+        print("  • 35+ Tasks")
+        print("  • 9 Tags")
+        print("  • 3 Comments")
+        print("\n🎯 DEMO FEATURES:")
+        print("  ✓ Permission-based access control")
+        print("  ✓ Clients see ONLY their projects")
+        print("  ✓ Managers see their assigned projects")
+        print("  ✓ Admin sees everything")
+        print("  ✓ Multiple sprints with different statuses")
+        print("  ✓ Completed sprint for velocity reports")
+        print("=" * 70)

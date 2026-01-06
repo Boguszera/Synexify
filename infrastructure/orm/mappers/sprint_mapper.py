@@ -14,7 +14,8 @@ class SprintMapper:
         )
 
         # Populate task ids
-        sprint._task_ids = [str(t.id) for t in model.tasks.all()]
+        for task in model.tasks.all():
+            sprint.add_task_id(str(task.id))
         return sprint
 
     @staticmethod
@@ -25,7 +26,7 @@ class SprintMapper:
 
         model.name = sprint.get_name()
         model.project_id = sprint.get_project_id()
-        model.start_date = getattr(sprint, "_start_date", None)
-        model.end_date = getattr(sprint, "_end_date", None)
+        model.start_date = sprint.get_start_date()
+        model.end_date = sprint.get_end_date()
 
         return model

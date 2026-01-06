@@ -24,13 +24,17 @@ def report_team_workload(request):
 
     project_id = request.GET.get('project_id')
 
-    workload_data = container.reporting.get_team_workload_summary(domain_user, project_id=project_id)
+    workload_data = container.reporting. get_team_workload_summary(domain_user, project_id=project_id)
 
     all_projects = container.project_repo.list_all()
+    visible_projects = [
+        p for p in all_projects
+        if container.project_service.can_view(domain_user, p)
+    ]
 
     return render(request, "web/reports/team_workload.html", {
         'workload_data': workload_data,
-        'all_projects': all_projects,
+        'all_projects': visible_projects,
         'selected_project_id': project_id,
         'title': 'Team Load'
     })

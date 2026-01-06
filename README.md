@@ -84,22 +84,42 @@ This creates:
 
 #### 👥 **Demo Users** (Password: `demo123`)
 
-| Login | Role                    | Email | 
-|-------|-------------------------|-------|
-| `root` | Admin                   | root@demo.synexify.com |
-| `manager1` | Manager                 | manager1@demo.synexify.com |
-| `dev1` | Developer (Team Member) | dev1@demo.synexify.com |
-| `dev2` | Developer (Team Member) | dev2@demo.synexify.com | 
-| `qa1` | QA (Team Member)                     | qa1@demo.synexify.com |
-| `client1` | Client                  | client1@demo.synexify.com |
+| Login | Role | Email | Projects | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `root` | Admin | root@demo.synexify.com | **ALL** | Full system access |
+| `admin2` | Admin | admin2@demo.synexify.com | **ALL** | Full system access |
+| `manager1` | Manager | manager1@demo.synexify.com | WebApp, Internal Tool | Project lead - WebApp Rebuild |
+| `manager2` | Manager | manager2@demo.synexify.com | CRM, Legacy | Project lead - Mobile CRM & Maintenance |
+| `manager3` | Manager | manager3@demo.synexify.com | Landing Page | Project lead - Marketing Landing Page |
+| `dev1` | Developer | dev1@demo.synexify.com | WebApp, Landing Page | Frontend Specialist |
+| `dev2` | Developer | dev2@demo.synexify.com | WebApp, CRM | Backend Specialist |
+| `dev3` | Developer | dev3@demo.synexify.com | CRM, Internal Tool | Mobile Developer |
+| `dev4` | Developer | dev4@demo.synexify.com | Internal Tool, Legacy | QA & Infrastructure |
+| `qa1` | QA | qa1@demo.synexify.com | WebApp, Landing Page | QA - WebApp Testing |
+| `qa2` | QA | qa2@demo.synexify.com | CRM | QA - CRM Testing |
+| `client1` | Client | client1@demo.synexify.com | WebApp Rebuild | Acme Corp - Client Access |
+| `client2` | Client | client2@demo.synexify.com | Mobile CRM | TechStart Inc - Client Access |
+| `client3` | Client | client3@demo.synexify.com | Landing Page | Marketing Pro - Client Access |
 
 #### 📦 **Sample Data**
 
-- **3 Projects**:  WebApp Rebuild, Mobile CRM Platform, Marketing Landing Page
-- **3 Active Sprints**: With different stages and task loads
-- **14 Tasks**: Mix of Features (with story points), Bugs (with severity), and Chores (basic task)
-- **7 Tags**: backend, frontend, api, ux, urgent, review, devops
-- **6 Comments**: Team collaboration examples
+* **5 Projects:**
+    * **WebApp Rebuild** – Complete rewrite with React + FastAPI *(manager1, dev1, dev2, qa1, client1)*
+    * **Mobile CRM Platform** – Next-gen mobile CRM *(manager2, dev2, dev3, qa2, client2)*
+    * **Marketing Landing Page** – Campaign with conversion optimization *(manager3, dev1, qa1, client3)*
+    * **Internal Analytics Tool** – Internal only, NO client access *(manager1, dev3, dev4)*
+    * **Legacy System Maintenance** – Maintenance work, NO client access *(manager2, dev4)*
+* **8 Sprints:**
+    * **Project 1:** 3 sprints (1 completed, 2 active)
+    * **Project 2:** 1 sprint (active)
+    * **Project 3:** 1 sprint (active)
+    * Plus planning sprints for Projects 4 & 5
+* **35+ Tasks:**
+    * Multiple types: Features (with story points), Bugs (with severity), Chores
+    * Statuses: To Do, In Progress, Done
+    * Distributed across all projects and assigned to team members
+* **9 Tags:** `backend`, `frontend`, `urgent`, `review`, `api`, `ux`, `devops`, `mobile`, `database`
+* **3 Comments:** Task collaboration and team feedback examples
 
 ---
 
