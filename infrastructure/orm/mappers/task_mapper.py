@@ -66,10 +66,10 @@ class TaskMapper:
         elif isinstance(task, FeatureTask):
             model.task_type = "feature"
             model.story_points = task.get_story_points()
-            model.severity = None
+            model.severity = ""
         else:
             model.task_type = "chore"
-            model.severity = None
+            model.severity = ""
             model.story_points = None
 
         return model

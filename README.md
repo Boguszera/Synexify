@@ -1,6 +1,6 @@
 # Synexify
 
-Project Management System implemented in **Python** with **Domain-Driven Design (DDD)** principles.  
+Project Management System implemented in **Python** with **Domain-Driven Design (DDD)** principles.
 Supports projects, sprints, tasks, users, notifications, comments, attachments and reporting.
 
 ---
@@ -58,7 +58,7 @@ DB_PORT=5432
 docker compose up --build
 ```
 
-This will: 
+This will:
 - Build the Django application container
 - Start PostgreSQL database container
 - Run migrations automatically
@@ -67,7 +67,6 @@ This will:
 ### 2. Access the Application
 
 - **Web Application**: http://127.0.0.1:8000/
-- **Admin Panel**: http://127.0.0.1:8000/admin/
 - **API Documentation**: http://127.0.0.1:8000/api/
 
 ---
@@ -80,7 +79,7 @@ This will:
 docker compose exec web python manage.py seed
 ```
 
-This creates:  
+This creates:
 
 #### 👥 **Demo Users** (Password: `demo123`)
 
@@ -120,23 +119,6 @@ This creates:
     * Distributed across all projects and assigned to team members
 * **9 Tags:** `backend`, `frontend`, `urgent`, `review`, `api`, `ux`, `devops`, `mobile`, `database`
 * **3 Comments:** Task collaboration and team feedback examples
-
----
-
-## Admin Panel & Superuser
-
-### Create Admin User
-
-```bash
-docker compose exec web python manage.py createsuperuser
-```
-
-Follow the prompts to create a new admin account.
-
-### Access Django Admin
-
-1. Open http://127.0.0.1:8000/admin/
-2. Log in with your superuser credentials
 
 ---
 
@@ -229,12 +211,6 @@ GET /api/reports/velocity/         # Team velocity
 - Upload attachments
 - Track progress
 
-### 🎯 **QA**
-- Report bugs
-- Add comments to tasks
-- Update task status
-- Test features
-
 ### 👥 **Client**
 - View assigned projects
 - Track progress
@@ -264,7 +240,7 @@ The system uses PostgreSQL with the following main entities:
 
 ```bash
 docker compose exec web python manage.py makemigrations
-docker compose exec web python manage. py migrate
+docker compose exec web python manage.py migrate
 ```
 
 ### Access Django Shell
@@ -280,6 +256,28 @@ docker compose logs -f web
 docker compose logs -f db
 ```
 
+### Code Quality (Linter & Formatter)
+
+This project uses **Ruff** for fast linting and **Black** for code formatting. To contribute to this project, you must install the git hooks locally:
+
+
+```bash
+# 1. Install pre-commit on your local machine
+pip install pre-commit
+
+# 2. Activate hooks for this repository
+pre-commit install
+```
+
+### Run linter checks
+```bash
+docker compose exec web ruff check .
+```
+
+### Run auto-formatter
+```bash
+docker compose exec web black .
+```
 ---
 
 ## Troubleshooting
@@ -314,6 +312,7 @@ docker compose up --build
 - **Backend**: Django 5.2, Python 3.12
 - **Database**: PostgreSQL 16
 - **API**: Django REST Framework with JWT
+- **Code Quality**: Ruff (Linter) & Black (Formatter)
 - **Architecture**: Domain-Driven Design (DDD)
 - **Containerization**: Docker & Docker Compose
 - **Frontend**: Bootstrap 5
@@ -325,9 +324,11 @@ docker compose up --build
 This project follows **Domain-Driven Design (DDD)**:
 
 - **Domain Layer** (`domain/`) - Pure business logic
-- **Application Layer** (`application/`) - Use cases
+- **Application Layer** (`application/`) - Use cases and Application Services
 - **Infrastructure Layer** (`infrastructure/`) - Technical implementation
 - **Presentation Layer** (`api/`, `web/`) - User interfaces
+
+*Note: The standard Django Admin Panel has been deliberately disabled to prevent bypassing the Domain Layer and direct ORM manipulation.*
 
 ---
 
@@ -339,7 +340,7 @@ MIT License - See LICENSE file for details
 
 ## Support
 
-For issues and questions:   
+For issues and questions:
 - Open an issue on GitHub
 - Check existing issues for solutions
 - Review documentation in code comments
