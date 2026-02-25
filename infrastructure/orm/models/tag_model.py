@@ -1,6 +1,8 @@
 # infrastructure/orm/models/tag_model.py
-from django.db import models
 import uuid
+
+from django.db import models
+
 
 class TagModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -8,3 +10,6 @@ class TagModel(models.Model):
 
     class Meta:
         db_table = "tags"
+
+    def __str__(self):
+        return self.name

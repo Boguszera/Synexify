@@ -1,17 +1,16 @@
 # infrastructure/api/views/users.py
-from rest_framework import viewsets, mixins, status
+from rest_framework import mixins, status, viewsets
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, BasePermission
-from infrastructure.adapters.user_adapter import to_domain_user, to_dict
+
 from domain.exceptions.exceptions import PermissionDenied
+from infrastructure.adapters.user_adapter import to_dict, to_domain_user
+
 
 class IsAdminUser(BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.user
-            and request.user.is_authenticated
-            and getattr(request.user, "role", None) == "admin"
-        )
+        return request.user and request.user.is_authenticated and getattr(request.user, "role", None) == "admin"
+
 
 class UserViewSet(
     mixins.ListModelMixin,
@@ -19,12 +18,13 @@ class UserViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
+    viewsets.GenericViewSet,
 ):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get_container(self):
         from infrastructure.di import Container
+
         return Container()
 
     def list(self, request, *args, **kwargs):
@@ -38,7 +38,6 @@ class UserViewSet(
 
     def retrieve(self, request, pk=None, *args, **kwargs):
         container = self.get_container()
-        domain_user = to_domain_user(request.user)
         try:
             user = container.admin_panel.get_user_by_id(pk)
             if not user:
@@ -58,7 +57,7 @@ class UserViewSet(
                 role=request.data.get("role"),
                 login=request.data.get("login"),
                 password=request.data.get("password"),
-                user=domain_user
+                user=domain_user,
             )
 
             return Response(to_dict(created), status=status.HTTP_201_CREATED)
@@ -73,11 +72,7 @@ class UserViewSet(
             target_user = container.admin_panel.get_user_by_id(pk)
             if not target_user:
                 return Response({"detail": "Not found"}, status=status.HTTP_404_NOT_FOUND)
-            updated_user = container.admin_panel.update_user(
-                user_id=pk,
-                fields=request.data,
-                user=domain_user
-            )
+            updated_user = container.admin_panel.update_user(user_id=pk, fields=request.data, user=domain_user)
             return Response(to_dict(updated_user))
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)

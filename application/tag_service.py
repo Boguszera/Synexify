@@ -1,9 +1,10 @@
-from domain.users.user_base import UserBase
-from domain.tasks.task_base import TaskBase
-from domain.tags.tag import Tag
-from domain.exceptions.exceptions import PermissionDenied
 import uuid
-from typing import List
+
+from domain.exceptions.exceptions import PermissionDenied
+from domain.tags.tag import Tag
+from domain.tasks.task_base import TaskBase
+from domain.users.user_base import UserBase
+
 
 class TagService:
     def __init__(self, auth_service, task_repo, tag_repo, project_repo):
@@ -15,7 +16,7 @@ class TagService:
     def add_tag_to_task(self, task: TaskBase, user: UserBase, tag_id: str):
         project = self.task_repo.get_by_id(task.get_id()).get_project_id()
         if not self.auth_service.can_manage_project(user, self.project_repo.get_by_id(project)):
-             raise PermissionDenied(user.get_id(), action="add_tag", resource=f"task:{task.get_id()}")
+            raise PermissionDenied(user.get_id(), action="add_tag", resource=f"task:{task.get_id()}")
 
         tag = self.tag_repo.get_by_id(tag_id)
         if not tag:
@@ -28,7 +29,7 @@ class TagService:
     def remove_tag_from_task(self, task: TaskBase, user: UserBase, tag_id: str):
         project = self.task_repo.get_by_id(task.get_id()).get_project_id()
         if not self.auth_service.can_manage_project(user, self.project_repo.get_by_id(project)):
-             raise PermissionDenied(user.get_id(), action="remove_tag", resource=f"task:{task.get_id()}")
+            raise PermissionDenied(user.get_id(), action="remove_tag", resource=f"task:{task.get_id()}")
 
         task.remove_tag_id(tag_id)
         self.task_repo.save(task)
@@ -51,5 +52,5 @@ class TagService:
             raise ValueError("Tag not found.")
         self.tag_repo.delete(tag_id)
 
-    def list_all_tags(self, user: UserBase) -> List[Tag]:
+    def list_all_tags(self, user: UserBase) -> list[Tag]:
         return self.tag_repo.list_all()

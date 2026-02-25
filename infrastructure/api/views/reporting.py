@@ -1,15 +1,17 @@
 # infrastructure/api/views/reporting.py
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from infrastructure.api.serializers.attachment_serializers import AttachmentSerializer
 from infrastructure.api.serializers.reporting_serializers import ProjectReportSerializer, UserWorkloadSerializer
 
+
 class AttachmentDetailView(APIView):
     def get_container(self):
         from infrastructure.di import Container
+
         return Container()
 
     def get(self, request, attachment_id):
@@ -21,6 +23,7 @@ class AttachmentDetailView(APIView):
         serializer = AttachmentSerializer(attachment)
         return Response(serializer.data)
 
+
 class ProjectReportView(APIView):
     def get(self, request, project_id):
         container = self.get_container()
@@ -29,6 +32,7 @@ class ProjectReportView(APIView):
         serializer = ProjectReportSerializer(report_data)
         return Response(serializer.data)
 
+
 class TeamWorkloadView(APIView):
     def get(self, request, project_id):
         container = self.get_container()
@@ -36,6 +40,7 @@ class TeamWorkloadView(APIView):
         workload = report_service.team_workload(project_id)
         serializer = UserWorkloadSerializer(workload, many=True)
         return Response(serializer.data)
+
 
 class DashboardView(APIView):
     def get(self, request):

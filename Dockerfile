@@ -10,13 +10,12 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# install python dependencies
-COPY requirements.txt .
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
-
-# copy project files
+# copy project files (including pyproject.toml)
 COPY . .
+
+# install project with all dependecies (production + dev + test)
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir .[all]
 
 # default command (can be overridden by docker-compose)
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

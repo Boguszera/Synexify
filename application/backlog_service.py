@@ -33,11 +33,9 @@ class BacklogService:
                 for task_id in sprint.get_task_ids():
                     task = self.task_repo.get(task_id)
                     if task:
-                        tasks_with_dates.append({
-                            "task": task,
-                            "start_date": sprint.get_start_date(),
-                            "end_date": sprint.get_end_date()
-                        })
+                        tasks_with_dates.append(
+                            {"task": task, "start_date": sprint.get_start_date(), "end_date": sprint.get_end_date()}
+                        )
         return tasks_with_dates
 
     def get_backlog(self, project, user):

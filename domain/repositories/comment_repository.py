@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
+
 from domain.comments.comment import Comment
-from typing import Optional, List
 
 
 class CommentRepository(ABC):
     @abstractmethod
-    def get_by_id(self, comment_id: str) -> Optional[Comment]:
+    def get_by_id(self, comment_id: str) -> Comment | None:
         pass
 
     @abstractmethod
@@ -17,5 +17,5 @@ class CommentRepository(ABC):
         pass
 
     @abstractmethod
-    def list_by_task(self, task_id: str) -> List[Comment]:
+    def list_by_task(self, task_id: str) -> list[Comment]:
         pass

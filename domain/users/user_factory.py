@@ -1,9 +1,9 @@
 # domain/users/user_factory.py
 
 from .admin_user import AdminUser
+from .client_user import ClientUser
 from .manager_user import ManagerUser
 from .team_member_user import TeamMemberUser
-from .client_user import ClientUser
 
 ROLE_MAP = {
     "admin": AdminUser,
@@ -12,6 +12,7 @@ ROLE_MAP = {
     "client": ClientUser,
 }
 
+
 class UserFactory:
     @staticmethod
     def create(name, email, role, login):
@@ -19,9 +20,4 @@ class UserFactory:
         if not cls:
             raise ValueError(f"Unknown role: {role}")
 
-        return cls(
-            name=name,
-            email=email,
-            role=role,
-            login=login
-        )
+        return cls(name=name, email=email, role=role, login=login)

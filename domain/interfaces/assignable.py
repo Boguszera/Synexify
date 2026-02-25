@@ -1,6 +1,6 @@
 # domain/interfaces/assignable.py
 from abc import ABC, abstractmethod
-from typing import List
+
 
 class Assignable(ABC):
     @abstractmethod
@@ -8,5 +8,5 @@ class Assignable(ABC):
         pass
 
     @abstractmethod
-    def get_assignees_ids(self) -> List[int]:
+    def get_assignees_ids(self) -> list[int]:
         pass

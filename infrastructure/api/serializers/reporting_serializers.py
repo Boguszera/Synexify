@@ -2,6 +2,7 @@
 
 from rest_framework import serializers
 
+
 class ProjectReportSerializer(serializers.Serializer):
     project_id = serializers.CharField()
     project_name = serializers.CharField()
@@ -9,6 +10,7 @@ class ProjectReportSerializer(serializers.Serializer):
     completed_tasks = serializers.IntegerField()
     overdue_tasks = serializers.IntegerField()
     progress_percentage = serializers.FloatField()
+
 
 class UserWorkloadSerializer(serializers.Serializer):
     user_id = serializers.CharField()

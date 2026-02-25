@@ -1,11 +1,11 @@
 # application/task_service.py
+import uuid
+
+from domain.comments.comment import Comment
 from domain.exceptions.exceptions import PermissionDenied
 from domain.tasks.bug_task import BugTask
-from domain.tasks.feature_task import FeatureTask
 from domain.tasks.chore_task import ChoreTask
-import uuid
-from domain.comments.comment import Comment
-from domain.attachments.attachment import Attachment
+from domain.tasks.feature_task import FeatureTask
 
 # Mapowanie slugów z interfejsu/URL na KANONICZNY format DOMENOWY (np. "To Do")
 CANONICAL_STATUS_MAP = {
@@ -17,8 +17,9 @@ CANONICAL_STATUS_MAP = {
 
 
 class TaskService:
-    def __init__(self, auth_service, task_repo, project_repo, notification_service, user_repo, attachment_repo,
-                 comment_repo):
+    def __init__(
+        self, auth_service, task_repo, project_repo, notification_service, user_repo, attachment_repo, comment_repo
+    ):
         self.auth = auth_service
         self.task_repo = task_repo
         self.project_repo = project_repo
@@ -33,14 +34,15 @@ class TaskService:
         project_id = project.get_id()
 
         if task_type == "bug":
-            task = BugTask(title=title, description=description, severity=severity, task_id=task_id,
-                           project_id=project_id)
+            task = BugTask(
+                title=title, description=description, severity=severity, task_id=task_id, project_id=project_id
+            )
         elif task_type == "feature":
-            task = FeatureTask(title=title, description=description, story_points=story_points, task_id=task_id,
-                               project_id=project_id)
+            task = FeatureTask(
+                title=title, description=description, story_points=story_points, task_id=task_id, project_id=project_id
+            )
         elif task_type == "chore":
-            task = ChoreTask(title=title, description=description, task_id=task_id,
-                             project_id=project_id)
+            task = ChoreTask(title=title, description=description, task_id=task_id, project_id=project_id)
         else:
             raise ValueError("Invalid task type")
 
@@ -62,6 +64,7 @@ class TaskService:
         self.task_repo.save(task)
 
         from domain.events.task_events import TaskAssignedEvent
+
         event = TaskAssignedEvent(task_id=task.get_id(), assigned_user_id=assignee.get_id())
         self.notifications.notify(event)
 
@@ -72,11 +75,7 @@ class TaskService:
 
         if not self.auth.can_assign_task(user, task):
             if user.get_id() != assignee_id:
-                raise PermissionDenied(
-                    user.get_id(),
-                    action="unassign_other_user",
-                    resource=f"task:{task.get_id()}"
-                )
+                raise PermissionDenied(user.get_id(), action="unassign_other_user", resource=f"task:{task.get_id()}")
 
         task.unassign_user_id(assignee.get_id())
         self.task_repo.save(task)
@@ -94,11 +93,8 @@ class TaskService:
         self.task_repo.save(task)
 
         from domain.events.task_events import TaskStatusChangedEvent
-        event = TaskStatusChangedEvent(
-            task_id=task.get_id(),
-            old_status=old_status,
-            new_status=normalized_status
-        )
+
+        event = TaskStatusChangedEvent(task_id=task.get_id(), old_status=old_status, new_status=normalized_status)
         self.notifications.notify(event)
 
         return task
@@ -114,11 +110,8 @@ class TaskService:
         self.comment_repo.save(comment, task.get_id())
 
         from domain.events.task_events import TaskCommentAddedEvent
-        event = TaskCommentAddedEvent(
-            task_id=task.get_id(),
-            comment_id=comment.get_id(),
-            commenter_id=user.get_id()
-        )
+
+        event = TaskCommentAddedEvent(task_id=task.get_id(), comment_id=comment.get_id(), commenter_id=user.get_id())
         self.notifications.notify(event)
         return comment
 

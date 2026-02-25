@@ -1,7 +1,6 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .utils import get_container, get_domain_user
+from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect, render
 
 
 def login_view(request):

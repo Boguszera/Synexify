@@ -1,6 +1,7 @@
 # application/sprint_service.py
 
-from domain.sprints. sprint_base import SprintBase
+from domain.sprints.sprint_base import SprintBase
+
 
 class SprintService:
     def __init__(self, auth_service, sprint_repo, project_repo, task_repo):
@@ -22,18 +23,13 @@ class SprintService:
     def create_sprint(self, project, name, start_date, end_date, user):
         self.auth.check_manage_project(user, project)
 
-        sprint = SprintBase(
-            name=name,
-            start_date=start_date,
-            end_date=end_date,
-            project_id=project.get_id()
-        )
+        sprint = SprintBase(name=name, start_date=start_date, end_date=end_date, project_id=project.get_id())
         saved_sprint = self.sprint_repo.save(sprint)
         project.add_sprint_id(saved_sprint.get_id())
         self.project_repo.save(project)
         return saved_sprint
 
-    def get_sprint(self, sprint_id:  str):
+    def get_sprint(self, sprint_id: str):
         return self.sprint_repo.get_by_id(sprint_id)
 
     def update_sprint(self, sprint: SprintBase, fields: dict, user):
@@ -52,7 +48,7 @@ class SprintService:
     def delete_sprint(self, sprint: SprintBase, user):
         project = self.project_repo.get_by_id(sprint.get_project_id())
         self.auth.check_manage_project(user, project)
-        self.sprint_repo.delete(sprint. get_id())
+        self.sprint_repo.delete(sprint.get_id())
 
     def add_task_to_sprint(self, sprint, task, user):
         project = self.project_repo.get_by_id(sprint.get_project_id())

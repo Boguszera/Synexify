@@ -1,9 +1,9 @@
 # infrastructure/adapters/user_adapter.py
 
 from domain.users.admin_user import AdminUser
+from domain.users.client_user import ClientUser
 from domain.users.manager_user import ManagerUser
 from domain.users.team_member_user import TeamMemberUser
-from domain.users.client_user import ClientUser
 
 ROLE_CLASS_MAP = {
     "admin": AdminUser,
@@ -12,20 +12,9 @@ ROLE_CLASS_MAP = {
     "client": ClientUser,
 }
 
-from domain.users.admin_user import AdminUser
-from domain.users.manager_user import ManagerUser
-from domain.users.team_member_user import TeamMemberUser
-from domain.users.client_user import ClientUser
-
-ROLE_CLASS_MAP = {
-    "admin": AdminUser,
-    "manager": ManagerUser,
-    "team_member": TeamMemberUser,
-    "client": ClientUser,
-}
 
 def to_domain_user(user_model):
-    role = getattr(user_model, 'role', 'team_member')
+    role = getattr(user_model, "role", "team_member")
     cls = ROLE_CLASS_MAP.get(role)
 
     if not cls:
@@ -45,6 +34,7 @@ def to_domain_user(user_model):
         role=role,
         login=user_model.login,
     )
+
 
 def to_dict(domain_user):
     return {

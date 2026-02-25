@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+
 from domain.tasks.task_base import TaskBase
+
 
 class TaskRepository(ABC):
     @abstractmethod
-    def get_by_id(self, task_id: str) -> Optional[TaskBase]:
+    def get_by_id(self, task_id: str) -> TaskBase | None:
         pass
 
     @abstractmethod
@@ -16,13 +17,13 @@ class TaskRepository(ABC):
         pass
 
     @abstractmethod
-    def list_by_project(self, project_id: str) -> List[TaskBase]:
+    def list_by_project(self, project_id: str) -> list[TaskBase]:
         pass
 
     @abstractmethod
-    def list_by_sprint(self, sprint_id: str) -> List[TaskBase]:
+    def list_by_sprint(self, sprint_id: str) -> list[TaskBase]:
         pass
 
     @abstractmethod
-    def get_all(self) -> List[TaskBase]:
+    def get_all(self) -> list[TaskBase]:
         pass

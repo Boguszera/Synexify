@@ -1,13 +1,13 @@
 # infrastructure/orm/models/comment_model.py
 
-from django.db import models
-from typing import TYPE_CHECKING
 import uuid
+from typing import TYPE_CHECKING
+
+from django.db import models
 
 if TYPE_CHECKING:
     from django.db.models.fields import UUIDField
-    from .task_model import TaskModel
-    from .user_model import UserModel
+
 
 class CommentModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -15,8 +15,8 @@ class CommentModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Relacje (to one tworzą pola _id w bazie)
-    task = models.ForeignKey('orm.TaskModel', on_delete=models.CASCADE, related_name='comments')
-    author = models.ForeignKey('orm.UserModel', on_delete=models.SET_NULL, null=True)
+    task = models.ForeignKey("orm.TaskModel", on_delete=models.CASCADE, related_name="comments")
+    author = models.ForeignKey("orm.UserModel", on_delete=models.SET_NULL, null=True)
 
     # --- POPRAWKA: Ukrywamy to przed Pythonem w czasie działania (Runtime) ---
     if TYPE_CHECKING:
@@ -26,3 +26,6 @@ class CommentModel(models.Model):
 
     class Meta:
         db_table = "comments"
+
+    def __str__(self):
+        return self.content

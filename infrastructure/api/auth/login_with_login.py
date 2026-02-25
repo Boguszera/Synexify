@@ -1,8 +1,9 @@
 # infrastructure/api/auth/login_with_login.py
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 class LoginWithLoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -18,6 +19,7 @@ class LoginWithLoginSerializer(TokenObtainPairSerializer):
         data["login"] = user.login
         data["role"] = user.role
         return data
+
 
 class LoginObtainPairView(TokenObtainPairView):
     serializer_class = LoginWithLoginSerializer

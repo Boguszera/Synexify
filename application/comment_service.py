@@ -1,8 +1,8 @@
 # application/comment_service
 
-from domain.users.user_base import UserBase
 from domain.comments.comment import Comment
 from domain.exceptions.exceptions import PermissionDenied
+from domain.users.user_base import UserBase
 
 
 class CommentService:

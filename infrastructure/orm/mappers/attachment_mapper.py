@@ -1,16 +1,11 @@
-from infrastructure.orm.models.attachment_model import AttachmentModel
 from domain.attachments.attachment import Attachment
-from typing import Optional
+from infrastructure.orm.models.attachment_model import AttachmentModel
 
 
 class AttachmentMapper:
     @staticmethod
     def to_domain(model: AttachmentModel) -> Attachment:
-        attachment = Attachment(
-            filename=model.filename,
-            uploaded_by=None,
-            attachment_id=str(model.id)
-        )
+        attachment = Attachment(filename=model.filename, uploaded_by=None, attachment_id=str(model.id))
         if model.uploaded_by_id:
             attachment.set_uploaded_by_id(str(model.uploaded_by_id))
         if model.uploaded_at:
@@ -22,11 +17,7 @@ class AttachmentMapper:
 
     @staticmethod
     def to_orm(attachment: Attachment, task_id: str) -> AttachmentModel:
-        model = AttachmentModel(
-            id=attachment.get_id(),
-            filename=attachment.get_filename(),
-            task_id=task_id
-        )
+        model = AttachmentModel(id=attachment.get_id(), filename=attachment.get_filename(), task_id=task_id)
         if attachment.get_uploaded_by_id():
             model.uploaded_by_id = attachment.get_uploaded_by_id()
         else:

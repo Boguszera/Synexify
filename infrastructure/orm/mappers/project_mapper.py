@@ -1,18 +1,13 @@
 # infrastructure/orm/mappers/project_mapper.py
-from infrastructure.orm.models.project_model import ProjectModel
-from infrastructure.orm.models.user_model import UserModel
+
 from domain.projects.project_base import ProjectBase
-from typing import Optional
+from infrastructure.orm.models.project_model import ProjectModel
 
 
 class ProjectMapper:
     @staticmethod
     def to_domain(model: ProjectModel) -> ProjectBase:
-        project = ProjectBase(
-            name=model.name,
-            description=model.description,
-            project_id=str(model.id)
-        )
+        project = ProjectBase(name=model.name, description=model.description, project_id=str(model.id))
 
         for member in model.members.all():
             project.add_member_id(str(member.id))
@@ -26,7 +21,7 @@ class ProjectMapper:
         return project
 
     @staticmethod
-    def to_orm(project: ProjectBase, model: Optional[ProjectModel] = None) -> ProjectModel:
+    def to_orm(project: ProjectBase, model: ProjectModel | None = None) -> ProjectModel:
         if model is None:
             model = ProjectModel(id=project.get_id())
 

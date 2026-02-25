@@ -1,27 +1,26 @@
-from django.core.management.base import BaseCommand
-from django.utils import timezone
-from infrastructure.repositories.user_django_repository import UserDjangoRepository
-from infrastructure.repositories.project_django_repository import ProjectDjangoRepository
-from infrastructure.repositories.task_django_repository import TaskDjangoRepository
-from infrastructure.repositories.sprint_django_repository import SprintDjangoRepository
-from infrastructure.repositories.tag_django_repository import TagDjangoRepository
-from infrastructure.repositories.comment_django_repository import CommentDjangoRepository
-
-from domain.users.admin_user import AdminUser
-from domain.users.manager_user import ManagerUser
-from domain.users.team_member_user import TeamMemberUser
-from domain.users.client_user import ClientUser
-
-from domain.projects.project_base import ProjectBase
-from domain.sprints.sprint_base import SprintBase
-from domain.tasks.bug_task import BugTask
-from domain.tasks.feature_task import FeatureTask
-from domain.tasks.chore_task import ChoreTask
-from domain.tags.tag import Tag
-from domain.comments.comment import Comment
-
 import uuid
 from datetime import timedelta
+
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from domain.comments.comment import Comment
+from domain.projects.project_base import ProjectBase
+from domain.sprints.sprint_base import SprintBase
+from domain.tags.tag import Tag
+from domain.tasks.bug_task import BugTask
+from domain.tasks.chore_task import ChoreTask
+from domain.tasks.feature_task import FeatureTask
+from domain.users.admin_user import AdminUser
+from domain.users.client_user import ClientUser
+from domain.users.manager_user import ManagerUser
+from domain.users.team_member_user import TeamMemberUser
+from infrastructure.repositories.comment_django_repository import CommentDjangoRepository
+from infrastructure.repositories.project_django_repository import ProjectDjangoRepository
+from infrastructure.repositories.sprint_django_repository import SprintDjangoRepository
+from infrastructure.repositories.tag_django_repository import TagDjangoRepository
+from infrastructure.repositories.task_django_repository import TaskDjangoRepository
+from infrastructure.repositories.user_django_repository import UserDjangoRepository
 
 
 class Command(BaseCommand):
@@ -46,22 +45,18 @@ class Command(BaseCommand):
             # ADMINS
             ("admin", "root", "Root Admin"),
             ("admin", "admin2", "Admin Two"),
-
             # MANAGERS
             ("manager", "manager1", "John Manager - WebApp"),
             ("manager", "manager2", "Sarah Manager - CRM"),
             ("manager", "manager3", "Mike Manager - LandingPage"),
-
             # DEVELOPERS
             ("team_member", "dev1", "Alice Developer - Frontend"),
             ("team_member", "dev2", "Bob Developer - Backend"),
             ("team_member", "dev3", "Charlie Developer - Mobile"),
             ("team_member", "dev4", "Diana Developer - QA"),
-
             # QA SPECIALISTS
             ("team_member", "qa1", "Eve QA - WebApp"),
             ("team_member", "qa2", "Frank QA - CRM"),
-
             # CLIENTS
             ("client", "client1", "Acme Corp - WebApp Client"),
             ("client", "client2", "TechStart Inc - CRM Client"),
@@ -120,10 +115,7 @@ class Command(BaseCommand):
         now = timezone.now()
 
         # PROJECT 1: WebApp Rebuild (manager1, dev1, dev2, qa1, client1)
-        project1 = ProjectBase(
-            "WebApp Rebuild",
-            "Complete rewrite of legacy web application with React + FastAPI"
-        )
+        project1 = ProjectBase("WebApp Rebuild", "Complete rewrite of legacy web application with React + FastAPI")
         for u in [manager1, dev1, dev2, qa1]:
             project1.add_member_id(u.get_id())
         project1.add_member_id(client1.get_id())  # CLIENT CAN SEE
@@ -132,10 +124,7 @@ class Command(BaseCommand):
         self.stdout.write("  ✓ WebApp Rebuild (client1 has access)")
 
         # PROJECT 2: Mobile CRM (manager2, dev2, dev3, qa2, client2)
-        project2 = ProjectBase(
-            "Mobile CRM Platform",
-            "Next-gen mobile CRM application for sales teams"
-        )
+        project2 = ProjectBase("Mobile CRM Platform", "Next-gen mobile CRM application for sales teams")
         for u in [manager2, dev2, dev3, qa2]:
             project2.add_member_id(u.get_id())
         project2.add_member_id(client2.get_id())  # CLIENT CAN SEE
@@ -144,10 +133,7 @@ class Command(BaseCommand):
         self.stdout.write("  ✓ Mobile CRM Platform (client2 has access)")
 
         # PROJECT 3: Landing Page (manager3, dev1, qa1, client3)
-        project3 = ProjectBase(
-            "Marketing Landing Page",
-            "Campaign landing page with conversion optimization"
-        )
+        project3 = ProjectBase("Marketing Landing Page", "Campaign landing page with conversion optimization")
         for u in [manager3, dev1, qa1]:
             project3.add_member_id(u.get_id())
         project3.add_member_id(client3.get_id())  # CLIENT CAN SEE
@@ -156,10 +142,7 @@ class Command(BaseCommand):
         self.stdout.write("  ✓ Marketing Landing Page (client3 has access)")
 
         # PROJECT 4: Internal Tool (manager1, dev3, dev4)
-        project4 = ProjectBase(
-            "Internal Analytics Tool",
-            "Internal tool - NO CLIENTS can see this"
-        )
+        project4 = ProjectBase("Internal Analytics Tool", "Internal tool - NO CLIENTS can see this")
         for u in [manager1, dev3, dev4]:
             project4.add_member_id(u.get_id())
         project4.add_manager_id(manager1.get_id())
@@ -167,10 +150,7 @@ class Command(BaseCommand):
         self.stdout.write("  ✓ Internal Analytics Tool (NO CLIENT ACCESS)")
 
         # PROJECT 5: Maintenance (manager2, dev4)
-        project5 = ProjectBase(
-            "Legacy System Maintenance",
-            "Maintain old system - small team only"
-        )
+        project5 = ProjectBase("Legacy System Maintenance", "Maintain old system - small team only")
         for u in [manager2, dev4]:
             project5.add_member_id(u.get_id())
         project5.add_manager_id(manager2.get_id())
@@ -186,7 +166,7 @@ class Command(BaseCommand):
             name="Sprint 0:  MVP (COMPLETED)",
             start_date=now - timedelta(days=30),
             end_date=now - timedelta(days=16),
-            project_id=project1.get_id()
+            project_id=project1.get_id(),
         )
         sprint_repo.save(p1_completed)
         project1.add_sprint_id(p1_completed.get_id())
@@ -196,7 +176,7 @@ class Command(BaseCommand):
             name="Sprint 1: Authentication",
             start_date=now - timedelta(days=5),
             end_date=now + timedelta(days=9),
-            project_id=project1.get_id()
+            project_id=project1.get_id(),
         )
         sprint_repo.save(p1_sprint1)
         project1.add_sprint_id(p1_sprint1.get_id())
@@ -206,7 +186,7 @@ class Command(BaseCommand):
             name="Sprint 2: Dashboard",
             start_date=now + timedelta(days=10),
             end_date=now + timedelta(days=24),
-            project_id=project1.get_id()
+            project_id=project1.get_id(),
         )
         sprint_repo.save(p1_sprint2)
         project1.add_sprint_id(p1_sprint2.get_id())
@@ -219,7 +199,7 @@ class Command(BaseCommand):
             name="Sprint 1: MVP Pilot",
             start_date=now - timedelta(days=2),
             end_date=now + timedelta(days=12),
-            project_id=project2.get_id()
+            project_id=project2.get_id(),
         )
         sprint_repo.save(p2_sprint1)
         project2.add_sprint_id(p2_sprint1.get_id())
@@ -232,7 +212,7 @@ class Command(BaseCommand):
             name="Sprint 1: Campaign A",
             start_date=now - timedelta(days=7),
             end_date=now + timedelta(days=7),
-            project_id=project3.get_id()
+            project_id=project3.get_id(),
         )
         sprint_repo.save(p3_sprint1)
         project3.add_sprint_id(p3_sprint1.get_id())
@@ -249,7 +229,7 @@ class Command(BaseCommand):
             story_points=8,
             task_id=str(uuid.uuid4()),
             project_id=project1.get_id(),
-            sprint_id=p1_completed.get_id()
+            sprint_id=p1_completed.get_id(),
         )
         c_t1.assign_user_id(dev1.get_id())
         c_t1.add_tag_id(tags["backend"].get_id())
@@ -266,7 +246,7 @@ class Command(BaseCommand):
             story_points=5,
             task_id=str(uuid.uuid4()),
             project_id=project1.get_id(),
-            sprint_id=p1_completed.get_id()
+            sprint_id=p1_completed.get_id(),
         )
         c_t2.assign_user_id(dev2.get_id())
         c_t2.add_tag_id(tags["frontend"].get_id())
@@ -282,7 +262,7 @@ class Command(BaseCommand):
             severity="high",
             task_id=str(uuid.uuid4()),
             project_id=project1.get_id(),
-            sprint_id=p1_completed.get_id()
+            sprint_id=p1_completed.get_id(),
         )
         c_t3.assign_user_id(qa1.get_id())
         c_t3.add_tag_id(tags["backend"].get_id())
@@ -297,7 +277,7 @@ class Command(BaseCommand):
             description="OWASP top 10 review",
             task_id=str(uuid.uuid4()),
             project_id=project1.get_id(),
-            sprint_id=p1_completed.get_id()
+            sprint_id=p1_completed.get_id(),
         )
         c_t4.assign_user_id(dev1.get_id())
         task_repo.save(c_t4)
@@ -315,7 +295,7 @@ class Command(BaseCommand):
                 story_points=3 + i,
                 task_id=str(uuid.uuid4()),
                 project_id=project1.get_id(),
-                sprint_id=p1_sprint1.get_id()
+                sprint_id=p1_sprint1.get_id(),
             )
             task.assign_user_id([dev1, dev2, qa1][i % 3].get_id())
             task.add_tag_id(tags["backend"].get_id())
@@ -335,7 +315,7 @@ class Command(BaseCommand):
                 story_points=5 + i,
                 task_id=str(uuid.uuid4()),
                 project_id=project1.get_id(),
-                sprint_id=p1_sprint2.get_id()
+                sprint_id=p1_sprint2.get_id(),
             )
             task.assign_user_id([dev1, dev2, qa1][i % 3].get_id())
             task.add_tag_id(tags["frontend"].get_id())
@@ -355,7 +335,7 @@ class Command(BaseCommand):
                 story_points=8 + i,
                 task_id=str(uuid.uuid4()),
                 project_id=project2.get_id(),
-                sprint_id=p2_sprint1.get_id()
+                sprint_id=p2_sprint1.get_id(),
             )
             task.assign_user_id([dev2, dev3, qa2][i % 3].get_id())
             if i % 2 == 0:
@@ -379,7 +359,7 @@ class Command(BaseCommand):
                 story_points=2 + i,
                 task_id=str(uuid.uuid4()),
                 project_id=project3.get_id(),
-                sprint_id=p3_sprint1.get_id()
+                sprint_id=p3_sprint1.get_id(),
             )
             task.assign_user_id([dev1, qa1, manager3][i % 3].get_id())
             task.add_tag_id(tags["frontend"].get_id())
@@ -396,7 +376,7 @@ class Command(BaseCommand):
         for i in range(4):
             task = FeatureTask(
                 title=f"Internal Tool Feature {i + 1}",
-                description=f"Internal analytics feature",
+                description="Internal analytics feature",
                 story_points=5,
                 task_id=str(uuid.uuid4()),
                 project_id=project4.get_id(),
@@ -410,7 +390,7 @@ class Command(BaseCommand):
         for i in range(3):
             task = BugTask(
                 title=f"Maintenance Issue {i + 1}",
-                description=f"Legacy system maintenance",
+                description="Legacy system maintenance",
                 severity="medium",
                 task_id=str(uuid.uuid4()),
                 project_id=project5.get_id(),

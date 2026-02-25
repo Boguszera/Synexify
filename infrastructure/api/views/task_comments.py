@@ -1,15 +1,16 @@
 # infrastructure/api/views/task_comments.py
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
-from infrastructure.di import Container
-from infrastructure.adapters.user_adapter import to_domain_user
-from infrastructure.api.serializers.comment_serializers import CommentSerializer
+
 from domain.exceptions.exceptions import PermissionDenied
+from infrastructure.adapters.user_adapter import to_domain_user
 from infrastructure.api.permissions.project_permissions import ProjectPermissions
+from infrastructure.api.serializers.comment_serializers import CommentSerializer
+from infrastructure.di import Container
+
 
 class CommentViewSet(viewsets.ViewSet):
     def get_container(self):
-        from infrastructure.di import Container
         return Container()
 
     def _check_task_access(self, container, user, task_id):
@@ -31,7 +32,8 @@ class CommentViewSet(viewsets.ViewSet):
         domain_user = to_domain_user(request.user)
 
         _, error = self._check_task_access(container, domain_user, task_pk)
-        if error: return error
+        if error:
+            return error
 
         comments = container.comments.list_comments_for_task(task_pk, domain_user)
         return Response(CommentSerializer(comments, many=True).data)
@@ -41,7 +43,8 @@ class CommentViewSet(viewsets.ViewSet):
         domain_user = to_domain_user(request.user)
 
         _, error = self._check_task_access(container, domain_user, task_pk)
-        if error: return error
+        if error:
+            return error
 
         try:
             comment = container.comments.add_comment(task_pk, domain_user, request.data.get("content", ""))

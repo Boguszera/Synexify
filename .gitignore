@@ -1,6 +1,9 @@
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
 env/
 venv/
 .idea/
@@ -11,6 +14,12 @@ venv/
 
 # Docker
 *.log
+
+# ruff cache
+.ruff_cache/
+
+#mypy
+.mypy_cache
 
 sys
 infrastructure/orm/migrations/0001_initial.py

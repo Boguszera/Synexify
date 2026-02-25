@@ -1,7 +1,9 @@
+from datetime import timedelta
+
 import pytest
 from django.utils import timezone
-from datetime import timedelta
 from model_bakery import baker
+
 from infrastructure.orm.models.project_model import ProjectModel
 from infrastructure.orm.models.sprint_model import SprintModel
 from infrastructure.orm.models.task_model import TaskModel
@@ -9,7 +11,6 @@ from infrastructure.orm.models.task_model import TaskModel
 
 @pytest.mark.django_db
 class TestSprintAndTaskFlow:
-
     @pytest.fixture
     def project_env(self, manager_user):
         project = baker.make(ProjectModel)
@@ -23,13 +24,13 @@ class TestSprintAndTaskFlow:
             "name": "Sprint 1",
             "start_date": now,
             "end_date": now + timedelta(days=14),
-            "project_id": str(project_env.id)
+            "project_id": str(project_env.id),
         }
 
-        response = client.post('/api/sprints/', data)
+        response = client.post("/api/sprints/", data)
 
         assert response.status_code == 201
-        assert response.data['project_id'] == str(project_env.id)
+        assert response.data["project_id"] == str(project_env.id)
 
     def test_add_task_to_sprint_action(self, auth_client, manager_user, project_env):
         # Arrange
@@ -37,7 +38,7 @@ class TestSprintAndTaskFlow:
         task = baker.make(TaskModel, project=project_env, title="Task 1")
 
         client = auth_client(manager_user)
-        url = f'/api/sprints/{sprint.id}/add_task/'
+        url = f"/api/sprints/{sprint.id}/add_task/"
 
         # Act
         response = client.post(url, {"task_id": str(task.id)})
@@ -53,7 +54,7 @@ class TestSprintAndTaskFlow:
         task = baker.make(TaskModel, project=project_env)
 
         client = auth_client(other_user)
-        url = f'/api/sprints/{sprint.id}/add_task/'
+        url = f"/api/sprints/{sprint.id}/add_task/"
 
         # Act
         response = client.post(url, {"task_id": str(task.id)})

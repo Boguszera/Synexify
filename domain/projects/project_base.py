@@ -1,9 +1,10 @@
-from typing import List, Dict, Optional
-from domain.interfaces.reportable import Reportable
 import uuid
 
+from domain.interfaces.reportable import Reportable
+
+
 class ProjectBase(Reportable):
-    def __init__(self, name: str, description: str, project_id: Optional[str] = None):
+    def __init__(self, name: str, description: str, project_id: str | None = None):
         if project_id is not None and not isinstance(project_id, str):
             raise TypeError("project_id must be a string UUID or None")
         if not isinstance(name, str) or not name.strip():
@@ -13,10 +14,10 @@ class ProjectBase(Reportable):
         self._id = project_id or str(uuid.uuid4())
         self._name = name
         self._description = description
-        self._member_ids: List[str] = []
-        self._manager_ids: List[str] = []
-        self._task_ids: List[str] = []
-        self._sprint_ids: List[str] = []
+        self._member_ids: list[str] = []
+        self._manager_ids: list[str] = []
+        self._task_ids: list[str] = []
+        self._sprint_ids: list[str] = []
         self._archived: bool = False
 
     def get_id(self) -> str:
@@ -31,13 +32,13 @@ class ProjectBase(Reportable):
     def get_description(self) -> str:
         return self._description
 
-    def get_member_ids(self) -> List[str]:
+    def get_member_ids(self) -> list[str]:
         return list(self._member_ids)
 
-    def get_task_ids(self) -> List[str]:
+    def get_task_ids(self) -> list[str]:
         return list(self._task_ids)
 
-    def get_sprint_ids(self) -> List[str]:
+    def get_sprint_ids(self) -> list[str]:
         return list(self._sprint_ids)
 
     def add_member_id(self, user_id: str):
@@ -67,7 +68,7 @@ class ProjectBase(Reportable):
             return
         self._sprint_ids.append(sprint_id)
 
-    def get_report_data(self, task_loader_callable=None) -> Dict:
+    def get_report_data(self, task_loader_callable=None) -> dict:
         total_tasks = len(self._task_ids)
         if task_loader_callable:
             tasks = [task_loader_callable(tid) for tid in self._task_ids]
@@ -83,7 +84,7 @@ class ProjectBase(Reportable):
             "tasks_done": done_tasks,
             "completion_percentage": completion,
             "members_count": len(self._member_ids),
-            "members": list(self._member_ids)
+            "members": list(self._member_ids),
         }
 
     def set_name(self, name: str):

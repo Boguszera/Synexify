@@ -1,26 +1,34 @@
 # domain/tasks/task_base.py
+import uuid
+
+from domain.events.task_events import (
+    TaskAssignedEvent,
+    TaskCommentAddedEvent,
+    TaskStatusChangedEvent,
+    TaskUnassignedEvent,
+)
 from domain.interfaces.assignable import Assignable
 from domain.interfaces.commentable import Commentable
-from domain.events.task_events import TaskStatusChangedEvent, TaskAssignedEvent, TaskCommentAddedEvent, TaskUnassignedEvent
-from typing import List, Optional
-import uuid
+
 
 class InvalidStatusError(Exception):
     pass
 
-class TaskBase(Assignable, Commentable):
 
+class TaskBase(Assignable, Commentable):
     VALID_STATUSES = {"To Do", "In Progress", "Done", "Blocked"}
 
-    def __init__(self, task_id: Optional[str], title: str, description: str, project_id: str = None, sprint_id: Optional[str] = None):
+    def __init__(
+        self, task_id: str | None, title: str, description: str, project_id: str = None, sprint_id: str | None = None
+    ):
         self._id = task_id or str(uuid.uuid4())
         self._title = title
         self._description = description
         self._status = "To Do"
-        self._assignee_ids: List[str] = []
-        self._comment_ids: List[str] = []
-        self._attachment_ids: List[str] = []
-        self._tag_ids: List[str] = []
+        self._assignee_ids: list[str] = []
+        self._comment_ids: list[str] = []
+        self._attachment_ids: list[str] = []
+        self._tag_ids: list[str] = []
         self._project_id = project_id
         self._sprint_id = sprint_id
         self._domain_events = []
@@ -37,25 +45,25 @@ class TaskBase(Assignable, Commentable):
     def get_status(self) -> str:
         return self._status
 
-    def get_assignee_ids(self) -> List[str]:
+    def get_assignee_ids(self) -> list[str]:
         return list(self._assignee_ids)
 
-    def get_comments_ids(self) -> List[str]:
+    def get_comments_ids(self) -> list[str]:
         return list(self._comment_ids)
 
-    def get_attachment_ids(self) -> List[str]:
+    def get_attachment_ids(self) -> list[str]:
         return list(self._attachment_ids)
 
-    def get_tag_ids(self) -> List[str]:
+    def get_tag_ids(self) -> list[str]:
         return list(self._tag_ids)
 
-    def get_project_id(self) -> Optional[str]:
+    def get_project_id(self) -> str | None:
         return self._project_id
 
-    def get_sprint_id(self) -> Optional[str]:
+    def get_sprint_id(self) -> str | None:
         return self._sprint_id
 
-    def get_assignees_ids(self) -> List[str]:
+    def get_assignees_ids(self) -> list[str]:
         return list(self._assignee_ids)
 
     # behavior
@@ -80,12 +88,13 @@ class TaskBase(Assignable, Commentable):
         self._status = new_status
         self._domain_events.append(TaskStatusChangedEvent(task_id=self._id, old_status=old, new_status=new_status))
 
-    def add_comment(self, comment_id: str, commenter_id: Optional[str] = None) -> None:
+    def add_comment(self, comment_id: str, commenter_id: str | None = None) -> None:
         if comment_id in self._comment_ids:
             return
         self._comment_ids.append(comment_id)
         self._domain_events.append(
-            TaskCommentAddedEvent(task_id=self._id, commenter_id=commenter_id, comment_id=comment_id))
+            TaskCommentAddedEvent(task_id=self._id, commenter_id=commenter_id, comment_id=comment_id)
+        )
 
     def attach_file_id(self, attachment_id: str):
         if attachment_id in self._attachment_ids:

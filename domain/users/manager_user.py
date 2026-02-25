@@ -1,7 +1,7 @@
 # domain/users/manager_user.py
+
 from .user_base import UserBase
-from domain.tasks.task_base import TaskBase
-from domain.users.user_base import UserBase as UserType
+
 
 class ManagerUser(UserBase):
     pass

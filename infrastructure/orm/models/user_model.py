@@ -1,7 +1,9 @@
 # infrastructure/orm/models/user_model.py
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.db import models
 import uuid
+
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db import models
+
 
 class UserManager(BaseUserManager):
     def create_user(self, login, email, name, role, password=None):
@@ -19,6 +21,7 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
+
 
 class UserModel(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

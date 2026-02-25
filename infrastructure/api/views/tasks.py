@@ -1,16 +1,19 @@
 # infrastructure/api/views/tasks.py
-from rest_framework import viewsets, status
-from rest_framework.response import Response
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from infrastructure.api.serializers.task_serializers import TaskSerializer
-from infrastructure.api.serializers.comment_serializers import CommentSerializer
-from infrastructure.api.serializers.attachment_serializers import AttachmentSerializer
-from infrastructure.adapters.user_adapter import to_domain_user
+from rest_framework.response import Response
+
 from domain.exceptions.exceptions import PermissionDenied
+from infrastructure.adapters.user_adapter import to_domain_user
+from infrastructure.api.serializers.attachment_serializers import AttachmentSerializer
+from infrastructure.api.serializers.comment_serializers import CommentSerializer
+from infrastructure.api.serializers.task_serializers import TaskSerializer
+
 
 class TaskViewSet(viewsets.ViewSet):
     def get_container(self):
         from infrastructure.di import Container
+
         return Container()
 
     def list(self, request):
@@ -19,8 +22,8 @@ class TaskViewSet(viewsets.ViewSet):
             domain_user = to_domain_user(request.user)
             filters = {}
 
-            if 'status' in request.query_params:
-                filters['status'] = request.query_params['status']
+            if "status" in request.query_params:
+                filters["status"] = request.query_params["status"]
 
             tasks = container.tasks.get_task_filters(user=domain_user, **filters)
             serializer = TaskSerializer(tasks, many=True)
@@ -51,7 +54,7 @@ class TaskViewSet(viewsets.ViewSet):
                 task_type=data.get("type", "chore"),
                 user=domain_user,
                 severity=data.get("severity"),
-                story_points=data.get("story_points")
+                story_points=data.get("story_points"),
             )
             serializer = TaskSerializer(task)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -77,7 +80,6 @@ class TaskViewSet(viewsets.ViewSet):
         container = self.get_container()
         try:
             domain_user = to_domain_user(request.user)
-            task = container.tasks.task_repo.get_by_id(pk)
             container.tasks.delete_task(pk, user=domain_user)
             return Response(status=status.HTTP_204_NO_CONTENT)
         except PermissionDenied as e:
@@ -119,11 +121,7 @@ class TaskViewSet(viewsets.ViewSet):
             domain_user = to_domain_user(request.user)
             task = container.tasks.task_repo.get_by_id(pk)
             file = request.FILES["file"]
-            attachment = container.attachments.add_attachment(
-                task_id=task.get_id(),
-                user=domain_user,
-                file=file
-            )
+            attachment = container.attachments.add_attachment(task_id=task.get_id(), user=domain_user, file=file)
             serializer = AttachmentSerializer(attachment)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except PermissionDenied as e:
@@ -131,8 +129,10 @@ class TaskViewSet(viewsets.ViewSet):
         except Exception as e:
             # Pokaż błąd I/O w konsoli, aby zdebugować problem z uprawnieniami/ścieżką
             print(f"FATAL UPLOAD ERROR: {type(e).__name__} - {e}")
-            return Response({"detail": f"Internal Server Error during upload: {type(e).__name__}"},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"detail": f"Internal Server Error during upload: {type(e).__name__}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @action(detail=True, methods=["get"])
     def attachments(self, request, pk=None):
@@ -142,7 +142,7 @@ class TaskViewSet(viewsets.ViewSet):
         serializer = AttachmentSerializer(attachments, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['patch'])
+    @action(detail=True, methods=["patch"])
     def assign(self, request, pk=None):
         container = self.get_container()
         domain_user = to_domain_user(request.user)

@@ -1,6 +1,7 @@
 # domain/events/task_events.py
 from domain.events.base_events import DomainEvent
 
+
 class TaskStatusChangedEvent(DomainEvent):
     def __init__(self, task_id: str, old_status: str, new_status: str):
         super().__init__()
@@ -20,6 +21,7 @@ class TaskAssignedEvent(DomainEvent):
 
     def get_event_name(self) -> str:
         return "TaskAssigned"
+
 
 class TaskUnassignedEvent(DomainEvent):
     def __init__(self, task_id: str, unassigned_user_id: str):

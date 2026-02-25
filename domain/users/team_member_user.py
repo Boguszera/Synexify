@@ -1,6 +1,7 @@
 # domain/users/team_member_user.py
 from .user_base import UserBase
 
+
 class TeamMemberUser(UserBase):
     pass
 
@@ -27,5 +28,5 @@ class TeamMemberUser(UserBase):
 
         attachment = Attachment(filename=file, uploaded_by=self)
         task.attach_file(attachment)
-    
+
     """

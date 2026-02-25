@@ -1,6 +1,7 @@
 # application/admin_panel_service.py
-from domain.users.user_factory import UserFactory
 from domain.users.user_base import UserBase
+from domain.users.user_factory import UserFactory
+
 
 class AdminPanelService:
     def __init__(self, auth_service, user_repo, project_repo):
@@ -16,12 +17,7 @@ class AdminPanelService:
     def create_user(self, name, email, role, login, password, user: UserBase):
         self.auth_service.check_manage_user(user, user)
 
-        new_user = UserFactory.create(
-            name=name,
-            email=email,
-            role=role,
-            login=login
-        )
+        new_user = UserFactory.create(name=name, email=email, role=role, login=login)
 
         saved = self.user_repo.save(new_user, password=password)
         return saved
@@ -31,7 +27,7 @@ class AdminPanelService:
         if not target_user:
             raise ValueError("User not found")
 
-        self.auth_service. check_manage_user(user, target_user)
+        self.auth_service.check_manage_user(user, target_user)
 
         if "name" in fields:
             target_user.set_name(fields["name"])
@@ -40,7 +36,7 @@ class AdminPanelService:
         if "role" in fields:
             target_user.set_role(fields["role"])
         if "login" in fields:
-            target_user. set_login(fields["login"])
+            target_user.set_login(fields["login"])
 
         return self.user_repo.save(target_user)
 

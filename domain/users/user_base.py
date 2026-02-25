@@ -1,11 +1,11 @@
 # domain/users/user_base.py
 import uuid
-from typing import Optional
+
 
 class UserBase:
     VALID_ROLES = {"admin", "manager", "team_member", "client"}
 
-    def __init__(self, name: str, email: str, role: str, login: str, user_id: Optional[str] = None):
+    def __init__(self, name: str, email: str, role: str, login: str, user_id: str | None = None):
         if role not in self.VALID_ROLES:
             raise ValueError(f"Invalid role '{role}'")
         self._id = user_id or str(uuid.uuid4())

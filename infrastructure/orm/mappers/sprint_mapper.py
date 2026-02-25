@@ -1,6 +1,6 @@
-from infrastructure.orm.models.sprint_model import SprintModel
 from domain.sprints.sprint_base import SprintBase
-from typing import Optional
+from infrastructure.orm.models.sprint_model import SprintModel
+
 
 class SprintMapper:
     @staticmethod
@@ -10,7 +10,7 @@ class SprintMapper:
             name=model.name,
             start_date=model.start_date,
             end_date=model.end_date,
-            project_id=str(model.project.id) if model.project else None
+            project_id=str(model.project.id) if model.project else None,
         )
 
         # Populate task ids
@@ -19,7 +19,7 @@ class SprintMapper:
         return sprint
 
     @staticmethod
-    def to_orm(sprint: SprintBase, model: Optional[SprintModel] = None) -> SprintModel:
+    def to_orm(sprint: SprintBase, model: SprintModel | None = None) -> SprintModel:
         if model is None:
             model = SprintModel()
             model.id = sprint.get_id()

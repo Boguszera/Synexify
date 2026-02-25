@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+
 from domain.sprints.sprint_base import SprintBase
+
 
 class SprintRepository(ABC):
     @abstractmethod
-    def get_by_id(self, sprint_id: str) -> Optional[SprintBase]:
+    def get_by_id(self, sprint_id: str) -> SprintBase | None:
         pass
 
     @abstractmethod
@@ -16,5 +17,5 @@ class SprintRepository(ABC):
         pass
 
     @abstractmethod
-    def list_by_project(self, project_id: str) -> List[SprintBase]:
+    def list_by_project(self, project_id: str) -> list[SprintBase]:
         pass

@@ -1,9 +1,10 @@
 # application/attachment_service.py
 
-from domain.users.user_base import UserBase
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 from domain.attachments.attachment import Attachment
 from domain.exceptions.exceptions import PermissionDenied
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from domain.users.user_base import UserBase
 
 MAX_ATTACHMENTS = 10
 

@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+
 from domain.users.user_base import UserBase
+
 
 class UserRepository(ABC):
     @abstractmethod
-    def get_by_id(self, user_id: str) -> Optional[UserBase]:
+    def get_by_id(self, user_id: str) -> UserBase | None:
         pass
 
     @abstractmethod
-    def get_by_login(self, login: str) -> Optional[UserBase]:
+    def get_by_login(self, login: str) -> UserBase | None:
         pass
 
     @abstractmethod
@@ -20,5 +21,5 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def list_all(self) -> List[UserBase]:
+    def list_all(self) -> list[UserBase]:
         pass

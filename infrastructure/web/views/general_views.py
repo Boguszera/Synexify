@@ -1,5 +1,6 @@
-from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+
 from infrastructure.orm.models.notification_model import NotificationModel
 
 
@@ -10,12 +11,12 @@ def mark_notification_read(request, pk):
     notif.save()
 
     if notif.task_id:
-        return redirect('web:task_detail', pk=notif.task_id)
+        return redirect("web:task_detail", pk=notif.task_id)
 
-    return redirect('web:project_list')
+    return redirect("web:project_list")
 
 
 @login_required
 def clear_notifications(request):
     NotificationModel.objects.filter(user_id=request.user.id, is_read=False).update(is_read=True)
-    return redirect(request.META.get('HTTP_REFERER', 'web:project_list'))
+    return redirect(request.META.get("HTTP_REFERER", "web:project_list"))

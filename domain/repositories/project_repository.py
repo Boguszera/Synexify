@@ -1,10 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+
 from domain.projects.project_base import ProjectBase
+
 
 class ProjectRepository(ABC):
     @abstractmethod
-    def get_by_id(self, project_id: str) -> Optional[ProjectBase]:
+    def get_by_id(self, project_id: str) -> ProjectBase | None:
         pass
 
     @abstractmethod
@@ -16,5 +17,5 @@ class ProjectRepository(ABC):
         pass
 
     @abstractmethod
-    def list_all(self) -> List[ProjectBase]:
+    def list_all(self) -> list[ProjectBase]:
         pass

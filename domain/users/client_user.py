@@ -1,6 +1,7 @@
 # domain/users/client_user.py
 from .user_base import UserBase
 
+
 class ClientUser(UserBase):
     pass
 

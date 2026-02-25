@@ -1,6 +1,7 @@
 # domain/users/admin_user.py
 from .user_base import UserBase
 
+
 class AdminUser(UserBase):
     pass
 

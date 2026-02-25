@@ -2,6 +2,7 @@
 
 from rest_framework import serializers
 
+
 class SprintSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True, source="get_id")
     name = serializers.CharField(source="get_name")

@@ -1,10 +1,10 @@
-from datetime import datetime, timezone
-from typing import Optional, Any
 import uuid
+from datetime import UTC, datetime
+from typing import Any
 
 
 class Attachment:
-    def __init__(self, filename: str, uploaded_by: Any, attachment_id: Optional[str] = None):
+    def __init__(self, filename: str, uploaded_by: Any, attachment_id: str | None = None):
         if not filename or not filename.strip():
             raise ValueError("Filename cannot be empty")
 
@@ -12,12 +12,12 @@ class Attachment:
         self._filename: str = filename
         self._uploaded_by = uploaded_by
 
-        if uploaded_by and hasattr(uploaded_by, 'get_id'):
+        if uploaded_by and hasattr(uploaded_by, "get_id"):
             self._uploaded_by_id = str(uploaded_by.get_id())
         else:
             self._uploaded_by_id = None
 
-        self._uploaded_at = datetime.now(timezone.utc)
+        self._uploaded_at = datetime.now(UTC)
 
     def get_id(self) -> str:
         return self._id
@@ -28,7 +28,7 @@ class Attachment:
     def get_uploaded_by(self):
         return self._uploaded_by
 
-    def get_uploaded_by_id(self) -> Optional[str]:
+    def get_uploaded_by_id(self) -> str | None:
         return self._uploaded_by_id
 
     def get_uploaded_at(self) -> datetime:

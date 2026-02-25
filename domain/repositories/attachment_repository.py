@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
+
 from domain.attachments.attachment import Attachment
-from typing import Optional, List
 
 
 class AttachmentRepository(ABC):
     @abstractmethod
-    def get_by_id(self, attachment_id: str) -> Optional[Attachment]:
+    def get_by_id(self, attachment_id: str) -> Attachment | None:
         pass
 
     @abstractmethod
@@ -17,7 +17,7 @@ class AttachmentRepository(ABC):
         pass
 
     @abstractmethod
-    def list_by_task(self, task_id: str) -> List[Attachment]:
+    def list_by_task(self, task_id: str) -> list[Attachment]:
         pass
 
     @abstractmethod

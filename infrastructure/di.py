@@ -1,26 +1,24 @@
 # infrastructure/di.py
 # dependency injection
 from application.admin_panel_service import AdminPanelService
+from application.attachment_service import AttachmentService
+from application.authorization_service import AuthorizationService
 from application.backlog_service import BacklogService
+from application.comment_service import CommentService
 from application.notifications_service import NotificationsService
+from application.project_service import ProjectService
 from application.reporting_service import ReportingService
 from application.sprint_service import SprintService
-from application.task_service import TaskService
-from application.authorization_service import AuthorizationService
-from application.project_service import ProjectService
-from application.comment_service import CommentService
-from application.attachment_service import AttachmentService
 from application.tag_service import TagService
-
-from infrastructure.repositories.user_django_repository import UserDjangoRepository
-from infrastructure.repositories.project_django_repository import ProjectDjangoRepository
-from infrastructure.repositories.task_django_repository import TaskDjangoRepository
-from infrastructure.repositories.sprint_django_repository import SprintDjangoRepository
-from infrastructure.repositories.comment_django_repository import CommentDjangoRepository
+from application.task_service import TaskService
 from infrastructure.repositories.attachment_django_repository import AttachmentDjangoRepository
+from infrastructure.repositories.comment_django_repository import CommentDjangoRepository
+from infrastructure.repositories.project_django_repository import ProjectDjangoRepository
+from infrastructure.repositories.sprint_django_repository import SprintDjangoRepository
 from infrastructure.repositories.tag_django_repository import TagDjangoRepository
+from infrastructure.repositories.task_django_repository import TaskDjangoRepository
+from infrastructure.repositories.user_django_repository import UserDjangoRepository
 
-from infrastructure.orm.models.notification_model import NotificationModel
 
 class Container:
     def __init__(self):
@@ -37,23 +35,20 @@ class Container:
         self.auth = AuthorizationService()
 
         # APPLICATION SERVICES
-        self.project_service = ProjectService(
-            auth_service=self.auth,
-            project_repo=self.project_repo
-        )
+        self.project_service = ProjectService(auth_service=self.auth, project_repo=self.project_repo)
 
         self.comments = CommentService(self.auth, self.comment_repo, self.task_repo, self.user_repo)
         self.attachments = AttachmentService(self.auth, self.attachment_repo, self.task_repo)
 
         self.admin_panel = AdminPanelService(
-            auth_service=self.auth,
-            user_repo=self.user_repo,
-            project_repo=self.project_repo
+            auth_service=self.auth, user_repo=self.user_repo, project_repo=self.project_repo
         )
 
         self.backlog = BacklogService(auth_service=self.auth, task_repo=self.task_repo, sprint_repo=self.sprint_repo)
         self.notifications = NotificationsService(task_repo=self.task_repo, user_repo=self.user_repo)
-        self.reporting = ReportingService(auth_service=self.auth, task_repo=self.task_repo, project_repo=self.project_repo, user_repo=self.user_repo)
+        self.reporting = ReportingService(
+            auth_service=self.auth, task_repo=self.task_repo, project_repo=self.project_repo, user_repo=self.user_repo
+        )
 
         self.sprints = SprintService(
             auth_service=self.auth,

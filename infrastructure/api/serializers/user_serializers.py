@@ -1,24 +1,24 @@
 # infrastructure/api/serializers/user_serializers
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, BasePermission
-from infrastructure.api.serializers.domain_user_serializers import DomainUserSerializer
-from infrastructure.adapters.user_adapter import to_domain_user
+
 from domain.exceptions.exceptions import PermissionDenied
+from infrastructure.adapters.user_adapter import to_domain_user
+from infrastructure.api.serializers.domain_user_serializers import DomainUserSerializer
+
 
 class IsAdminUser(BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.user
-            and request.user.is_authenticated
-            and getattr(request.user, "role", None) == "admin"
-        )
+        return request.user and request.user.is_authenticated and getattr(request.user, "role", None) == "admin"
+
 
 class UserViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get_container(self):
         from infrastructure.di import Container
+
         return Container()
 
     def list(self, request):
@@ -33,7 +33,6 @@ class UserViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         container = self.get_container()
-        domain_user = to_domain_user(request.user)
         try:
             user = container.admin_panel.get_user_by_id(pk)
             if not user:
@@ -52,7 +51,7 @@ class UserViewSet(viewsets.ViewSet):
                 email=request.data.get("email"),
                 role=request.data.get("role"),
                 login=request.data.get("login"),
-                user=domain_user
+                user=domain_user,
             )
             serializer = DomainUserSerializer(user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

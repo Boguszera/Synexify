@@ -2,13 +2,13 @@
 
 from domain.exceptions.exceptions import PermissionDenied
 from domain.users.admin_user import AdminUser
-from domain.users.manager_user import ManagerUser
-from domain.users.team_member_user import  TeamMemberUser
 from domain.users.client_user import ClientUser
+from domain.users.manager_user import ManagerUser
+from domain.users.team_member_user import TeamMemberUser
 from domain.users.user_base import UserBase
 
-class AuthorizationService:
 
+class AuthorizationService:
     def can_edit_task(self, user: UserBase, task) -> bool:
         if isinstance(user, AdminUser) or isinstance(user, ManagerUser):
             return True
@@ -17,12 +17,12 @@ class AuthorizationService:
         return False
 
     def can_assign_task(self, user: UserBase, task) -> bool:
-        return isinstance(user, (AdminUser, ManagerUser))
+        return isinstance(user, AdminUser | ManagerUser)
 
     def can_view_project(self, user: UserBase, project) -> bool:
         if isinstance(user, AdminUser):
             return True
-        if isinstance(user, (ManagerUser, TeamMemberUser, ClientUser)):
+        if isinstance(user, ManagerUser | TeamMemberUser | ClientUser):
             return user.get_id() in project.get_member_ids()
         return False
 
@@ -51,4 +51,4 @@ class AuthorizationService:
             raise PermissionDenied(user.get_id(), action="manage_user", resource=target_user.get_id())
 
     def is_admin_or_manager(self, user: UserBase) -> bool:
-        return isinstance(user, (AdminUser, ManagerUser))
+        return isinstance(user, AdminUser | ManagerUser)

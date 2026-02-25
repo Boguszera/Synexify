@@ -1,14 +1,13 @@
+from domain.events.base_events import DomainEvent
 from domain.events.task_events import (
-    TaskStatusChangedEvent,
     TaskAssignedEvent,
     TaskCommentAddedEvent,
     TaskPriorityUpdatedEvent,
+    TaskStatusChangedEvent,
     TaskUnassignedEvent,
 )
-from domain.users.user_base import UserBase
-from domain.tasks.task_base import TaskBase
-from domain.events.base_events import DomainEvent
 from infrastructure.orm.models.notification_model import NotificationModel
+
 
 class NotificationsService:
     def __init__(self, task_repo, user_repo):
@@ -37,7 +36,7 @@ class NotificationsService:
                 user,
                 task,
                 event.get_event_name(),
-                extra_data={"old_status": event.old_status, "new_status": event.new_status}
+                extra_data={"old_status": event.old_status, "new_status": event.new_status},
             )
 
     def _notify_task_assigned(self, event: TaskAssignedEvent):
@@ -51,10 +50,7 @@ class NotificationsService:
 
         if user and task:
             self._send_notification(
-                user,
-                task,
-                event.get_event_name(),
-                extra_data={"unassigned_user_id": event.unassigned_user_id}
+                user, task, event.get_event_name(), extra_data={"unassigned_user_id": event.unassigned_user_id}
             )
 
     def _notify_task_comment_added(self, event: TaskCommentAddedEvent):
@@ -68,7 +64,7 @@ class NotificationsService:
                 user,
                 task,
                 event.get_event_name(),
-                extra_data={"comment_id": event.comment_id, "commenter_id": commenter.get_id()}
+                extra_data={"comment_id": event.comment_id, "commenter_id": commenter.get_id()},
             )
 
     def _notify_task_priority_updated(self, event: TaskPriorityUpdatedEvent):
@@ -79,7 +75,7 @@ class NotificationsService:
                 user,
                 task,
                 event.get_event_name(),
-                extra_data={"old_priority": event.old_priority, "new_priority": event.new_priority}
+                extra_data={"old_priority": event.old_priority, "new_priority": event.new_priority},
             )
 
     def _send_notification(self, user, task, event_name: str, extra_data: dict = None):
@@ -95,10 +91,5 @@ class NotificationsService:
         elif event_name == "TaskCommentAdded":
             title = "New comment"
             message = f"Comment added in task: {task.get_title()}"
-        NotificationModel.objects.create(
-            user_id=user.get_id(),
-            task_id=task.get_id(),
-            title=title,
-            message=message
-        )
+        NotificationModel.objects.create(user_id=user.get_id(), task_id=task.get_id(), title=title, message=message)
         print(f"[NOTIFICATION SAVED] User: {user.get_email()} | Msg: {message}")

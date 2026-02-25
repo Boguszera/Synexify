@@ -1,4 +1,5 @@
-#infrastructure/api/permissions/sprint_permissions.py
+# infrastructure/api/permissions/sprint_permissions.py
+
 
 class SprintPermissions:
     @staticmethod

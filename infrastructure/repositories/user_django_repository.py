@@ -1,9 +1,9 @@
 # infrastructure/repositories/user_django_repository.py
-from infrastructure.orm.models.user_model import UserModel
 from infrastructure.adapters.user_adapter import to_domain_user
+from infrastructure.orm.models.user_model import UserModel
+
 
 class UserDjangoRepository:
-
     def _to_domain(self, orm_obj):
         return to_domain_user(orm_obj)
 
@@ -23,7 +23,6 @@ class UserDjangoRepository:
         return [self._to_domain(u) for u in UserModel.objects.all()]
 
     def save(self, domain_user, password=None):
-
         orm_user, created = UserModel.objects.update_or_create(
             id=domain_user.get_id(),
             defaults={
@@ -31,7 +30,7 @@ class UserDjangoRepository:
                 "email": domain_user.get_email(),
                 "name": domain_user.get_name(),
                 "role": domain_user.get_role(),
-            }
+            },
         )
 
         if password:

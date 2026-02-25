@@ -1,20 +1,21 @@
 # infrastructure/api/views/sprints.py
 
-from rest_framework import viewsets, status
-from rest_framework.response import Response
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from infrastructure.api.serializers.sprint_serializers import SprintSerializer
-from infrastructure.adapters.user_adapter import to_domain_user
-from infrastructure.api.permissions.sprint_permissions import SprintPermissions
-from infrastructure.api.permissions.project_permissions import ProjectPermissions
-from infrastructure.api.serializers.task_serializers import TaskSerializer
+from rest_framework.response import Response
+
 from domain.exceptions.exceptions import PermissionDenied
+from infrastructure.adapters.user_adapter import to_domain_user
+from infrastructure.api.permissions.project_permissions import ProjectPermissions
+from infrastructure.api.permissions.sprint_permissions import SprintPermissions
+from infrastructure.api.serializers.sprint_serializers import SprintSerializer
+from infrastructure.api.serializers.task_serializers import TaskSerializer
+
 
 class SprintViewSet(viewsets.ViewSet):
-    """CRUD Sprint"""
-
     def get_container(self):
         from infrastructure.di import Container
+
         return Container()
 
     def list(self, request):
@@ -26,7 +27,6 @@ class SprintViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         container = self.get_container()
-        domain_user = to_domain_user(request.user)
         sprint = container.sprints.get_sprint(pk)
         if not sprint:
             return Response({"detail": "Not found"}, status=404)
@@ -44,7 +44,7 @@ class SprintViewSet(viewsets.ViewSet):
             name=request.data["name"],
             start_date=request.data["start_date"],
             end_date=request.data["end_date"],
-            user=domain_user
+            user=domain_user,
         )
         serializer = SprintSerializer(sprint)
         return Response(serializer.data, status=201)
@@ -60,9 +60,9 @@ class SprintViewSet(viewsets.ViewSet):
             {
                 "name": request.data.get("name", sprint.get_name()),
                 "start_date": request.data.get("start_date", getattr(sprint, "_start_date", None)),
-                "end_date": request.data.get("end_date", getattr(sprint, "_end_date", None))
+                "end_date": request.data.get("end_date", getattr(sprint, "_end_date", None)),
             },
-            user=domain_user
+            user=domain_user,
         )
         serializer = SprintSerializer(updated_sprint)
         return Response(serializer.data)
@@ -78,10 +78,7 @@ class SprintViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=["post"])
     def add_task(self, request, pk=None):
-        """
-        POST /api/sprints/{id}/add_task/
-        Body: {"task_id": "uuid"}
-        """
+        # POST /api/sprints/{id}/add_task/
         container = self.get_container()
         domain_user = to_domain_user(request.user)
 
@@ -107,10 +104,7 @@ class SprintViewSet(viewsets.ViewSet):
 
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
-        """
-        GET /api/sprints/{id}/tasks/
-        Dodano weryfikację uprawnień opartą na dostępie do projektu.
-        """
+        # GET /api/sprints/{id}/tasks/
         container = self.get_container()
         domain_user = to_domain_user(request.user)
 
@@ -123,8 +117,10 @@ class SprintViewSet(viewsets.ViewSet):
             return Response({"detail": "Project not found for this sprint"}, status=status.HTTP_404_NOT_FOUND)
 
         if not ProjectPermissions.can_view(domain_user, project):
-            return Response({"detail": "Forbidden: User cannot view tasks in this project's sprint"},
-                            status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"detail": "Forbidden: User cannot view tasks in this project's sprint"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         tasks = container.tasks.task_repo.list_by_sprint(pk)
         serializer = TaskSerializer(tasks, many=True)
