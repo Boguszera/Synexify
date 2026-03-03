@@ -31,3 +31,8 @@ media/
 pytest.ini
 tests/
 migrations/
+db.sqlite3
+synexify.egg-info/
+*.egg-info/
+htmlcov/
+.coverage
