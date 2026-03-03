@@ -29,5 +29,7 @@ full_test_api.sh
 
 media/
 pytest.ini
-tests/
 migrations/
+db.sqlite3
+.coverage
+htmlcov/
