@@ -113,6 +113,12 @@ class TaskBase(Assignable, Commentable):
     def set_sprint_id(self, sprint_id: str):
         self._sprint_id = sprint_id
 
+    def set_title(self, title: str):
+        self._title = title
+
+    def set_description(self, description: str):
+        self._description = description
+
     # domain events accessor
     def pull_domain_events(self):
         events = list(self._domain_events)

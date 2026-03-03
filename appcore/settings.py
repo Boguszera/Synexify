@@ -3,6 +3,7 @@ import os
 from datetime import timedelta
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 INSTALLED_APPS = [
@@ -69,9 +70,29 @@ AUTHENTICATION_BACKENDS = [
     "infrastructure.api.auth.login_backend.LoginBackend",
 ]
 
-load_dotenv()
+env_path = BASE_DIR / ".env"
+if env_path.exists():
+    load_dotenv(dotenv_path=env_path)
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+
+def get_env_var(var_name: str) -> str:
+    value = os.getenv(var_name)
+    if not value:
+        # To nam powie, gdzie jesteśmy i co widzi Python
+        current_path = os.getcwd()
+        env_exists = os.path.exists(str(BASE_DIR / ".env"))
+        files_in_base = os.listdir(str(BASE_DIR)) if os.path.exists(str(BASE_DIR)) else "BASE_DIR_NOT_FOUND"
+
+        error_msg = (
+            f"Variable {var_name} missing! "
+            f"PWD: {current_path}, "
+            f"BASE_DIR: {BASE_DIR}, "
+            f"Env file exists: {env_exists}, "
+            f"Files in BASE_DIR: {files_in_base}"
+        )
+        raise ImproperlyConfigured(error_msg)
+    return value
+
 
 LOGIN_URL = "web:login"
 LOGIN_REDIRECT_URL = "web:project_list"
@@ -83,12 +104,12 @@ ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h]
 
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.getenv("DB_NAME", BASE_DIR / "db.sqlite3"),
-        "USER": os.getenv("DB_USER", ""),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", ""),
-        "PORT": os.getenv("DB_PORT", ""),
+        "ENGINE": get_env_var("DB_ENGINE"),
+        "NAME": get_env_var("DB_NAME"),
+        "USER": get_env_var("DB_USER"),
+        "PASSWORD": get_env_var("DB_PASSWORD"),
+        "HOST": get_env_var("DB_HOST"),
+        "PORT": get_env_var("DB_PORT"),
     }
 }
 
@@ -113,4 +134,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
+SECRET_KEY = get_env_var("SECRET_KEY")
+if not SECRET_KEY:
+    raise ImproperlyConfigured("The SECRET_KEY environment variable is missing! Make sure the .env file is loaded.")

@@ -61,7 +61,7 @@ class TaskViewSet(viewsets.ViewSet):
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def update(self, request, pk=None):
+    def partial_update(self, request, pk=None):
         container = self.get_container()
         try:
             domain_user = to_domain_user(request.user)
@@ -107,7 +107,7 @@ class TaskViewSet(viewsets.ViewSet):
             return Response({"detail": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
 
         project = container.project_service.get_project(task.get_project_id())
-        if not project or not container.auth.eeecan_view_project(domain_user, project):
+        if not project or not container.auth.can_view_project(domain_user, project):
             return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
 
         comments = container.comments.list_comments_for_task(pk, domain_user)
@@ -127,7 +127,6 @@ class TaskViewSet(viewsets.ViewSet):
         except PermissionDenied as e:
             return Response({"detail": str(e)}, status=status.HTTP_403_FORBIDDEN)
         except Exception as e:
-            # Pokaż błąd I/O w konsoli, aby zdebugować problem z uprawnieniami/ścieżką
             print(f"FATAL UPLOAD ERROR: {type(e).__name__} - {e}")
             return Response(
                 {"detail": f"Internal Server Error during upload: {type(e).__name__}"},
@@ -138,6 +137,8 @@ class TaskViewSet(viewsets.ViewSet):
     def attachments(self, request, pk=None):
         container = self.get_container()
         task = container.tasks.task_repo.get_by_id(pk)
+        if not task:
+            return Response({"detail": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
         attachments = [container.tasks.get_attachment_by_id(aid) for aid in task.get_attachment_ids()]
         serializer = AttachmentSerializer(attachments, many=True)
         return Response(serializer.data)
