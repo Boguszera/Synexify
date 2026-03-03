@@ -7,19 +7,19 @@ from infrastructure.orm.models.project_model import ProjectModel
 from infrastructure.orm.models.task_model import TaskModel
 
 
-@pytest.fixture
+@pytest.fixture()
 def project_with_member(manager_user):
     project = baker.make(ProjectModel)
     project.members.add(manager_user)
     return project
 
 
-@pytest.fixture
+@pytest.fixture()
 def task_in_project(project_with_member):
     return baker.make(TaskModel, project=project_with_member)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestNestedCommentViewSet:
     def test_list_comments_for_task_returns_200(self, auth_client, manager_user, task_in_project):
         client = auth_client(manager_user)

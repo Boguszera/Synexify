@@ -8,19 +8,19 @@ from infrastructure.orm.models.project_model import ProjectModel
 from infrastructure.orm.models.task_model import TaskModel
 
 
-@pytest.fixture
+@pytest.fixture()
 def project_with_member(manager_user):
     project = baker.make(ProjectModel)
     project.members.add(manager_user)
     return project
 
 
-@pytest.fixture
+@pytest.fixture()
 def task_in_project(project_with_member):
     return baker.make(TaskModel, project=project_with_member)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskViewSetList:
     def test_list_tasks_returns_200(self, auth_client, manager_user):
         client = auth_client(manager_user)
@@ -39,7 +39,7 @@ class TestTaskViewSetList:
         assert response.status_code == 401
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskViewSetCreate:
     def test_create_task_returns_201(self, auth_client, manager_user, project_with_member):
         client = auth_client(manager_user)
@@ -59,7 +59,7 @@ class TestTaskViewSetCreate:
         assert response.status_code == 401
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskViewSetRetrieve:
     def test_get_task_returns_200(self, auth_client, manager_user, task_in_project):
         client = auth_client(manager_user)
@@ -73,7 +73,7 @@ class TestTaskViewSetRetrieve:
         assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskViewSetUpdate:
     def test_patch_task_returns_200(self, auth_client, manager_user, task_in_project):
         client = auth_client(manager_user)
@@ -81,7 +81,7 @@ class TestTaskViewSetUpdate:
         assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskViewSetDelete:
     def test_delete_task_returns_204(self, auth_client, manager_user, task_in_project):
         client = auth_client(manager_user)
@@ -89,13 +89,16 @@ class TestTaskViewSetDelete:
         assert response.status_code == 204
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskAssign:
     def test_assign_task_with_assignee_id_returns_200(
         self, auth_client, manager_user, team_member_user, task_in_project
     ):
         client = auth_client(manager_user)
-        response = client.patch(f"/api/tasks/{task_in_project.id}/assign/", {"assignee_id": str(team_member_user.id)})
+        response = client.patch(
+            f"/api/tasks/{task_in_project.id}/assign/",
+            {"assignee_id": str(team_member_user.id)},
+        )
         assert response.status_code == 200
 
     def test_assign_task_without_assignee_id_returns_400(self, auth_client, manager_user, task_in_project):
@@ -104,7 +107,7 @@ class TestTaskAssign:
         assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskCommentActions:
     def test_add_comment_returns_201(self, auth_client, manager_user, task_in_project):
         client = auth_client(manager_user)
@@ -117,12 +120,16 @@ class TestTaskCommentActions:
         assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskAttachmentActions:
     def test_add_attachment_returns_201(self, auth_client, manager_user, task_in_project):
         client = auth_client(manager_user)
         file = SimpleUploadedFile("test.txt", b"file content", content_type="text/plain")
-        response = client.post(f"/api/tasks/{task_in_project.id}/add_attachment/", {"file": file}, format="multipart")
+        response = client.post(
+            f"/api/tasks/{task_in_project.id}/add_attachment/",
+            {"file": file},
+            format="multipart",
+        )
         assert response.status_code == 201
         assert response.data["filename"] == "test.txt"
 

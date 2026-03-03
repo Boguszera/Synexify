@@ -9,9 +9,9 @@ from infrastructure.orm.models.sprint_model import SprintModel
 from infrastructure.orm.models.task_model import TaskModel
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestSprintAndTaskFlow:
-    @pytest.fixture
+    @pytest.fixture()
     def project_env(self, manager_user):
         project = baker.make(ProjectModel)
         project.members.add(manager_user)

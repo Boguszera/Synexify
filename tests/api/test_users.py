@@ -5,7 +5,7 @@ import pytest
 from infrastructure.orm.models.user_model import UserModel
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestUserViewSetList:
     def test_list_users_as_admin_returns_200(self, auth_client, admin_user):
         client = auth_client(admin_user)
@@ -23,7 +23,7 @@ class TestUserViewSetList:
         assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestUserViewSetCreate:
     def test_create_user_as_admin_returns_201(self, auth_client, admin_user):
         client = auth_client(admin_user)
@@ -51,7 +51,7 @@ class TestUserViewSetCreate:
         assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestUserViewSetRetrieve:
     def test_get_user_as_admin_returns_200(self, auth_client, admin_user, manager_user):
         client = auth_client(admin_user)
@@ -71,7 +71,7 @@ class TestUserViewSetRetrieve:
         assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestUserViewSetUpdate:
     def test_update_user_as_admin_returns_200(self, auth_client, admin_user, manager_user):
         client = auth_client(admin_user)
@@ -86,7 +86,7 @@ class TestUserViewSetUpdate:
         assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestUserViewSetDelete:
     def test_delete_user_as_admin_returns_204(self, auth_client, admin_user):
         target = UserModel.objects.create_user(

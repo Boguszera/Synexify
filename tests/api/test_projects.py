@@ -6,7 +6,7 @@ from model_bakery import baker
 from infrastructure.orm.models.project_model import ProjectModel
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestProjectViewSetList:
     def test_list_projects_as_authenticated_user_returns_200(self, auth_client, admin_user):
         client = auth_client(admin_user)
@@ -25,7 +25,7 @@ class TestProjectViewSetList:
         assert str(project.id) in ids
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestProjectViewSetCreate:
     def test_create_project_as_manager_returns_201(self, auth_client, manager_user):
         client = auth_client(manager_user)
@@ -47,7 +47,7 @@ class TestProjectViewSetCreate:
         assert response.status_code == 201
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestProjectViewSetRetrieve:
     def test_get_project_as_member_returns_200(self, auth_client, manager_user):
         project = baker.make(ProjectModel)
@@ -76,7 +76,7 @@ class TestProjectViewSetRetrieve:
         assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestProjectViewSetUpdate:
     def test_patch_project_as_manager_member_returns_200(self, auth_client, manager_user):
         project = baker.make(ProjectModel)
@@ -92,7 +92,7 @@ class TestProjectViewSetUpdate:
         assert response.status_code == 403
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestProjectViewSetDelete:
     def test_delete_project_as_manager_member_returns_204(self, auth_client, manager_user):
         project = baker.make(ProjectModel)

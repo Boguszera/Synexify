@@ -2,7 +2,7 @@ import pytest
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestAuthLogin:
     def test_login_valid_credentials_returns_tokens(self, api_client, admin_user):
         data = {"login": "admin_user", "password": "password123"}
@@ -24,7 +24,7 @@ class TestAuthLogin:
         assert response.status_code == 401
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestAuthRefresh:
     def test_refresh_valid_token_returns_new_access(self, api_client, admin_user):
         refresh = RefreshToken.for_user(admin_user)
@@ -37,7 +37,7 @@ class TestAuthRefresh:
         assert response.status_code == 401
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestUnauthenticatedAccess:
     def test_unauthenticated_request_to_protected_endpoint_returns_401(self, api_client):
         response = api_client.get("/api/users/")

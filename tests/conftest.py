@@ -5,12 +5,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from infrastructure.orm.models.user_model import UserModel
 
 
-@pytest.fixture
+@pytest.fixture()
 def api_client():
     return APIClient()
 
 
-@pytest.fixture
+@pytest.fixture()
 def admin_user(db):
     return UserModel.objects.create_user(
         login="admin_user",
@@ -21,7 +21,7 @@ def admin_user(db):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def manager_user(db):
     return UserModel.objects.create_user(
         login="manager_user",
@@ -32,7 +32,7 @@ def manager_user(db):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def team_member_user(db):
     return UserModel.objects.create_user(
         login="team_member_user",
@@ -43,7 +43,7 @@ def team_member_user(db):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def client_user(db):
     return UserModel.objects.create_user(
         login="client_user",
@@ -54,7 +54,7 @@ def client_user(db):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def other_user(db):
     return UserModel.objects.create_user(
         login="other_user",
@@ -65,7 +65,7 @@ def other_user(db):
     )
 
 
-@pytest.fixture
+@pytest.fixture()
 def auth_client():
     def _auth_client(user):
         refresh = RefreshToken.for_user(user)
@@ -77,7 +77,7 @@ def auth_client():
     return _auth_client
 
 
-@pytest.fixture
+@pytest.fixture()
 def auth_header_for():
     def _auth_header(user):
         refresh = RefreshToken.for_user(user)

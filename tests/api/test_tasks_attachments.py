@@ -6,9 +6,9 @@ from infrastructure.orm.models.project_model import ProjectModel
 from infrastructure.orm.models.task_model import TaskModel
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestTaskAttachments:
-    @pytest.fixture
+    @pytest.fixture()
     def setup_task(self, manager_user):
         project = baker.make(ProjectModel)
         project.members.add(manager_user)

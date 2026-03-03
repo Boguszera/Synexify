@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestDashboardView:
     def test_dashboard_authenticated_returns_200(self, auth_client, admin_user):
         client = auth_client(admin_user)

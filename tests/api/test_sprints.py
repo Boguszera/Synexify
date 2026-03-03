@@ -10,20 +10,25 @@ from infrastructure.orm.models.sprint_model import SprintModel
 from infrastructure.orm.models.task_model import TaskModel
 
 
-@pytest.fixture
+@pytest.fixture()
 def project_with_manager(manager_user):
     project = baker.make(ProjectModel)
     project.members.add(manager_user)
     return project
 
 
-@pytest.fixture
+@pytest.fixture()
 def sprint_in_project(project_with_manager):
     now = timezone.now()
-    return baker.make(SprintModel, project=project_with_manager, start_date=now, end_date=now + timedelta(days=14))
+    return baker.make(
+        SprintModel,
+        project=project_with_manager,
+        start_date=now,
+        end_date=now + timedelta(days=14),
+    )
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestSprintViewSetList:
     def test_list_sprints_returns_200(self, auth_client, manager_user):
         client = auth_client(manager_user)
@@ -32,7 +37,7 @@ class TestSprintViewSetList:
         assert isinstance(response.data, list)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestSprintViewSetCreate:
     def test_create_sprint_as_manager_member_returns_201(self, auth_client, manager_user, project_with_manager):
         client = auth_client(manager_user)
@@ -72,7 +77,7 @@ class TestSprintViewSetCreate:
         assert response.status_code == 401
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestSprintViewSetRetrieve:
     def test_get_sprint_returns_200(self, auth_client, manager_user, sprint_in_project):
         client = auth_client(manager_user)
@@ -86,7 +91,7 @@ class TestSprintViewSetRetrieve:
         assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestSprintViewSetUpdate:
     def test_patch_sprint_returns_200(self, auth_client, manager_user, sprint_in_project):
         client = auth_client(manager_user)
@@ -94,7 +99,7 @@ class TestSprintViewSetUpdate:
         assert response.status_code == 200
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestSprintViewSetDelete:
     def test_delete_sprint_returns_204(self, auth_client, manager_user, sprint_in_project):
         client = auth_client(manager_user)
@@ -108,7 +113,7 @@ class TestSprintViewSetDelete:
         assert response.status_code == 404
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestSprintAddTask:
     def test_add_task_to_sprint_returns_200(self, auth_client, manager_user, project_with_manager, sprint_in_project):
         task = baker.make(TaskModel, project=project_with_manager)
@@ -122,7 +127,7 @@ class TestSprintAddTask:
         assert response.status_code == 400
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestSprintTasks:
     def test_get_sprint_tasks_returns_200(self, auth_client, manager_user, sprint_in_project):
         client = auth_client(manager_user)
