@@ -22,15 +22,12 @@ venv/
 .mypy_cache
 
 sys
-infrastructure/orm/migrations/0001_initial.py
 
 create_users.sh
 full_test_api.sh
 
 media/
 pytest.ini
-tests/
-migrations/
 db.sqlite3
 synexify.egg-info/
 *.egg-info/
