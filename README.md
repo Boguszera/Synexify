@@ -4,7 +4,16 @@ Project Management System implemented in **Python** with **Domain-Driven Design 
 Supports projects, sprints, tasks, users, notifications, comments, attachments and reporting.
 
 ---
+## Preview
+<div align="center">
+  <p><b>Project Access Overview</b> – A clear list of all projects assigned to the current user.</p>
+  <img src="./assets/screenshots/projects.png" alt="Projects View" width="100%" style="max-width: 800px;">
 
+  <br> <p><b>Task Detailed View</b> - Domain-driven task attributes, comments, and attachments.</p>
+  <img src="./assets/screenshots/task.png" alt="Task View" width="100%" style="max-width: 800px;">
+</div>
+
+___
 ## Requirements
 
 * Docker ≥ 24
@@ -278,6 +287,11 @@ docker compose exec web ruff check .
 ```bash
 docker compose exec web black .
 ```
+
+### Run tests
+```bash
+docker compose exec web pytest
+```
 ---
 
 ## Troubleshooting
@@ -313,6 +327,7 @@ docker compose up --build
 - **Database**: PostgreSQL 16
 - **API**: Django REST Framework with JWT
 - **Code Quality**: Ruff (Linter) & Black (Formatter)
+- **Tests**: Pytest
 - **Architecture**: Domain-Driven Design (DDD)
 - **Containerization**: Docker & Docker Compose
 - **Frontend**: Bootstrap 5
@@ -334,7 +349,7 @@ This project follows **Domain-Driven Design (DDD)**:
 
 ## License
 
-MIT License - See LICENSE file for details
+Apache License 2.0 - See LICENSE file for details
 
 ---
 
@@ -351,4 +366,4 @@ For issues and questions:
 
 **Boguszera** - Project Creator
 
----
+---**~~
