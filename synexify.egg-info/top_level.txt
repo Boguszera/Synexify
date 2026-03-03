@@ -1,0 +1,4 @@
+appcore
+application
+domain
+infrastructure
