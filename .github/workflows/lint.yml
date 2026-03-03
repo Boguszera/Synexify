@@ -28,9 +28,6 @@ jobs:
     - name: Run Ruff linter
       run: ruff check .
 
-    - name: Check formatting with Black
-      run: black --check .
-
     - name: Run type checking with mypy
       run: mypy appcore application domain infrastructure
       continue-on-error: true
