@@ -1,0 +1,28 @@
+[run]
+source =
+    appcore
+    application
+    domain
+    infrastructure
+
+# disabled files:
+omit =
+    */__init__.py
+    */asgi.py
+    */wsgi.py
+    manage.py
+    */apps.py
+    */migrations/*
+    */management/commands/*
+    */urls.py
+    appcore/settings.py
+
+[report]
+# ignored lines:
+exclude_lines =
+    pragma: no cover
+    def __str__
+    def __repr__
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    pass

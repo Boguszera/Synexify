@@ -3,6 +3,13 @@
 Project Management System implemented in **Python** with **Domain-Driven Design (DDD)** principles.
 Supports projects, sprints, tasks, users, notifications, comments, attachments and reporting.
 
+[![CI/CD Pipeline](https://github.com/boguszera/Synexify>/actions/workflows/ci.yml/badge.svg)](https://github.com/boguszera/Synexify/actions)
+[![codecov](https://codecov.io/github/Boguszera/Synexify/graph/badge.svg?token=K1RCGHF15B)](https://codecov.io/github/Boguszera/Synexify) <br>
+[![Code Style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg?logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/django-%23092E20.svg?logo=django&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgresql-4169e1?logo=postgresql&logoColor=white)
+
 ---
 ## Preview
 <div align="center">
@@ -267,7 +274,7 @@ docker compose logs -f db
 
 ### Code Quality (Linter & Formatter)
 
-This project uses **Ruff** for fast linting and **Black** for code formatting. To contribute to this project, you must install the git hooks locally:
+This project uses **Ruff** for fast linting and code formatting. To contribute to this project, you must install the git hooks locally:
 
 
 ```bash
@@ -365,5 +372,3 @@ For issues and questions:
 ## Author
 
 **Boguszera** - Project Creator
-
----**~~
