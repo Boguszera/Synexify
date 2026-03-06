@@ -1,5 +1,6 @@
 # appcore/settings.py
 import os
+import sys
 from datetime import timedelta
 from pathlib import Path
 
@@ -77,20 +78,8 @@ if env_path.exists():
 
 def get_env_var(var_name: str) -> str:
     value = os.getenv(var_name)
-    if not value:
-        # To nam powie, gdzie jesteśmy i co widzi Python
-        current_path = os.getcwd()
-        env_exists = os.path.exists(str(BASE_DIR / ".env"))
-        files_in_base = os.listdir(str(BASE_DIR)) if os.path.exists(str(BASE_DIR)) else "BASE_DIR_NOT_FOUND"
-
-        error_msg = (
-            f"Variable {var_name} missing! "
-            f"PWD: {current_path}, "
-            f"BASE_DIR: {BASE_DIR}, "
-            f"Env file exists: {env_exists}, "
-            f"Files in BASE_DIR: {files_in_base}"
-        )
-        raise ImproperlyConfigured(error_msg)
+    if value is None:
+        raise ImproperlyConfigured(f"Server configuration missing environment variable {var_name}")
     return value
 
 
@@ -112,6 +101,10 @@ DATABASES = {
         "PORT": get_env_var("DB_PORT"),
     }
 }
+
+# disable server cursors for pytest
+if "pytest" in sys.modules:
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {
