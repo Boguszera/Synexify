@@ -7,6 +7,7 @@ __pycache__/
 env/
 venv/
 .idea/
+build/
 
 # Env files
 .env
@@ -26,3 +27,5 @@ media/
 .coverage
 
 **/migrations/__pycache__/
+
+synexify.egg-info/

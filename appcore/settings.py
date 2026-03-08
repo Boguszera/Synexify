@@ -4,6 +4,7 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
@@ -91,16 +92,27 @@ LOGOUT_REDIRECT_URL = "web:login"
 DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h]
 
-DATABASES = {
-    "default": {
-        "ENGINE": get_env_var("DB_ENGINE"),
-        "NAME": get_env_var("DB_NAME"),
-        "USER": get_env_var("DB_USER"),
-        "PASSWORD": get_env_var("DB_PASSWORD"),
-        "HOST": get_env_var("DB_HOST"),
-        "PORT": get_env_var("DB_PORT"),
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": get_env_var("DB_ENGINE"),
+            "NAME": get_env_var("DB_NAME"),
+            "USER": get_env_var("DB_USER"),
+            "PASSWORD": get_env_var("DB_PASSWORD"),
+            "HOST": get_env_var("DB_HOST"),
+            "PORT": get_env_var("DB_PORT"),
+        }
+    }
 
 # disable server cursors for pytest
 if "pytest" in sys.modules:

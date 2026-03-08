@@ -3,12 +3,20 @@
 Project Management System implemented in **Python** with **Domain-Driven Design (DDD)** principles.
 Supports projects, sprints, tasks, users, notifications, comments, attachments and reporting.
 
-[![CI/CD Pipeline](https://github.com/boguszera/Synexify>/actions/workflows/ci.yml/badge.svg)](https://github.com/boguszera/Synexify/actions)
-[![codecov](https://codecov.io/github/Boguszera/Synexify/graph/badge.svg?token=K1RCGHF15B)](https://codecov.io/github/Boguszera/Synexify) <br>
+### Status & Quality
+[![CI/CD Pipeline](https://github.com/boguszera/Synexify/actions/workflows/ci.yml/badge.svg)](https://github.com/boguszera/Synexify/actions)
+[![codecov](https://codecov.io/github/Boguszera/Synexify/graph/badge.svg?token=K1RCGHF15B)](https://codecov.io/github/Boguszera/Synexify)
 [![Code Style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
+### 🛠️ Tech Stack
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg?logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/django-%23092E20.svg?logo=django&logoColor=white)
+
+#### `~~_**![DRF](https://img.shields.io/badge/django%20rest-framework-%23A30000.svg?logo=django&logoColor=white)**_~~`
+
 ![PostgreSQL](https://img.shields.io/badge/postgresql-4169e1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?logo=json-web-tokens&logoColor=white)
 
 ---
 ## Preview
@@ -288,11 +296,6 @@ pre-commit install
 ### Run linter checks
 ```bash
 docker compose exec web ruff check .
-```
-
-### Run auto-formatter
-```bash
-docker compose exec web black .
 ```
 
 ### Run tests

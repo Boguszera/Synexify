@@ -1,3 +1,7 @@
+# ===========================================================================
+# Dockerfile for production server
+# ===========================================================================
+
 # python base image
 FROM python:3.12-slim
 
@@ -10,12 +14,17 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# copy project files (including pyproject.toml)
+# copy configuration files
+COPY pyproject.toml ./
+
+# install project dependecies (production)
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir .
+
+# copy source code
 COPY . .
 
-# install project with all dependecies (production + dev + test)
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir .[all]
+EXPOSE 8000
 
 # default command (can be overridden by docker-compose)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "appcore.wsgi:application"]

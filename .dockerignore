@@ -1,0 +1,51 @@
+# =========================
+# git giles
+# =========================
+.git/
+.gitignore
+
+# =========================
+# 2. python and environment
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+
+# =========================
+# 3. docker
+# =========================
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# =========================
+# 4. CI/CD and github files
+# =========================
+.github/
+
+# =========================
+# 5. tests and linters
+# =========================
+tests/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coveragerc
+htmlcov/
+.pre-commit-config.yaml
+
+# =========================
+# 6. local files and documentation
+# =========================
+assets/
+README.md
+LICENSE
+.env
+.env.example
+wait-for-db.sh
+requirements.txt
