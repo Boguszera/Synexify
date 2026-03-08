@@ -8,12 +8,10 @@ Supports projects, sprints, tasks, users, notifications, comments, attachments a
 [![codecov](https://codecov.io/github/Boguszera/Synexify/graph/badge.svg?token=K1RCGHF15B)](https://codecov.io/github/Boguszera/Synexify)
 [![Code Style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-### 🛠️ Tech Stack
+### Tech Stack
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg?logo=python&logoColor=white)
 ![Django](https://img.shields.io/badge/django-%23092E20.svg?logo=django&logoColor=white)
-
-#### `~~_**![DRF](https://img.shields.io/badge/django%20rest-framework-%23A30000.svg?logo=django&logoColor=white)**_~~`
-
+![DRF](https://img.shields.io/badge/django%20rest-framework-%23A30000.svg?logo=django&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-4169e1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?logo=json-web-tokens&logoColor=white)
@@ -215,27 +213,27 @@ GET /api/reports/velocity/         # Team velocity
 
 ## Key Features by Role
 
-### 👨‍💼 **Admin**
+### **Admin**
 - Manage all users
 - Manage all projects
 - Access all reports
 - System configuration
 
-### 👔 **Manager**
+### **Manager**
 - Create & manage projects
 - Plan sprints
 - Assign tasks
 - View team workload
 - Generate reports
 
-### 👨‍💻 **Developer**
+### **Developer**
 - View assigned tasks
 - Update task status
 - Add comments
 - Upload attachments
 - Track progress
 
-### 👥 **Client**
+### **Client**
 - View assigned projects
 - Track progress
 - Add comments
