@@ -92,6 +92,13 @@ LOGOUT_REDIRECT_URL = "web:login"
 DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://synexify.app",
+    "https://www.synexify.app",
+]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if DATABASE_URL:
