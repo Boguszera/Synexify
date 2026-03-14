@@ -21,7 +21,7 @@ jobs:
           pip install .[all]
       - name: Flush and Seed
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
           SECRET_KEY: "dummy-key-for-manage-py"
         run: |
           python manage.py flush --no-input
