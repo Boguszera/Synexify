@@ -1,0 +1,28 @@
+name: Scheduled Database Reset
+
+on:
+  schedule:
+    - cron: '0 */3 * * *' # Run every 3 hours
+  workflow_dispatch:      # Allow run script manually (GH Actions)
+
+jobs:
+  reset-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install all dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[all]
+      - name: Flush and Seed
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SECRET_KEY: "dummy-key-for-manage-py"
+        run: |
+          python manage.py flush --no-input
+          python manage.py seed
