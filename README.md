@@ -4,7 +4,8 @@ Project Management System implemented in **Python** with **Domain-Driven Design 
 Supports projects, sprints, tasks, users, notifications, comments, attachments and reporting.
 
 ### Status & Quality
-[![CI/CD Pipeline](https://github.com/boguszera/Synexify/actions/workflows/ci.yml/badge.svg)](https://github.com/boguszera/Synexify/actions)
+[![CI/CD Pipeline](https://github.com/boguszera/Synexify/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/boguszera/Synexify/actions)
+[![Azure Container Apps](https://img.shields.io/badge/Deploy-Azure_Container_Apps-0078D4?logo=microsoft-azure)](https://synexify.app)
 [![codecov](https://codecov.io/github/Boguszera/Synexify/graph/badge.svg?token=K1RCGHF15B)](https://codecov.io/github/Boguszera/Synexify)
 [![Code Style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
@@ -15,7 +16,13 @@ Supports projects, sprints, tasks, users, notifications, comments, attachments a
 ![PostgreSQL](https://img.shields.io/badge/postgresql-4169e1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-black?logo=json-web-tokens&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/github%20actions-%232088FF.svg?logo=githubactions&logoColor=white)
+![Microsoft Azure](https://img.shields.io/badge/azure-%230078D4.svg?logo=microsoftazure&logoColor=white)
 
+## Live Demo
+The application is deployed on Azure Cloud and ready for testing. The database **resets automatically every 3 hours**.
+* **Link:** [synexify.app](https://synexify.app)
+* **Login:** We’ve implemented one-click persona-based login (One-Click Persona Login). No need to enter passwords—just click the link and select a role (Admin, Manager, Developer) to test the RBAC system immediately.
 ---
 ## Preview
 <div align="center">
@@ -26,6 +33,19 @@ Supports projects, sprints, tasks, users, notifications, comments, attachments a
   <img src="./assets/screenshots/task.png" alt="Task View" width="100%" style="max-width: 800px;">
 </div>
 
+---
+## Architecture Principles
+
+This project follows **Domain-Driven Design (DDD)**:
+
+- **Domain Layer** (`domain/`) - Pure business logic
+- **Application Layer** (`application/`) - Use cases and Application Services
+- **Infrastructure Layer** (`infrastructure/`) - Technical implementation
+- **Presentation Layer** (`api/`, `web/`) - User interfaces
+
+*Note: The standard Django Admin Panel has been deliberately disabled to prevent bypassing the Domain Layer and direct ORM manipulation.*
+
+---
 ___
 ## Requirements
 
@@ -326,32 +346,6 @@ docker compose exec web chmod -R 755 /app/media/
 docker compose down -v  # Remove all volumes
 docker compose up --build
 ```
-
----
-
-## Technology Stack
-
-- **Backend**: Django 5.2, Python 3.12
-- **Database**: PostgreSQL 16
-- **API**: Django REST Framework with JWT
-- **Code Quality**: Ruff (Linter) & Black (Formatter)
-- **Tests**: Pytest
-- **Architecture**: Domain-Driven Design (DDD)
-- **Containerization**: Docker & Docker Compose
-- **Frontend**: Bootstrap 5
-
----
-
-## Architecture Principles
-
-This project follows **Domain-Driven Design (DDD)**:
-
-- **Domain Layer** (`domain/`) - Pure business logic
-- **Application Layer** (`application/`) - Use cases and Application Services
-- **Infrastructure Layer** (`infrastructure/`) - Technical implementation
-- **Presentation Layer** (`api/`, `web/`) - User interfaces
-
-*Note: The standard Django Admin Panel has been deliberately disabled to prevent bypassing the Domain Layer and direct ORM manipulation.*
 
 ---
 

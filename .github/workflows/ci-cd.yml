@@ -1,4 +1,4 @@
-name: CI - Lint, Type Check, Test, Security
+name: CI/CD Pipeline
 
 on:
   push:
