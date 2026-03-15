@@ -1,3 +1,5 @@
+from django.conf import settings
+
 from infrastructure.orm.models.notification_model import NotificationModel
 
 
@@ -11,3 +13,7 @@ def user_notifications(request):
 
         return {"notifications_list": notifications, "notifications_count": count}
     return {"notifications_list": [], "notifications_count": 0}
+
+
+def demo_mode(request):
+    return {"DEMO_MODE": getattr(settings, "DEMO_MODE", False)}

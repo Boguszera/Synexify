@@ -49,6 +49,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "infrastructure.web.context_processors.user_notifications",
+                "infrastructure.web.context_processors.demo_mode",
             ],
         },
     },
@@ -91,6 +92,7 @@ LOGOUT_REDIRECT_URL = "web:login"
 # dynamic loading of environment variables - if key doesn't exist: default value
 DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h]
+DEMO_MODE = os.getenv("DEMO_MODE", "False") == "True"
 
 CSRF_TRUSTED_ORIGINS = [
     "https://synexify.app",

@@ -1,12 +1,12 @@
-<!-- # infrastructure/web/templates/web/auth/login.html -->
-
 {% extends "layouts/base.html" %}
 
 {% block title %}Login - Synexify{% endblock %}
 
 {% block content %}
+    <div class="container">
 <div class="row justify-content-center mt-5">
-    <div class="col-md-4">
+    <div class="col-md-5">
+
         <div class="card shadow">
             <div class="card-header bg-primary text-white text-center">
                 <h4>Log in</h4>
@@ -40,6 +40,53 @@
                 <small>Synexify Project Manager</small>
             </div>
         </div>
+
+{% if DEMO_MODE %}
+        <div class="card shadow mt-4 border-info">
+            <div class="card-header bg-info text-white text-center">
+                <h5 class="mb-0">🚀 Live Demo </h5>
+            </div>
+            <div class="card-body text-center p-4">
+                <p class="small text-muted mb-4">
+                    Baza danych jest w stanie nienaruszalnym. Zaimplementowano zautomatyzowany mechanizm <strong>resetujący środowisko co 3 godziny</strong>. Przetestuj Role-Based Access Control (RBAC), klikając w wybraną rolę:
+                </p>
+
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+                    <form method="POST" action="{% url 'web:login' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="login" value="admin2">
+                        <input type="hidden" name="password" value="demo123">
+
+                        <input type="text" name="website_url_honeypot" tabindex="-1" autocomplete="off" style="opacity: 0; position: absolute; top: 0; left: -9999px; z-index: -1;">
+
+                        <button type="submit" class="btn btn-danger shadow-sm">👑 Admin</button>
+                    </form>
+
+                    <form method="POST" action="{% url 'web:login' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="login" value="manager1">
+                        <input type="hidden" name="password" value="demo123">
+
+                        <input type="text" name="website_url_honeypot" tabindex="-1" autocomplete="off" style="opacity: 0; position: absolute; top: 0; left: -9999px; z-index: -1;">
+
+                        <button type="submit" class="btn btn-warning text-dark shadow-sm">📊 Manager</button>
+                    </form>
+
+                    <form method="POST" action="{% url 'web:login' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="login" value="dev1">
+                        <input type="hidden" name="password" value="demo123">
+
+                        <input type="text" name="website_url_honeypot" tabindex="-1" autocomplete="off" style="opacity: 0; position: absolute; top: 0; left: -9999px; z-index: -1;">
+
+                        <button type="submit" class="btn btn-success shadow-sm">👤 Developer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
+    </div>
 {% endblock %}

@@ -1,10 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect, render
 
 
 def login_view(request):
     if request.method == "POST":
+        if request.POST.get("website_url_honeypot"):
+            return HttpResponseForbidden("Invalid request.")
+
         login_str = request.POST.get("login")
         password = request.POST.get("password")
 
