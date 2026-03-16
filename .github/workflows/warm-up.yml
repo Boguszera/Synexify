@@ -1,5 +1,6 @@
 name: Synexify Smart Warm-up
 on:
+  workflow_dispatch:  
   schedule:
     - cron: '*/15 8-17 * * 1-6'
 
