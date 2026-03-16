@@ -1,0 +1,14 @@
+name: Synexify Smart Warm-up
+on:
+  schedule:
+    - cron: '*/15 8-17 * * 1-6'
+
+jobs:
+  ping-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Poke Synexify (Office Hours)
+        run: |
+          curl -I -s --connect-timeout 60 --max-time 90 \
+          -A "Mozilla/5.0 (GitHubAction-SmartWarmUp)" \
+          https://synexify.app
