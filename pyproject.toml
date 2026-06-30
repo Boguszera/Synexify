@@ -11,8 +11,8 @@ requires-python = ">=3.10"
 license = "MIT"
 
 dependencies = [
-    "Django>=6.0rc1",
-    "djangorestframework>=3.15",
+    "Django>=5.0,<5.2",
+    "djangorestframework>=3.15.2",
     "djangorestframework-simplejwt",
     "python-dotenv>=1.0",
     "psycopg2-binary>=2.9",
