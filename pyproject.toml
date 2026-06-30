@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = "MIT"
 
 dependencies = [
-    "Django>=5.0,<5.2",
+    "Django>=5.0,<5.1",
     "djangorestframework>=3.15.2",
     "djangorestframework-simplejwt",
     "python-dotenv>=1.0",
@@ -19,7 +19,6 @@ dependencies = [
     "dj-database-url>=2.1",
     "gunicorn>=21.2",
 ]
-
 [project.optional-dependencies]
 # dependencies for development
 dev = [
